@@ -6,7 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
