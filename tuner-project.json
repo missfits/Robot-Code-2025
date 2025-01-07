@@ -1,0 +1,182 @@
+{
+    "Version": "1.0.0.0",
+    "LastState": 11,
+    "Modules": [
+        {
+            "ValidatedSteerId": 1,
+            "ValidatedDriveId": 2,
+            "ValidatedEncoderId": 3,
+            "IsEncoderOffsetConfigured": true,
+            "IsDeviceSelectionCompleted": true,
+            "IsConfigurationCompleted": true,
+            "ModuleName": "Front Left",
+            "ModuleId": 0,
+            "Encoder": {
+                "Id": 3,
+                "Name": "CANCoder 1e (Device ID 3)",
+                "Model": "CANCoder",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "SteerMotor": {
+                "Id": 1,
+                "Name": "Talon FX 1s (Device ID 1)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "DriveMotor": {
+                "Id": 2,
+                "Name": "Talon FX 1d (Device ID 2)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "IsSteerInverted": true,
+            "EncoderOffset": 0.25390625,
+            "DriveMotorSelectionState": 1,
+            "SteerMotorSelectionState": 1,
+            "SteerEncoderSelectionState": 1,
+            "IsModuleValidationComplete": true
+        },
+        {
+            "ValidatedSteerId": 10,
+            "ValidatedDriveId": 11,
+            "ValidatedEncoderId": 12,
+            "IsEncoderOffsetConfigured": true,
+            "IsDeviceSelectionCompleted": true,
+            "IsConfigurationCompleted": true,
+            "ModuleName": "Front Right",
+            "ModuleId": 1,
+            "Encoder": {
+                "Id": 12,
+                "Name": "CANCoder 4e (Device ID 12)",
+                "Model": "CANCoder",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "SteerMotor": {
+                "Id": 10,
+                "Name": "Talon FX 4s (Device ID 10)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "DriveMotor": {
+                "Id": 11,
+                "Name": "Talon FX 4d (Device ID 11)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "IsSteerInverted": true,
+            "EncoderOffset": 0.41064453125,
+            "DriveMotorSelectionState": 1,
+            "SteerMotorSelectionState": 1,
+            "SteerEncoderSelectionState": 1,
+            "IsModuleValidationComplete": true
+        },
+        {
+            "ValidatedSteerId": 4,
+            "ValidatedDriveId": 5,
+            "ValidatedEncoderId": 6,
+            "IsEncoderOffsetConfigured": true,
+            "IsDeviceSelectionCompleted": true,
+            "IsConfigurationCompleted": true,
+            "ModuleName": "Back Left",
+            "ModuleId": 2,
+            "Encoder": {
+                "Id": 6,
+                "Name": "CANCoder 2e (Device ID 6)",
+                "Model": "CANCoder",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "SteerMotor": {
+                "Id": 4,
+                "Name": "Talon FX 2s (Device ID 4)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "DriveMotor": {
+                "Id": 5,
+                "Name": "Talon FX 2d (Device ID 5)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "IsSteerInverted": true,
+            "EncoderOffset": -0.204833984375,
+            "DriveMotorSelectionState": 1,
+            "SteerMotorSelectionState": 1,
+            "SteerEncoderSelectionState": 1,
+            "IsModuleValidationComplete": true
+        },
+        {
+            "ValidatedSteerId": 7,
+            "ValidatedDriveId": 8,
+            "ValidatedEncoderId": 9,
+            "IsEncoderOffsetConfigured": true,
+            "IsDeviceSelectionCompleted": true,
+            "IsConfigurationCompleted": true,
+            "ModuleName": "Back Right",
+            "ModuleId": 3,
+            "Encoder": {
+                "Id": 9,
+                "Name": "CANCoder 3e (Device ID 9)",
+                "Model": "CANCoder",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "SteerMotor": {
+                "Id": 7,
+                "Name": "Talon FX 3s (Device ID 7)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "DriveMotor": {
+                "Id": 8,
+                "Name": "Talon FX 3d (Device ID 8)",
+                "Model": "Talon FX vers. C",
+                "CANbus": "rio",
+                "CANbusFriendly": ""
+            },
+            "IsSteerInverted": true,
+            "EncoderOffset": -0.335205078125,
+            "DriveMotorSelectionState": 1,
+            "SteerMotorSelectionState": 1,
+            "SteerEncoderSelectionState": 1,
+            "IsModuleValidationComplete": true
+        }
+    ],
+    "SwerveOptions": {
+        "IsValidConfiguration": true,
+        "Gyro": {
+            "Id": 13,
+            "Name": "Pigeon 2 (Device ID 13)",
+            "Model": "Pigeon 2 vers. S",
+            "CANbus": "rio",
+            "CANbusFriendly": ""
+        },
+        "IsValidGyroCANbus": true,
+        "VerticalTrackSizeInches": 20.25,
+        "HorizontalTrackSizeInches": 20.25,
+        "WheelRadiusInches": 2.0,
+        "IsLeftSideInverted": false,
+        "IsRightSideInverted": true,
+        "SwerveModuleType": 4,
+        "SwerveModuleConfiguration": {
+            "_CouplingRatio": 3.5714285714285716,
+            "_CustomName": "L2",
+            "SteerRatio": 21.428571428571427,
+            "Flipped": 4,
+            "DriveRatio": 6.746031746031747,
+            "CouplingRatio": 3.5714285714285716,
+            "CustomName": "L2"
+        },
+        "HasVerifiedSteer": true,
+        "HasVerifiedDrive": true
+    }
+}

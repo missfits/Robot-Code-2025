@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.0,
+      "y": 7.0
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "drive 1m, rotate 45 deg"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
