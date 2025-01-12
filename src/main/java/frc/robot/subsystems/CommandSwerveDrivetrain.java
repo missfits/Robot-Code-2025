@@ -99,8 +99,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             () -> getState().Speeds, // Supplier of current robot speeds. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> setControl(
                     m_pathApplyRobotSpeeds.withSpeeds(speeds)
-                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                        // .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                        // .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
                 ), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                     new PIDConstants(DrivetrainConstants.ROBOT_DRIVE_P, DrivetrainConstants.ROBOT_DRIVE_I, DrivetrainConstants.ROBOT_DRIVE_D), // Translation PID constants
