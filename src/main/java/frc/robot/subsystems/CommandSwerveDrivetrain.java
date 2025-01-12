@@ -137,7 +137,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     );
         
     /* The SysId routine to test */
-    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineRotation;
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
@@ -174,8 +174,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         // .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
                 ), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(DrivetrainConstants.ROBOT_DRIVE_P, DrivetrainConstants.ROBOT_DRIVE_I, DrivetrainConstants.ROBOT_DRIVE_D), // Translation PID constants
-                    new PIDConstants(DrivetrainConstants.ROBOT_STEER_P, DrivetrainConstants.ROBOT_STEER_I, DrivetrainConstants.ROBOT_STEER_D) // Rotation PID constants            
+                    new PIDConstants(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D), // Translation PID constants
+                    new PIDConstants(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D) // Rotation PID constants            
             ),
             config,
             () -> {

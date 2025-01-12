@@ -75,7 +75,7 @@ public class RobotContainer {
           .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
       }));
 
-    snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_STEER_P, DrivetrainConstants.ROBOT_STEER_I, DrivetrainConstants.ROBOT_STEER_D);
+    snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     snapToAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
     
     // snap to angle

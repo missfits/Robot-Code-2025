@@ -22,11 +22,11 @@ public final class Constants {
 
   public static class DrivetrainConstants {
     // Not tuned
-    public static final double ROBOT_STEER_P = 5;
-    public static final double ROBOT_STEER_I = 0;
-    public static final double ROBOT_STEER_D = 0;
-    public static final double ROBOT_DRIVE_P = 5;
-    public static final double ROBOT_DRIVE_I = 0;
-    public static final double ROBOT_DRIVE_D = 0;
+    public static final double ROBOT_ROTATION_P = 5;
+    public static final double ROBOT_ROTATION_I = 0;
+    public static final double ROBOT_ROTATION_D = 0;
+    public static final double ROBOT_POSITION_P = 5;
+    public static final double ROBOT_POSITION_I = 0;
+    public static final double ROBOT_POSITION_D = 0;
   }
 }
