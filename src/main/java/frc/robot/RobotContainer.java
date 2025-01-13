@@ -23,6 +23,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -39,6 +41,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LEDSubsystem;
 
 public class RobotContainer {
 
@@ -53,6 +56,8 @@ public class RobotContainer {
 
   
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
+  private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
+
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -77,7 +82,11 @@ public class RobotContainer {
 
     snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     snapToAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
-    
+    //set buttons to LED lights
+    // a to flash yellow
+    driverJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
+    driverJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
+
     // snap to angle
     driverJoystick.y().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(0))));
     driverJoystick.x().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(90))));
@@ -114,6 +123,7 @@ public class RobotContainer {
     // SignalLogger.start();
     
 
+  
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
     m_autoChooser = AutoBuilder.buildAutoChooser();
@@ -126,6 +136,7 @@ public class RobotContainer {
     compTab.add("Auto Chooser", m_autoChooser).withSize(3, 2);
 
     configureBindings();
+
   }
 
 
@@ -143,4 +154,5 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
   }
+
 }
