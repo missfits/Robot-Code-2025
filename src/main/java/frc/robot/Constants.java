@@ -27,4 +27,9 @@ public final class Constants {
     public static final double ROBOT_DRIVE_I = 0;
     public static final double ROBOT_DRIVE_D = 0;
   }
+  
+  public static class LEDConstants {
+    public static final int KPORT = 0;
+    public static final int KLENGTH = 30;
+  }
 }
