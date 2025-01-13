@@ -78,6 +78,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getStructTopic("drivetrain/pose", Pose2d.struct).publish();
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
+    // units are rotor rotations, which should be correct with voltage based control. 
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
             null,        // Use default ramp rate (1 V/s)
@@ -94,6 +95,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     );
 
     /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
+    // units are wheel rotations, which should be correct with voltage based control. 
     private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
         new SysIdRoutine.Config(
             null,        // Use default ramp rate (1 V/s)
