@@ -24,13 +24,17 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.setCoastDrivetrain();
+  }
 
   @Override
   public void disabledPeriodic() {}
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+    m_robotContainer.setBrakeDrivetrain();
+  }
 
   @Override
   public void autonomousInit() {
@@ -39,7 +43,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    
+
+    m_robotContainer.setBrakeDrivetrain();
   }
 
   @Override
@@ -53,6 +58,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    m_robotContainer.setBrakeDrivetrain();
   }
 
   @Override

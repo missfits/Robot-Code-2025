@@ -139,6 +139,15 @@ public class RobotContainer {
 
   }
 
+  // set all drivetrain motors to brake mode
+  public void setBrakeDrivetrain() {
+    drivetrain.setBrake(true);
+  }
+
+  // set all drivetrain motors to coast mode
+  public void setCoastDrivetrain() {
+    drivetrain.setBrake(true);
+  }
 
   private JoystickVals inputShape(double x, double y) {
     double hypot = Math.hypot(x, y);
