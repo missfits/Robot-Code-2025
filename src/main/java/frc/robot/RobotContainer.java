@@ -146,7 +146,7 @@ public class RobotContainer {
 
   // set all drivetrain motors to coast mode
   public void setCoastDrivetrain() {
-    drivetrain.setBrake(true);
+    drivetrain.setBrake(false);
   }
 
   private JoystickVals inputShape(double x, double y) {
