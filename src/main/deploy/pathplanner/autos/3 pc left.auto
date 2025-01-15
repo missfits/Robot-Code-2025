@@ -7,25 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1st center left"
+            "pathName": "left start to peg i"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "1st pickup left"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "peg i to left feed"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "score 1st pickup left"
+            "pathName": "left feed to peg L"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "peg L to left feed"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left feed to peg K"
           }
         }
       ]

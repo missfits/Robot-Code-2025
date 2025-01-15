@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right side start peg e"
+            "pathName": "right start peg E"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "peg e to right feed"
+            "pathName": "peg E to right feed"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "right feed to peg c"
+            "pathName": "right feed to peg C"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "peg c to feed"
+            "pathName": "peg C to feed"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "right feed to peg d"
+            "pathName": "right feed to peg D"
           }
         },
         {
