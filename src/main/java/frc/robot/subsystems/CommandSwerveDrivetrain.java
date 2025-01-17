@@ -239,7 +239,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     // sets all motors' neutral modes to coast (false) or brake (true)
     public void setBrake(boolean brake) {
-            this.configNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.configNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
 
     @Override
