@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -12,6 +13,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private Timer m_neutralModeTimer;
 
   @Override
   public void robotInit() {
@@ -25,15 +27,20 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    m_robotContainer.setCoastDrivetrain();
+    m_neutralModeTimer.start();
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // if 10 seconds have passed since disabling, set the neutral mode to coast
+    if (m_neutralModeTimer.get() > 10) {
+      m_robotContainer.setDisabledNeutralMode();
+    }
+  }
 
   @Override
   public void disabledExit() {
-    m_robotContainer.setBrakeDrivetrain();
+    m_robotContainer.setEnabledNeutralMode();
   }
 
   @Override
@@ -44,7 +51,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.schedule();
     }
 
-    m_robotContainer.setBrakeDrivetrain();
+    m_robotContainer.setEnabledNeutralMode();
   }
 
   @Override
@@ -59,7 +66,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    m_robotContainer.setBrakeDrivetrain();
+    m_robotContainer.setEnabledNeutralMode();
   }
 
   @Override

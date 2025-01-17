@@ -139,13 +139,13 @@ public class RobotContainer {
 
   }
 
-  // set all drivetrain motors to brake mode
-  public void setBrakeDrivetrain() {
+  // set motors to appropriate neutral modes for an enabled robot
+  public void setEnabledNeutralMode() {
     drivetrain.setBrake(true);
   }
 
-  // set all drivetrain motors to coast mode
-  public void setCoastDrivetrain() {
+  // set motors to appropriate neutral modes for an disabled robot
+  public void setDisabledNeutralMode() {
     drivetrain.setBrake(false);
   }
 
