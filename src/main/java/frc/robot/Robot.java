@@ -8,12 +8,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.RobotConstants;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private Timer m_neutralModeTimer;
+  private Timer m_neutralModeTimer = new Timer();
 
   @Override
   public void robotInit() {
@@ -32,8 +33,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    // if 10 seconds have passed since disabling, set the neutral mode to coast
-    if (m_neutralModeTimer.get() > 10) {
+    // if DISABLED_COAST_DELAY seconds have passed since disabling, set the neutral mode to coast
+    if (m_neutralModeTimer.get() > RobotConstants.DISABLED_COAST_DELAY) {
       m_robotContainer.setDisabledNeutralMode();
     }
   }
@@ -41,6 +42,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledExit() {
     m_robotContainer.setEnabledNeutralMode();
+    m_neutralModeTimer.reset();
   }
 
   @Override
