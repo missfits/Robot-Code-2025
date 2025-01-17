@@ -42,6 +42,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledExit() {
     m_robotContainer.setEnabledNeutralMode();
+    m_neutralModeTimer.stop();
     m_neutralModeTimer.reset();
   }
 
