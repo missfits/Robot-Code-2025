@@ -4,6 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+
+
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -33,5 +43,17 @@ public final class Constants {
   public static class LEDConstants {
     public static final int KPORT = 0;
     public static final int KLENGTH = 30;
+  }
+
+  public static class VisionConstants {
+    public static final String CAMERA_NAME = "Arducam_OV9782_USB_Camera";  
+
+    public static final Translation2d ROBOT_TO_CAM = 
+      new Translation2d(0, 0); // bogus
+    
+    public static final double CAMERA_HEIGHT = 0; // in meters, bogus
+    public static final double CAMERA_PITCH = 0; // in radians, bogus
+    public static final double TARGET_HEIGHT = 0.174625; // in meters to the bottom of tags on the reef 
+
   }
 }

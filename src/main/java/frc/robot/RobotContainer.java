@@ -42,6 +42,8 @@ import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.Vision;
+
 
 public class RobotContainer {
 
@@ -57,6 +59,7 @@ public class RobotContainer {
   
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
+  private final Vision m_vision = new Vision();
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
