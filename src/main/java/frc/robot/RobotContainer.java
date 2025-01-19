@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants.DrivetrainConstants;
@@ -42,7 +43,7 @@ import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.VisionSubsystem;
 
 
 public class RobotContainer {
@@ -59,7 +60,7 @@ public class RobotContainer {
   
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
-  private final Vision m_vision = new Vision();
+  private final VisionSubsystem m_vision = new VisionSubsystem();
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -89,6 +90,9 @@ public class RobotContainer {
     // a to flash yellow
     driverJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
     driverJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
+    
+    // run command runSolidGreen continuously if robot isWithinTarget()
+    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
 
     // snap to angle
     driverJoystick.y().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(0))));
