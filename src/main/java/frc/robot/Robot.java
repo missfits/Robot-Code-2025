@@ -36,14 +36,14 @@ public class Robot extends TimedRobot {
     // if DISABLED_COAST_DELAY seconds have passed since disabling, set the neutral mode to coast
     if (m_neutralModeTimer.get() > RobotConstants.DISABLED_COAST_DELAY) {
       m_robotContainer.setDisabledNeutralMode();
+      m_neutralModeTimer.stop();
+      m_neutralModeTimer.reset();
     }
   }
 
   @Override
   public void disabledExit() {
     m_robotContainer.setEnabledNeutralMode();
-    m_neutralModeTimer.stop();
-    m_neutralModeTimer.reset();
   }
 
   @Override
@@ -53,8 +53,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-
-    m_robotContainer.setEnabledNeutralMode();
   }
 
   @Override
@@ -68,8 +66,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
-    m_robotContainer.setEnabledNeutralMode();
   }
 
   @Override
