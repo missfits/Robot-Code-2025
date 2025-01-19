@@ -139,6 +139,15 @@ public class RobotContainer {
 
   }
 
+  // set motors to appropriate neutral modes for an enabled robot
+  public void setEnabledNeutralMode() {
+    drivetrain.setBrake(true);
+  }
+
+  // set motors to appropriate neutral modes for an disabled robot
+  public void setDisabledNeutralMode() {
+    drivetrain.setBrake(false);
+  }
 
   private JoystickVals inputShape(double x, double y) {
     double hypot = Math.hypot(x, y);
