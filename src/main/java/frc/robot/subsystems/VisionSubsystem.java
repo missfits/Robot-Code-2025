@@ -17,6 +17,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 
 
@@ -70,7 +71,7 @@ public class VisionSubsystem extends SubsystemBase {
         targetTranslation2d = 
           PhotonUtils.estimateCameraToTargetTranslation(
             targetDistanceMeters,              
-            Rotation2d.fromDegrees(target.getYaw()));
+            Rotation2d.fromDegrees(target.getYaw())).plus(Constants.VisionConstants.ROBOT_TO_CAM);
 
         targetFound = true;
       }
