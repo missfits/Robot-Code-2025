@@ -40,4 +40,8 @@ public final class Constants {
     public static final int KPORT = 0;
     public static final int KLENGTH = 30;
   }
+
+  public static class IntakeConstants {
+    public static final int LASER_CAN_ID = 14;
+  }
 }

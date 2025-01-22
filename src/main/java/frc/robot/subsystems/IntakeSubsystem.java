@@ -1,24 +1,22 @@
 package frc.robot.subsystems;
 
 import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.CanBridge;
+
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import frc.robot.Constants.IntakeConstants;
+
+
 public class IntakeSubsystem extends SubsystemBase {
   private LaserCan lc;
 
   public IntakeSubsystem() {
-    lc = new LaserCan(0);
-    // Optionally initialise the settings of the LaserCAN, if you haven't already done so in GrappleHook
-    try {
-      lc.setRangingMode(LaserCan.RangingMode.SHORT);
-      lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
-      lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
-    } catch (ConfigurationFailedException e) {
-      System.out.println("Configuration failed! " + e);
-    }
+    CanBridge.runTCP(); // allow grapplehook to communicate w/ lasercan:)
+    lc = new LaserCan(IntakeConstants.LASER_CAN_ID);
   }
 
   //to-do: smartdashboard print these values instead of system.out.print.ln
