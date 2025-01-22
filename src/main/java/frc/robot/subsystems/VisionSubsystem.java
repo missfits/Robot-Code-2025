@@ -99,8 +99,9 @@ public class VisionSubsystem extends SubsystemBase {
     return new Trigger(() -> isWithinTarget());
   }
 
-  // to do: check if apriltag is found
-  public boolean isWithinTarget(double toleranceX, double toleranceY){
-    return (Math.abs(targetTranslation2d.getX() - distToTargetX) < toleranceX && Math.abs(targetTranslation2d.getY() - distToTargetY) < toleranceY);
+  public boolean isWithinTarget(double toleranceX, double toleranceY) {
+    return (targetFound
+            && Math.abs(targetTranslation2d.getX() - distToTargetX) < toleranceX
+            && Math.abs(targetTranslation2d.getY() - distToTargetY) < toleranceY);
   }
 }
