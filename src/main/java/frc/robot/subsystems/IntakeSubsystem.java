@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -26,9 +27,10 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     LaserCan.Measurement measurement = lc.getMeasurement();
     if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-      System.out.println("The target is " + measurement.distance_mm + "mm away!");
+      SmartDashboard.putNumber("LaserCAN Distance", measurement.distance_mm);
     } else {
-      System.out.println("Oh no! The target is out of range, or we can't get a reliable measurement!");
+      SmartDashboard.putNumber("LaserCAN Distance", 0);
+      // System.out.println("Oh no! The target is out of range, or we can't get a reliable measurement!");
       // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurement.
     }
   }
