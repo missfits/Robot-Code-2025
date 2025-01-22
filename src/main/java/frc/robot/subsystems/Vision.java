@@ -29,10 +29,6 @@ public class Vision extends SubsystemBase {
     m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
   }
 
-  public Translation2d getRobotTranslationToTag() {
-    return targetFound ? targetTranslation2d.plus(VisionConstants.ROBOT_TO_CAM) : new Translation2d(0,0); // only return translation2d if target was found
-  }
-
   @Override
   public void periodic() {
 
