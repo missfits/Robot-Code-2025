@@ -54,6 +54,7 @@ public final class Constants {
     public static final double CAMERA_HEIGHT = 0; // in meters, bogus
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.174625; // in meters to the bottom of tags on the reef 
+  }
 
   public static class IntakeConstants {
     public static final int LASER_CAN_ID = 14;
