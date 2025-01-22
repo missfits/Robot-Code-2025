@@ -28,6 +28,11 @@ public class Vision extends SubsystemBase {
     m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
   }
 
+  public boolean isWithinRange(double rangeDistance) {
+    return (targetFound && 
+            targetTranslation2d.getDistance(new Translation2d(0,0)) < rangeDistance);
+  }
+
   @Override
   public void periodic() {
 
