@@ -4,7 +4,11 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,6 +21,8 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 
@@ -24,16 +30,24 @@ import frc.robot.Constants.VisionConstants;
 
 public class VisionSubsystem extends SubsystemBase {
   private final PhotonCamera m_camera;
+  private final Pigeon2 m_gyro;
   // private final LEDSubsystem m_ledSubsystem;
   private Translation2d targetTranslation2d = new Translation2d(0,0); // distance to the target; updated every periodic() call if target is found 
   private boolean targetFound; // true if the translation2d was updated last periodic() call
+  private Pose2d targetPose;
+  private Pose2d currentPose; // current robot pose, updates periodically
+
+  private AprilTagFieldLayout aprilTagFieldLayout;
 
   private double distToTargetX;
   private double distToTargetY;
 
   /** Creates a new Vision Subsystem. */
-  public VisionSubsystem() {
+  public VisionSubsystem(Pigeon2 pigeon) {
     m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+    m_gyro = pigeon;
+
+    aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     
     distToTargetX = 1;
     distToTargetY = 1;
@@ -58,20 +72,16 @@ public class VisionSubsystem extends SubsystemBase {
 
       if (result.hasTargets()) {
         PhotonTrackedTarget target = result.getBestTarget();
+        targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
 
-        // calculate distance to the target
-        targetDistanceMeters =
-          PhotonUtils.calculateDistanceToTargetMeters(
-            VisionConstants.CAMERA_HEIGHT,
-            VisionConstants.TARGET_HEIGHT,
-            VisionConstants.CAMERA_PITCH,
-            Units.degreesToRadians(target.getPitch()));
+        // calculate currentPose of robot relative to field
+        currentPose = PhotonUtils.estimateFieldToRobot(VisionConstants.CAMERA_HEIGHT, VisionConstants.CAMERA_PITCH, VisionConstants.TARGET_HEIGHT, VisionConstants.TARGET_PITCH, new Rotation2d(target.getYaw()), new Rotation2d(m_gyro.getYaw().getValue()), targetPose, new Transform2d(VisionConstants.ROBOT_TO_CAM, new Rotation2d(0)));
 
-        // calculate translation2d to the target based on dist + yaw
-        targetTranslation2d = 
-          PhotonUtils.estimateCameraToTargetTranslation(
-            targetDistanceMeters,              
-            Rotation2d.fromDegrees(target.getYaw())).plus(Constants.VisionConstants.ROBOT_TO_CAM);
+        // euclidean distance between currentPose and targetPose
+        targetDistanceMeters = PhotonUtils.getDistanceToPose(currentPose, targetPose);
+
+        // translation 2d between currentPose and targetPose
+        targetTranslation2d = new Translation2d(Math.abs(currentPose.getX() - targetPose.getX()), Math.abs(currentPose.getY() - targetPose.getY()));
 
         targetFound = true;
       }
