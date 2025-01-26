@@ -81,7 +81,7 @@ public class VisionSubsystem extends SubsystemBase {
         targetDistanceMeters = PhotonUtils.getDistanceToPose(currentPose, targetPose);
 
         // translation 2d between currentPose and targetPose
-        targetTranslation2d = new Translation2d(Math.abs(currentPose.getX() - targetPose.getX()), Math.abs(currentPose.getY() - targetPose.getY()));
+        targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
 
         targetFound = true;
       }
