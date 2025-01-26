@@ -60,7 +60,7 @@ public class VisionSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    targetFound = false; 
+    // targetFound = false; 
     double targetDistanceMeters = 0.0;
 
     var results = m_camera.getAllUnreadResults();
@@ -84,6 +84,9 @@ public class VisionSubsystem extends SubsystemBase {
         targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
 
         targetFound = true;
+      }
+      else{
+        targetFound = false;
       }
     }
 
