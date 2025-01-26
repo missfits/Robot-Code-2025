@@ -54,6 +54,5 @@ public final class Constants {
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
-    public static final double TARGET_PITCH = 0;
   }
 }
