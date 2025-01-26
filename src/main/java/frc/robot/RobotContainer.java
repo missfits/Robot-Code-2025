@@ -80,7 +80,7 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
       drivetrain.applyRequest(() -> {
-        JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+        JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
         return drive.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
           .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
           .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
@@ -96,25 +96,25 @@ public class RobotContainer {
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
     driverJoystick.y().whileTrue(drivetrain.applyRequest(() -> {
-      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
         .withTargetDirection(Rotation2d.fromDegrees(0));
     }));
     driverJoystick.x().whileTrue(drivetrain.applyRequest(() -> {
-      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
         .withTargetDirection(Rotation2d.fromDegrees(90));
     }));
     driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> {
-      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
         .withTargetDirection(Rotation2d.fromDegrees(180));
     }));
     driverJoystick.b().whileTrue(drivetrain.applyRequest(() -> {
-      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
         .withTargetDirection(Rotation2d.fromDegrees(270));
@@ -176,17 +176,6 @@ public class RobotContainer {
     drivetrain.setBrake(false);
   }
 
-  private JoystickVals inputShape(double x, double y) {
-    double hypot = Math.hypot(x, y);
-    double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.JOYSTICK_DEADBAND);
-  
-    double scaleFactor = deadbandedValue * Math.abs(deadbandedValue) / hypot;
-
-    JoystickVals output = new JoystickVals(x * scaleFactor, y * scaleFactor);
-
-    return output;
-
-  }
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
   }
