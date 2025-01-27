@@ -10,8 +10,6 @@ import frc.robot.subsystems.VisionSubsystem;
 
 import java.util.Optional;
 
-import org.photonvision.PhotonCamera;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
@@ -54,10 +52,14 @@ public class AutoAlignCommand extends Command {
   //   }
   //   return m_vision.getRobotTranslationToTag().getAngle();
   // }
-
+  
+  /*
+   * return empty (nothing) if no tag found,
+   * else return robot to tag Rotation2d angle
+   */
   private Optional<Rotation2d> getRotationToTag(){
     Translation2d translation = m_vision.getRobotTranslationToTag();
-    if (translation.equals(Translation2d.kZero)){ // if tag not found, press trigger again
+    if (translation.equals(Translation2d.kZero)){
       return Optional.empty();
     }
     return Optional.of(m_vision.getRobotTranslationToTag().getAngle());
@@ -71,6 +73,9 @@ public class AutoAlignCommand extends Command {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  /*
+   * rotate drivetrain m_targetRotation deg
+   */
   @Override
   public void execute() {      
     if (!m_isTargetFound){
