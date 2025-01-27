@@ -236,6 +236,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public Rotation2d getRobotRotation(){
+        return this.getState().Pose.getRotation();
+    }
+
     @Override
     public void periodic() {
         SwerveModuleState[] currentStates = {this.getModule(0).getCurrentState(), this.getModule(1).getCurrentState(), this.getModule(2).getCurrentState(), this.getModule(3).getCurrentState()};

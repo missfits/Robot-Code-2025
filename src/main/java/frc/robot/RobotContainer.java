@@ -7,8 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 
-import java.nio.file.SecureDirectoryStream;
-
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule;
@@ -44,6 +42,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.commands.AutoAlignCommand;
 
 
 public class RobotContainer {
@@ -99,6 +98,8 @@ public class RobotContainer {
     driverJoystick.x().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(90))));
     driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(180))));
     driverJoystick.b().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(270))));
+
+    driverJoystick.rightTrigger().onTrue(new AutoAlignCommand(drivetrain, m_vision));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
