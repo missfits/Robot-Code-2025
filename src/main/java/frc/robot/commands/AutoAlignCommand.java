@@ -16,6 +16,7 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
@@ -86,7 +87,13 @@ public class AutoAlignCommand extends Command {
       }
     }
 
-    m_drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(m_targetRotation));
+    if (getRotationToTag().isPresent()){
+    SmartDashboard.putNumber("autoaligncommand/rotationtotag", getRotationToTag().get().getDegrees());
+    SmartDashboard.putNumber("autoaligncommand/targetrotation", m_targetRotation.getDegrees());
+    SmartDashboard.putNumber("autoaligncommand/robotrotation", m_drivetrain.getRobotRotation().getDegrees());
+    }
+
+    m_drivetrain.setControl(snapToAngle.withTargetDirection(m_targetRotation));
   }
 
   // Called once the command ends or is interrupted.
