@@ -15,8 +15,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.controller.PIDController;
+
 
 /** An example command that uses an example subsystem. */
 public class AutoAlignCommand extends Command {
@@ -24,9 +27,12 @@ public class AutoAlignCommand extends Command {
   private final CommandSwerveDrivetrain m_drivetrain;
   private final VisionSubsystem m_vision;
   private Rotation2d m_targetRotation;
+  private Translation2d m_targetTranslation;
+  private Pose2d m_startPose;
   private boolean m_isTargetFound;
-  private final SwerveRequest.FieldCentricFacingAngle snapToAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withVelocityX(0).withVelocityY(0);
-
+  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
+  private PIDController m_xController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D); 
+  private PIDController m_yController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D); 
 
   /**
    * Creates a new ExampleCommand.
@@ -38,8 +44,8 @@ public class AutoAlignCommand extends Command {
     m_vision = vision;
     m_isTargetFound = false;
 
-    snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P/10.0, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
-    snapToAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
+    driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P/10.0, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
+    driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
@@ -70,6 +76,7 @@ public class AutoAlignCommand extends Command {
   public void initialize() {
     m_isTargetFound = false;
     m_targetRotation = m_drivetrain.getRobotRotation();
+    m_startPose = m_drivetrain.getState().Pose;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -83,10 +90,16 @@ public class AutoAlignCommand extends Command {
       // if (!getRotationToTag().equals(Rotation2d.kZero)){
         m_isTargetFound = true;
         m_targetRotation = m_drivetrain.getRobotRotation().minus(getRotationToTag().get());
+        m_targetTranslation = m_vision.getRobotTranslationToTag();
       }
     }
+    if (m_isTargetFound) {
+      m_drivetrain.applyRequest(() -> driveFacingAngle
+      .withTargetDirection(m_targetRotation)
+      .withVelocityX(m_yController.calculate(m_drivetrain.getState().Pose.getX() - m_startPose.getX(), m_targetTranslation.getX()))
+      .withVelocityY(m_xController.calculate(m_drivetrain.getState().Pose.getY() - m_startPose.getY(), m_targetTranslation.getY())));
+    }
 
-    m_drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(m_targetRotation));
   }
 
   // Called once the command ends or is interrupted.
