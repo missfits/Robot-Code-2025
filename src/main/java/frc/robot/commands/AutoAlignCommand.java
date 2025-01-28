@@ -8,6 +8,7 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionSubsystem;
 
+import java.lang.management.PlatformLoggingMXBean;
 import java.util.Optional;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -17,6 +18,7 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.controller.PIDController;
 
@@ -37,14 +39,14 @@ public class AutoAlignCommand extends Command {
   /**
    * Creates a new ExampleCommand.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param subsystem The susbsystem used by this command.
    */
   public AutoAlignCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision) {
     m_drivetrain = drivetrain;
     m_vision = vision;
     m_isTargetFound = false;
 
-    driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P/10.0, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
+    driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -94,10 +96,16 @@ public class AutoAlignCommand extends Command {
       }
     }
     if (m_isTargetFound) {
-      m_drivetrain.applyRequest(() -> driveFacingAngle
+      m_drivetrain.setControl(driveFacingAngle
       .withTargetDirection(m_targetRotation)
-      .withVelocityX(m_yController.calculate(m_drivetrain.getState().Pose.getX() - m_startPose.getX(), m_targetTranslation.getX()))
-      .withVelocityY(m_xController.calculate(m_drivetrain.getState().Pose.getY() - m_startPose.getY(), m_targetTranslation.getY())));
+      .withVelocityX(-m_xController.calculate(m_drivetrain.getState().Pose.getX() - m_startPose.getX(), m_targetTranslation.getX()))
+      .withVelocityY(-m_yController.calculate(m_drivetrain.getState().Pose.getY() - m_startPose.getY(), m_targetTranslation.getY())));
+    }
+
+    if (getRotationToTag().isPresent()){
+    SmartDashboard.putNumber("autoaligncommand/rotationtotag", getRotationToTag().get().getDegrees());
+    SmartDashboard.putNumber("autoaligncommand/targetrotation", m_targetRotation.getDegrees());
+    SmartDashboard.putNumber("autoaligncommand/robotrotation", m_drivetrain.getRobotRotation().getDegrees());
     }
 
   }

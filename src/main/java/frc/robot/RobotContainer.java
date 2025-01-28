@@ -99,7 +99,7 @@ public class RobotContainer {
     driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(180))));
     driverJoystick.b().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(270))));
 
-    driverJoystick.rightTrigger().onTrue(new AutoAlignCommand(drivetrain, m_vision));
+    driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
