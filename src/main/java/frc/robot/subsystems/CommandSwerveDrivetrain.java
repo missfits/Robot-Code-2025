@@ -5,8 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
@@ -238,6 +241,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Rotation2d getRobotRotation(){
         return this.getState().Pose.getRotation();
+    } 
+    
+    // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
+    public void setBrake(boolean brake) {
+        this.configNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.configSteerNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    }
+
+    public StatusCode configSteerNeutralMode(NeutralModeValue neutralModeValue){
+        StatusCode statusCode = StatusCode.OK;
+        for (var module : getModules()){
+            StatusCode result = module.getSteerMotor().setNeutralMode(neutralModeValue);
+            if (!result.equals(StatusCode.OK)){
+                statusCode = result;
+            }
+        }
+        return statusCode;
     }
 
     @Override

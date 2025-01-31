@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.util.Units;
@@ -37,10 +36,6 @@ public class VisionSubsystem extends SubsystemBase {
     
     distToTargetX = 1;
     distToTargetY = 1;
-  }
-
-  public Translation2d getRobotTranslationToTag() {
-    return targetFound ? targetTranslation2d.plus(VisionConstants.ROBOT_TO_CAM) : new Translation2d(0,0); // only return translation2d if target was found
   }
 
   @Override

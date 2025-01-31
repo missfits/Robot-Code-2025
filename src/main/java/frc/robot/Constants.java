@@ -4,14 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 
+import edu.wpi.first.math.geometry.Translation2d;
 
 
 /**
@@ -23,6 +17,12 @@ import edu.wpi.first.apriltag.AprilTagFields;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  public static class RobotConstants {
+    public static final int DISABLED_COAST_DELAY = 10; // in secs
+
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kTestControllerPort = 2;
@@ -54,5 +54,9 @@ public final class Constants {
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
+  }
+
+  public static class IntakeConstants {
+    public static final int LASER_CAN_ID = 14;
   }
 }
