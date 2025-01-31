@@ -79,18 +79,17 @@ public class AutoAlignCommand extends Command {
    */
   @Override
   public void execute() {      
-    if (!m_isTargetFound){
+    if (!m_isTargetFound){ // only set target rotation once
       if (getRotationToTag().isPresent()){ // checks if value is empty (NOT ROBOT AT 0,0)
-      // if (!getRotationToTag().equals(Rotation2d.kZero)){
         m_isTargetFound = true;
         m_targetRotation = m_drivetrain.getRobotRotation().minus(getRotationToTag().get());
       }
     }
 
     if (getRotationToTag().isPresent()){
-    SmartDashboard.putNumber("autoaligncommand/rotationtotag", getRotationToTag().get().getDegrees());
-    SmartDashboard.putNumber("autoaligncommand/targetrotation", m_targetRotation.getDegrees());
-    SmartDashboard.putNumber("autoaligncommand/robotrotation", m_drivetrain.getRobotRotation().getDegrees());
+      SmartDashboard.putNumber("autoaligncommand/rotationtotag", getRotationToTag().get().getDegrees());
+      SmartDashboard.putNumber("autoaligncommand/targetrotation", m_targetRotation.getDegrees());
+      SmartDashboard.putNumber("autoaligncommand/robotrotation", m_drivetrain.getRobotRotation().getDegrees());
     }
 
     m_drivetrain.setControl(snapToAngle.withTargetDirection(m_targetRotation));
