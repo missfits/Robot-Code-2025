@@ -33,12 +33,14 @@ public final class Constants {
 
   public static class DrivetrainConstants {
     // Not tuned
-    public static final double ROBOT_ROTATION_P = 5;
+    public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
-    public static final double ROBOT_ROTATION_D = 0;
+    public static final double ROBOT_ROTATION_D = 0; // 0.10877 from rotation sys-id @PF 1/13
     public static final double ROBOT_POSITION_P = 5;
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
+
+    public static final double WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
   }
   
   public static class LEDConstants {
