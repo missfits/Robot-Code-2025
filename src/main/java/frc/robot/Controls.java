@@ -10,6 +10,8 @@ public class Controls {
         return adjustSlowmode(inputShape(x, y), slowmode);
     }
 
+
+    // square the input while maintaining direction 
     public static JoystickVals inputShape(double x, double y) {
         double hypot = Math.hypot(x, y);
         double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.JOYSTICK_DEADBAND);
