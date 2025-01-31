@@ -64,4 +64,12 @@ public class LEDSubsystem extends SubsystemBase {
   public Command runSolidBlue() {
     return runPattern(LEDPattern.solid(Color.kBlue));
   }
+
+  public Command runSolidOrange() {
+    return runPattern(LEDPattern.solid(Color.kOrange));
+  }
+
+  public Command runSolidGreen() {
+    return runPattern(LEDPattern.solid(Color.kGreen));
+  }
 }

@@ -239,6 +239,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public Rotation2d getRobotRotation(){
+        return this.getState().Pose.getRotation();
+    } 
+    
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
     public void setBrake(boolean brake) {
         this.configNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);

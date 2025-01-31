@@ -7,8 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 
-import java.nio.file.SecureDirectoryStream;
-
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule;
@@ -34,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants.DrivetrainConstants;
@@ -43,7 +42,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.commands.AutoAlignCommand;
 
 
 public class RobotContainer {
@@ -60,7 +60,7 @@ public class RobotContainer {
   
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
-  private final Vision m_vision = new Vision();
+  private final VisionSubsystem m_vision = new VisionSubsystem();
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
 
 
@@ -92,6 +92,9 @@ public class RobotContainer {
     // a to flash yellow
     driverJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
     driverJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
+    
+    // run command runSolidGreen continuously if robot isWithinTarget()
+    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
 
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
@@ -119,6 +122,8 @@ public class RobotContainer {
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
         .withTargetDirection(Rotation2d.fromDegrees(270));
     }));
+
+    driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.

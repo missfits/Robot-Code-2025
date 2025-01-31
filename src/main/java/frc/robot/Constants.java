@@ -49,14 +49,14 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final String CAMERA_NAME = "Arducam_OV9782_USB_Camera";  
+    public static final String CAMERA_NAME = "max_camera";  
 
     public static final Translation2d ROBOT_TO_CAM = 
-      new Translation2d(0, 0); // bogus
+      new Translation2d(0.3048, 0); // in meters from center of robot to 2x4 camera mount
     
-    public static final double CAMERA_HEIGHT = 0; // in meters, bogus
+    public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
-    public static final double TARGET_HEIGHT = 0.174625; // in meters to the bottom of tags on the reef 
+    public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
   }
 
   public static class IntakeConstants {
