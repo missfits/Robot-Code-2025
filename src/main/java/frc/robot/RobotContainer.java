@@ -42,6 +42,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
@@ -61,6 +62,8 @@ public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem();
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
+
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -69,7 +72,7 @@ public class RobotContainer {
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-  private final SwerveRequest.FieldCentricFacingAngle snapToAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withVelocityX(0).withVelocityY(0);
+  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -84,8 +87,8 @@ public class RobotContainer {
           .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
       }));
 
-    snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
-    snapToAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
+    driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
+    driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
     //set buttons to LED lights
     // a to flash yellow
     driverJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
@@ -94,11 +97,32 @@ public class RobotContainer {
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
 
-    // snap to angle
-    driverJoystick.y().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(0))));
-    driverJoystick.x().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(90))));
-    driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(180))));
-    driverJoystick.b().whileTrue(drivetrain.applyRequest(() -> snapToAngle.withTargetDirection(Rotation2d.fromDegrees(270))));
+    // drive facing angle buttons
+    // can be pressed alone for rotation or pressed with joystick input
+    driverJoystick.y().whileTrue(drivetrain.applyRequest(() -> {
+      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(0));
+    }));
+    driverJoystick.x().whileTrue(drivetrain.applyRequest(() -> {
+      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(90));
+    }));
+    driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> {
+      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(180));
+    }));
+    driverJoystick.b().whileTrue(drivetrain.applyRequest(() -> {
+      JoystickVals shapedValues = inputShape(driverJoystick.getLeftX(), driverJoystick.getLeftY());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(270));
+    }));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
@@ -146,6 +170,15 @@ public class RobotContainer {
 
   }
 
+  // set motors to appropriate neutral modes for an enabled robot
+  public void setEnabledNeutralMode() {
+    drivetrain.setBrake(true);
+  }
+
+  // set motors to appropriate neutral modes for an disabled robot
+  public void setDisabledNeutralMode() {
+    drivetrain.setBrake(false);
+  }
 
   private JoystickVals inputShape(double x, double y) {
     double hypot = Math.hypot(x, y);
