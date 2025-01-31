@@ -142,10 +142,9 @@ public class RobotContainer {
 
   public RobotContainer() {
     DataLogManager.start(); // log networktable 
-    DriverStation.startDataLog(DataLogManager.getLog()); // log ds state, joystick data
+    DriverStation.startDataLog(DataLogManager.getLog()); // log ds state, joystick data to /u/logs w/ usb stick, or home/lvuser/logs without. 
     DriverStation.silenceJoystickConnectionWarning(true); // turn off unplugged joystick errors 
 
-    SignalLogger.setPath("/home/lvuser/logs/");
     SignalLogger.enableAutoLogging(false);
     // SignalLogger.start();
     
