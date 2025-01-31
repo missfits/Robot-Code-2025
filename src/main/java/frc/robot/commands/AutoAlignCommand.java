@@ -39,7 +39,7 @@ public class AutoAlignCommand extends Command {
     m_vision = vision;
     m_isTargetFound = false;
 
-    snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P/10.0, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
+    snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     snapToAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
 
     // Use addRequirements() here to declare subsystem dependencies.
