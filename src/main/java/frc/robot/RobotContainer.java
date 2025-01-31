@@ -70,7 +70,6 @@ public class RobotContainer {
       .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -123,7 +122,7 @@ public class RobotContainer {
         .withTargetDirection(Rotation2d.fromDegrees(270));
     }));
 
-    driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+    driverJoystick.rightBumper().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
@@ -133,8 +132,7 @@ public class RobotContainer {
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     driverJoystick.leftBumper().whileTrue(drivetrain.applyRequest(() -> brake));
-    driverJoystick.rightBumper().whileTrue(drivetrain
-        .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))));
+
 
     // reset the field-centric heading on left trigger press
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
