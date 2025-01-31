@@ -28,6 +28,7 @@ public final class Constants {
     public static final int kTestControllerPort = 2;
 
     public static final double JOYSTICK_DEADBAND = 0.1;
+    public static final double SLOWMODE_FACTOR = 0.1;
   }
 
   public static class DrivetrainConstants {
