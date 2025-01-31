@@ -28,6 +28,8 @@ public final class Constants {
     public static final double ROBOT_POSITION_P = 5;
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
+
+    public static final double WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
   }
   
   public static class LEDConstants {

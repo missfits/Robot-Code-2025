@@ -47,7 +47,7 @@ public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
 
-  private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)*0.75; // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
+  private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
