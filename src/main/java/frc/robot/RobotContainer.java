@@ -43,6 +43,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.collar.CollarSubsystem;
+import frc.robot.subsystems.lifter.ElevatorAndArmSubsystem;
 import frc.robot.commands.AutoAlignCommand;
 
 
@@ -55,6 +57,7 @@ public class RobotContainer {
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController driverJoystick = new CommandXboxController(OperatorConstants.kDriverControllerPort); // driver joystick
+  private final CommandXboxController copilotJoystick = new CommandXboxController(OperatorConstants.kCopilotControllerPort); // copilot joystick
   private final CommandXboxController testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort); // test joystick
 
   
@@ -62,6 +65,8 @@ public class RobotContainer {
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem();
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
+  private final CollarSubsystem m_collar = new CollarSubsystem();
+  private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
 
 
 
@@ -88,14 +93,7 @@ public class RobotContainer {
 
     driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
-    //set buttons to LED lights
-    // a to flash yellow
-    driverJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
-    driverJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
-    
-    // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
-
+   
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
     driverJoystick.y().whileTrue(drivetrain.applyRequest(() -> {
@@ -123,7 +121,18 @@ public class RobotContainer {
         .withTargetDirection(Rotation2d.fromDegrees(270));
     }));
 
-    driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+    // reset the field-centric heading on left trigger press
+    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    // run command runSolidGreen continuously if robot isWithinTarget()
+    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
+
+    //set buttons to LED lights
+    // a to flash yellow
+    testJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
+    testJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
+
+    testJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
@@ -131,13 +140,6 @@ public class RobotContainer {
     testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-    driverJoystick.leftBumper().whileTrue(drivetrain.applyRequest(() -> brake));
-    driverJoystick.rightBumper().whileTrue(drivetrain
-        .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))));
-
-    // reset the field-centric heading on left trigger press
-    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
