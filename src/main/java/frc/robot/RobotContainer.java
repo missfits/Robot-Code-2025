@@ -31,6 +31,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -52,6 +54,13 @@ public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
 
+  public enum RobotState { 
+    L1_CORAL, L2_CORAL, L3_CORAL, L4_CORAL, L2_ALGAE, L3_ALGAE, INTAKE
+  } 
+
+  private RobotState currentState = RobotState.INTAKE;
+  private RobotState nextState = RobotState.INTAKE;
+
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
@@ -67,8 +76,6 @@ public class RobotContainer {
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
-
-
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -123,6 +130,29 @@ public class RobotContainer {
 
     // reset the field-centric heading on left trigger press
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+
+    driverJoystick.leftBumper().onTrue(
+      new ParallelCommandGroup(
+        m_lifter.getCommand(nextState),
+        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
+
+    driverJoystick.rightBumper().onTrue(m_collar.getCommand(currentState));
+
+
+    copilotJoystick.leftTrigger().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}));
+    copilotJoystick.rightTrigger().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}));
+    copilotJoystick.leftBumper().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}));
+    copilotJoystick.rightBumper().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}));
+    copilotJoystick.a().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}));
+    copilotJoystick.y().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}));
 
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
