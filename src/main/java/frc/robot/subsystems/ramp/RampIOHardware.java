@@ -5,9 +5,4 @@ public class RampIOHardware implements RampIO {
     public RampIOHardware() {
 
     }
-
-    @Override
-    public void readInputs(RampSensorInputs input) {
-
-    }
 }

@@ -6,9 +6,4 @@ public class CollarIOHardware implements CollarIO {
     public CollarIOHardware() {
 
     }
-
-    @Override
-    public void readInputs(CollarSensorInputs input) {
-
-    }
 }
