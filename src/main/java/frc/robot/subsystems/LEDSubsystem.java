@@ -36,7 +36,7 @@ public class LEDSubsystem extends SubsystemBase {
     // Set the default command to turn the strip off, otherwise the last colors written by
     // the last command to run will continue to be displayed.
     // Note: Other default patterns could be used instead!
-    setDefaultCommand(runPattern(LEDPattern.solid(Color.kRed)).withName("Off"));
+    setDefaultCommand((runGradientBlueYellow()).withName("Off"));
   }
 
 
@@ -72,4 +72,26 @@ public class LEDSubsystem extends SubsystemBase {
   public Command runSolidGreen() {
     return runPattern(LEDPattern.solid(Color.kGreen));
   }
+
+  public Command runSoildRed() {
+    return runPattern(LEDPattern.solid(Color.kRed));
+  }
+
+  public Command runSoildWhite() {
+    return runPattern(LEDPattern.solid(Color.kWhite));
+  }
+
+  public Command runSoildPink() {
+    return runPattern(LEDPattern.solid(Color.kPink));
+  }
+
+  public Command runSoildPurple() {
+    return runPattern(LEDPattern.solid(Color.kPurple));
+  }
+  
+  public Command runGradientBlueYellow(){
+    LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kBlue);
+    return runPattern(gradient);
+  }
+  
 }
