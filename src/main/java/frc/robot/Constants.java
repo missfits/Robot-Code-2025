@@ -5,7 +5,10 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 
 /**
@@ -55,10 +58,14 @@ public final class Constants {
 
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(0.3048, 0); // in meters from center of robot to 2x4 camera mount
+
+    public static final Transform3d ROBOT_TO_CAM_3D = 
+      new Transform3d(new Translation3d(0.3048, 0.0, 0), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
     
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
+    public static final double TARGET_PITCH = 0; 
   }
 
   public static class IntakeConstants {
