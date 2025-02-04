@@ -138,7 +138,13 @@ public class RobotContainer {
         m_lifter.getCommand(nextState),
         new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
-    driverJoystick.rightBumper().onTrue(m_collar.getCommand(currentState));
+
+    driverJoystick.rightBumper().onTrue(
+      m_collar.getCommand(currentState)
+
+      .andThen(new ParallelCommandGroup(
+        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+        m_lifter.getCommand(currentState))));
 
 
     copilotJoystick.leftTrigger().onTrue(
