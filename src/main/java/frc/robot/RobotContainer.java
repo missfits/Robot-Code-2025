@@ -133,14 +133,24 @@ public class RobotContainer {
 
     driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
 
+    // move lifter to next position 
     driverJoystick.leftBumper().onTrue(
       new ParallelCommandGroup(
         m_lifter.getCommand(nextState),
         new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
-    driverJoystick.rightBumper().onTrue(m_collar.getCommand(currentState));
+
+    // outtake from collar, then move lifter to the default position
+    driverJoystick.rightBumper().onTrue(
+      m_collar.getCommand(currentState)
+
+      .andThen(new ParallelCommandGroup(
+        // move the lifter to the intake (default) position 
+        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+        m_lifter.getCommand(currentState))));
 
 
+    // set next state 
     copilotJoystick.leftTrigger().onTrue(
       new InstantCommand(() -> {nextState = RobotState.L4_CORAL; m_ledSubsystem.runSoildRed().withTimeout(5);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
     copilotJoystick.rightTrigger().onTrue(
