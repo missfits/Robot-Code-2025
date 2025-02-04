@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -38,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
@@ -145,36 +147,37 @@ public class RobotContainer {
       m_collar.getCommand(currentState)
 
       .andThen(new ParallelCommandGroup(
-        // move the lifter to the intake (default) position 
+        // move the lifter to the intake (default) position, reset LED
         new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
-        m_lifter.getCommand(currentState))));
+        m_lifter.getCommand(currentState),
+        m_ledSubsystem.runBlinkGreen().withTimeout(LEDConstants.BLINK_TIME))));
 
 
     // set next state, change LED colors accordingly 
     copilotJoystick.leftTrigger().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
-      m_ledSubsystem.runSolidRed().withTimeout(5))); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      m_ledSubsystem.runSolidRed())); 
     copilotJoystick.rightTrigger().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
-      m_ledSubsystem.runSolidOrange().withTimeout(4))); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      m_ledSubsystem.runSolidOrange())); 
     copilotJoystick.leftBumper().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
-      m_ledSubsystem.runSolidYellow().withTimeout(3))); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      m_ledSubsystem.runSolidYellow())); 
     copilotJoystick.rightBumper().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
-      m_ledSubsystem.runSolidWhite().withTimeout(2))); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      m_ledSubsystem.runSolidWhite())); 
     copilotJoystick.a().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}),
-      m_ledSubsystem.runSolidPurple().withTimeout(4))); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      m_ledSubsystem.runSolidPurple())); 
     copilotJoystick.y().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
-      m_ledSubsystem.runSolidPink().withTimeout(3))); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      m_ledSubsystem.runSolidPink())); 
 
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());

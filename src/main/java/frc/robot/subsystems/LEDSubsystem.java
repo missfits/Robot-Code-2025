@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -55,6 +58,10 @@ public class LEDSubsystem extends SubsystemBase {
    */
   public Command runPattern(LEDPattern pattern) {
     return run(() -> pattern.applyTo(m_ledBuffer)).ignoringDisable(true);
+  }
+
+  public Command runBlinkGreen() {
+    return runPattern(LEDPattern.solid(Color.kGreen).blink(Time.ofBaseUnits(0.25, Units.Seconds)));
   }
 
   public Command runSolidYellow() {
