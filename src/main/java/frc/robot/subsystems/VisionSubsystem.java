@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -35,6 +36,7 @@ public class VisionSubsystem extends SubsystemBase {
   private Translation2d targetTranslation2d = new Translation2d(0,0); // distance to the target; updated every periodic() call if target is found 
   private boolean targetFound; // true if the translation2d was updated last periodic() call
   private Pose2d targetPose;
+  private double targetYaw; // in radians, relative to field
   private Pose2d currentPose; // current robot pose, updates periodically
 
   private AprilTagFieldLayout aprilTagFieldLayout;
@@ -57,6 +59,16 @@ public class VisionSubsystem extends SubsystemBase {
     return targetFound ? targetTranslation2d.plus(VisionConstants.ROBOT_TO_CAM) : new Translation2d(0,0); // only return translation2d if target was found
   }
 
+
+  /** returns yaw (rotation on field) of target in radians */
+  public double getTargetYaw() {
+    return targetYaw;
+  }
+
+  public boolean getTargetFound() {
+    return targetFound;
+  }
+
   @Override
   public void periodic() {
 
@@ -71,7 +83,10 @@ public class VisionSubsystem extends SubsystemBase {
       var result = results.get(results.size() - 1);
 
       if (result.hasTargets()) {
-        PhotonTrackedTarget target = result.getBestTarget();
+        PhotonTrackedTarget target = result.getBestTarget(); 
+
+        targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
+
         targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
 
         // calculate currentPose of robot relative to field
@@ -85,7 +100,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         targetFound = true;
       }
-      else{
+      else {
         targetFound = false;
       }
     }
