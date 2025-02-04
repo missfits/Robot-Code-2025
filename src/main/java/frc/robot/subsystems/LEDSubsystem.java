@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -36,7 +39,7 @@ public class LEDSubsystem extends SubsystemBase {
     // Set the default command to turn the strip off, otherwise the last colors written by
     // the last command to run will continue to be displayed.
     // Note: Other default patterns could be used instead!
-    setDefaultCommand(runPattern(LEDPattern.solid(Color.kRed)).withName("Off"));
+    setDefaultCommand((runGradientBlueYellow()).withName("Off"));
   }
 
 
@@ -57,6 +60,10 @@ public class LEDSubsystem extends SubsystemBase {
     return run(() -> pattern.applyTo(m_ledBuffer)).ignoringDisable(true);
   }
 
+  public Command runBlinkGreen() {
+    return runPattern(LEDPattern.solid(Color.kGreen).blink(Time.ofBaseUnits(0.25, Units.Seconds)));
+  }
+
   public Command runSolidYellow() {
     return runPattern(LEDPattern.solid(Color.kYellow));
   }
@@ -72,4 +79,26 @@ public class LEDSubsystem extends SubsystemBase {
   public Command runSolidGreen() {
     return runPattern(LEDPattern.solid(Color.kGreen));
   }
+
+  public Command runSolidRed() {
+    return runPattern(LEDPattern.solid(Color.kRed));
+  }
+
+  public Command runSolidWhite() {
+    return runPattern(LEDPattern.solid(Color.kWhite));
+  }
+
+  public Command runSolidPink() {
+    return runPattern(LEDPattern.solid(Color.kPink));
+  }
+
+  public Command runSolidPurple() {
+    return runPattern(LEDPattern.solid(Color.kPurple));
+  }
+  
+  public Command runGradientBlueYellow(){
+    LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kBlue);
+    return runPattern(gradient);
+  }
+  
 }
