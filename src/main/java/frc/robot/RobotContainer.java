@@ -152,17 +152,17 @@ public class RobotContainer {
 
     // set next state 
     copilotJoystick.leftTrigger().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L4_CORAL; m_ledSubsystem.runSoildRed().withTimeout(5);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      new InstantCommand(() -> {nextState = RobotState.L4_CORAL; m_ledSubsystem.runSolidRed().withTimeout(5);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
     copilotJoystick.rightTrigger().onTrue(
       new InstantCommand(() -> {nextState = RobotState.L3_CORAL; m_ledSubsystem.runSolidOrange().withTimeout(4);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
     copilotJoystick.leftBumper().onTrue(
       new InstantCommand(() -> {nextState = RobotState.L2_CORAL; m_ledSubsystem.runSolidYellow().withTimeout(3);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
     copilotJoystick.rightBumper().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L1_CORAL; m_ledSubsystem.runSoildWhite().withTimeout(2);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      new InstantCommand(() -> {nextState = RobotState.L1_CORAL; m_ledSubsystem.runSolidWhite().withTimeout(2);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
     copilotJoystick.a().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE; m_ledSubsystem.runSoildPurple().withTimeout(4);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE; m_ledSubsystem.runSolidPurple().withTimeout(4);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
     copilotJoystick.y().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE; m_ledSubsystem.runSoildPink().withTimeout(3);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
+      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE; m_ledSubsystem.runSolidPink().withTimeout(3);})); //to-do: tune the nubmer of seconds according to how long it takes for mechanism to complete
 
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
