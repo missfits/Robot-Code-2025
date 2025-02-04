@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left start to peg i"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "peg i to left feed"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left feed to peg L"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "peg L to left feed"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left feed to peg K"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

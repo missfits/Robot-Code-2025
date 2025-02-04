@@ -4,14 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 
+import edu.wpi.first.math.geometry.Translation2d;
 
 
 /**
@@ -23,21 +17,31 @@ import edu.wpi.first.apriltag.AprilTagFields;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  public static class RobotConstants {
+    public static final int DISABLED_COAST_DELAY = 10; // in secs
+
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kCopilotControllerPort = 1;
     public static final int kTestControllerPort = 2;
 
     public static final double JOYSTICK_DEADBAND = 0.1;
+    public static final double SLOWMODE_FACTOR = 0.1;
   }
 
   public static class DrivetrainConstants {
     // Not tuned
-    public static final double ROBOT_ROTATION_P = 5;
+    public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
-    public static final double ROBOT_ROTATION_D = 0;
+    public static final double ROBOT_ROTATION_D = 0; // 0.10877 from rotation sys-id @PF 1/13
     public static final double ROBOT_POSITION_P = 5;
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
+
+    public static final double WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
   }
   
   public static class LEDConstants {
@@ -46,7 +50,7 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final String CAMERA_NAME = "Arducam_OV9782_USB_Camera";  
+    public static final String CAMERA_NAME = "max_camera";  
 
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(0.3048, 0); // in meters from center of robot to 2x4 camera mount
@@ -54,6 +58,9 @@ public final class Constants {
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
-    public static final double TARGET_PITCH = 0;
+  }
+
+  public static class IntakeConstants {
+    public static final int LASER_CAN_ID = 14;
   }
 }
