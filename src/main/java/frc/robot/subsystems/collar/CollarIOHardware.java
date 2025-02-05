@@ -1,6 +1,6 @@
 package frc.robot.subsystems.collar;
 
-public class CollarIOHardware implements CollarIO {
+public class CollarIOHardware {
     
     // constructor
     public CollarIOHardware() {
