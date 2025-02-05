@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.photonvision.EstimatedRobotPose;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -225,6 +226,11 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
+  }
+
+  public void updatePoseEstWithVision() {
+    EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
+    drivetrain.addVisionMeasurement(estimatedRobotPose.estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds);
   }
 
 }
