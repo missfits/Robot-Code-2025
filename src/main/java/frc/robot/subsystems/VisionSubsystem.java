@@ -119,20 +119,6 @@ public class VisionSubsystem extends SubsystemBase {
 
         // targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
 
-        // calculate distance to the target
-        // targetDistanceMeters =
-        //   PhotonUtils.calculateDistanceToTargetMeters(
-        //     VisionConstants.CAMERA_HEIGHT,
-        //     VisionConstants.TARGET_HEIGHT,
-        //     VisionConstants.CAMERA_PITCH,
-        //     Units.degreesToRadians(target.getPitch()));
-
-        // euclidean distance between currentPose and targetPose
-        // targetDistanceMeters = PhotonUtils.getDistanceToPose(currentPose, targetPose);
-
-        // translation 2d between currentPose and targetPose
-        // targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
-
         targetFound = true;
       }
       else {
@@ -142,7 +128,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
-    SmartDashboard.putBoolean("inTarget", isWithinTarget());
     SmartDashboard.putNumber("Target X Distance", targetTranslation2d.getX());
     SmartDashboard.putNumber("Target Y Distance", targetTranslation2d.getY());
 
