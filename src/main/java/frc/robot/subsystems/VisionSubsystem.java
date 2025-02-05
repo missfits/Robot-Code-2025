@@ -81,6 +81,22 @@ public class VisionSubsystem extends SubsystemBase {
 
         targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
 
+        // targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
+
+        // calculate distance to the target
+        // targetDistanceMeters =
+        //   PhotonUtils.calculateDistanceToTargetMeters(
+        //     VisionConstants.CAMERA_HEIGHT,
+        //     VisionConstants.TARGET_HEIGHT,
+        //     VisionConstants.CAMERA_PITCH,
+        //     Units.degreesToRadians(target.getPitch()));
+
+        // euclidean distance between currentPose and targetPose
+        // targetDistanceMeters = PhotonUtils.getDistanceToPose(currentPose, targetPose);
+
+        // translation 2d between currentPose and targetPose
+        // targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
+
         targetFound = true;
       }
       else {
