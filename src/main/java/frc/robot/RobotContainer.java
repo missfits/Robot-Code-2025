@@ -166,7 +166,7 @@ public class RobotContainer {
       new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}));
 
     // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
+    m_vision.isWithinTargetTrigger(drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
     //set buttons to LED lights
     // a to flash yellow

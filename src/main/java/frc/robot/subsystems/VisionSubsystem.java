@@ -117,7 +117,7 @@ public class VisionSubsystem extends SubsystemBase {
           new Transform2d(VisionConstants.ROBOT_TO_CAM, new Rotation2d(0)));
 
 
-        // targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
+        targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
 
         targetFound = true;
       }
@@ -139,15 +139,18 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   // returns bool if camera within tolerance to AprilTag
-  public boolean isWithinTarget(){
-    return isWithinTarget(1, 1);
+  public boolean isWithinTarget(Pose2d currentPose){
+    SmartDashboard.putBoolean("inTarget", isWithinTarget(currentPose,1, 1));
+    return isWithinTarget(currentPose,1, 1);
   }
 
-  public Trigger isWithinTargetTrigger() {
-    return new Trigger(() -> isWithinTarget());
+  public Trigger isWithinTargetTrigger(Pose2d currentPose) {
+    return new Trigger(() -> isWithinTarget(currentPose));
   }
 
-  public boolean isWithinTarget(double toleranceX, double toleranceY) {
+  public boolean isWithinTarget(Pose2d currentPose, double toleranceX, double toleranceY) {
+    targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
+    
     return (targetFound
             && Math.abs(targetTranslation2d.getX() - distToTargetX) < toleranceX
             && Math.abs(targetTranslation2d.getY() - distToTargetY) < toleranceY);
