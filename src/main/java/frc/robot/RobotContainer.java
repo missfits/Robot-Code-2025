@@ -230,7 +230,12 @@ public class RobotContainer {
 
   public void updatePoseEstWithVision() {
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
-    drivetrain.addVisionMeasurement(estimatedRobotPose.estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds);
+    Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+    
+    // check if new estimated pose and previous pose are less than 1 meter apart
+    if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
+      drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+    }
   }
 
 }
