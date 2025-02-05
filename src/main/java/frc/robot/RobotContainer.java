@@ -31,6 +31,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -38,11 +40,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.collar.CollarSubsystem;
+import frc.robot.subsystems.lifter.ElevatorAndArmSubsystem;
 import frc.robot.commands.AutoAlignCommand;
 
 
@@ -50,11 +55,19 @@ public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
 
+  public enum RobotState { 
+    L1_CORAL, L2_CORAL, L3_CORAL, L4_CORAL, L2_ALGAE, L3_ALGAE, INTAKE
+  } 
+
+  private RobotState currentState = RobotState.INTAKE;
+  private RobotState nextState = RobotState.INTAKE;
+
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController driverJoystick = new CommandXboxController(OperatorConstants.kDriverControllerPort); // driver joystick
+  private final CommandXboxController copilotJoystick = new CommandXboxController(OperatorConstants.kCopilotControllerPort); // copilot joystick
   private final CommandXboxController testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort); // test joystick
 
   
@@ -62,8 +75,8 @@ public class RobotContainer {
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem();
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
-
-
+  private final CollarSubsystem m_collar = new CollarSubsystem();
+  private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -87,14 +100,7 @@ public class RobotContainer {
 
     driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
-    //set buttons to LED lights
-    // a to flash yellow
-    driverJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
-    driverJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
-    
-    // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
-
+   
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
     driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
@@ -122,7 +128,51 @@ public class RobotContainer {
         .withTargetDirection(Rotation2d.fromDegrees(270));
     }));
 
-    driverJoystick.rightBumper().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+    // reset the field-centric heading on left trigger press
+    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
+
+    // move lifter to next position 
+    driverJoystick.leftBumper().onTrue(
+      new ParallelCommandGroup(
+        m_lifter.getCommand(nextState),
+        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
+
+
+    // outtake from collar, then move lifter to the default position
+    driverJoystick.rightBumper().onTrue(
+      m_collar.getCommand(currentState)
+
+      .andThen(new ParallelCommandGroup(
+        // move the lifter to the intake (default) position 
+        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+        m_lifter.getCommand(currentState))));
+
+
+    // set next state 
+    copilotJoystick.leftTrigger().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}));
+    copilotJoystick.rightTrigger().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}));
+    copilotJoystick.leftBumper().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}));
+    copilotJoystick.rightBumper().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}));
+    copilotJoystick.a().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}));
+    copilotJoystick.y().onTrue(
+      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}));
+
+    // run command runSolidGreen continuously if robot isWithinTarget()
+    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
+
+    //set buttons to LED lights
+    // a to flash yellow
+    testJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
+    testJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
+
+    testJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
@@ -130,12 +180,6 @@ public class RobotContainer {
     testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-    driverJoystick.leftBumper().whileTrue(drivetrain.getCommandFromRequest(() -> brake));
-
-
-    // reset the field-centric heading on left trigger press
-    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
