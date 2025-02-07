@@ -6,20 +6,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class CollarSubsystem extends SubsystemBase {
+    private final CollarIOHardware m_IO = new CollarIOHardware();
     
     // constructor
     public CollarSubsystem() {
         
-    }
-
-    // sets collar motor speed (forward if positive, backward if negative)
-    public void runCollarMotor(double speed) {
-
-    }
-
-    // sets intake motor speed to zero and stops motor
-    public void collarMotorOff() {
-
     }
 
     public Command getCommand(RobotState targetRobotState) {
