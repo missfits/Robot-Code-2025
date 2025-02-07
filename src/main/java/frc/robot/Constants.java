@@ -125,4 +125,21 @@ public final class Constants {
   public static class IntakeConstants {
     public static final int LASER_CAN_ID = 14;
   }
+
+  public static class RobotStateConstants {
+    public static final double C1_ELEVATOR_POS = 0.0;
+    public static final double C1_ARM_POS = 0.0;
+    public static final double C2_ELEVATOR_POS = 0.0;
+    public static final double C2_ARM_POS = 0.0;
+    public static final double C3_ELEVATOR_POS = 0.0;
+    public static final double C3_ARM_POS = 0.0;
+    public static final double C4_ELEVATOR_POS = 0.0;
+    public static final double C4_ARM_POS = 0.0;
+    public static final double A2_ELEVATOR_POS = 0.0;
+    public static final double A2_ARM_POS = 0.0;
+    public static final double A3_ELEVATOR_POS = 0.0;
+    public static final double A3_ARM_POS = 0.0;
+    public static final double IN_ELEVATOR_POS = 0.0;
+    public static final double IN_ARM_POS = 0.0;
+  }
 }
