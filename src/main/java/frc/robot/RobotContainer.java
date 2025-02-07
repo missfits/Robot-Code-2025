@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -81,6 +82,12 @@ public class RobotContainer {
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
+
+  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+    drivetrain.getKinematics(), 
+    drivetrain.getPigeon2().getRotation2d(), 
+    drivetrain.getState().ModulePositions, 
+    drivetrain.getState().Pose); 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -234,17 +241,22 @@ public class RobotContainer {
   }
 
   public void updatePoseEstWithVision() {
+
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
       Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
     
       // check if new estimated pose and previous pose are less than 1 meter apart
       // if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
-        drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+        poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
 
         m_estPoseField.setRobotPose(estPose2d);
       // }
     }
+    drivetrain.resetPose(poseEstimator.update(
+      drivetrain.getPigeon2().getRotation2d(), 
+      drivetrain.getState().ModulePositions)); 
+
   }
 
 }
