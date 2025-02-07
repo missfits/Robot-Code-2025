@@ -17,12 +17,12 @@ public class ArmIOHardware {
     // getters
     public double getPosition() {
         double angle = m_armMotor.getPosition().getValue().in(Revolutions);
-        return angle*ArmConstants.METERS_PER_ROTATION;
+        return angle*ArmConstants.DEGREES_PER_ROTATION;
     }
 
     public double getVelocity() {
         double speed = m_armMotor.getVelocity().getValue().in(RevolutionsPerSecond);
-        return speed*ArmConstants.METERS_PER_ROTATION;
+        return speed*ArmConstants.DEGREES_PER_ROTATION;
     }
 
     // setters

@@ -74,14 +74,22 @@ public final class Constants {
     public static final int ARM_MOTOR_ID = 22; // placeholder
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
-    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double DEGREES_PER_ROTATION = 0.0; 
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
+    public static final double kS = 0;
+    public static final double kG = 0;
+    public static final double kV = 12/MAX_SPEED; // may need to be updated
+    public static final double kA = 0;
+
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
+    
+    public static final double kMaxV = 0;
+    public static final double kMaxA = 0; 
   }
 
   public static class CollarConstants {
