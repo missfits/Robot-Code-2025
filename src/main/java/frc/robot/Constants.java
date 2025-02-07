@@ -54,13 +54,17 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
+
+    public static final double ROBOT_TO_CAM_X = 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = 0.1397; // in meters from the floor?
     
 
     public static final Translation2d ROBOT_TO_CAM = 
-      new Translation2d(0.3048, 0); // in meters from center of robot to 2x4 camera mount
+      new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
 
     public static final Transform3d ROBOT_TO_CAM_3D = 
-      new Transform3d(new Translation3d(0.3048, 0.0, 0), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
+      new Transform3d(new Translation3d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y, ROBOT_TO_CAM_Z), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
     
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
