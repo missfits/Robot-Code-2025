@@ -102,6 +102,8 @@ public class RobotContainer {
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
 
   private final Field2d m_estPoseField = new Field2d();
+  private final Field2d m_actualField = new Field2d();
+
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -210,6 +212,7 @@ public class RobotContainer {
     // SignalLogger.start();
     
     SmartDashboard.putData("est pose field", m_estPoseField);
+    SmartDashboard.putData("Actual Field", m_actualField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
@@ -253,6 +256,9 @@ public class RobotContainer {
         m_estPoseField.setRobotPose(estPose2d);
       // }
     }
+
+    m_actualField.setRobotPose(drivetrain.getState().Pose);
+
     drivetrain.resetPose(poseEstimator.update(
       drivetrain.getPigeon2().getRotation2d(), 
       drivetrain.getState().ModulePositions)); 
