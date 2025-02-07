@@ -18,12 +18,12 @@ public class CollarIOHardware {
     // getters
     public double getPosition() {
         double angle = m_collarMotor.getPosition().getValue().in(Revolutions);
-        return angle*ArmConstants.METERS_PER_ROTATION;
+        return angle*CollarConstants.METERS_PER_ROTATION;
     }
 
     public double getVelocity() {
         double speed = m_collarMotor.getVelocity().getValue().in(RevolutionsPerSecond);
-        return speed*ArmConstants.METERS_PER_ROTATION;
+        return speed*CollarConstants.METERS_PER_ROTATION;
     }
 
     // setters
