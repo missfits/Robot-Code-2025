@@ -44,7 +44,7 @@ public class VisionSubsystem extends SubsystemBase {
   private Pose2d currentPose; // current robot pose, updates periodically
   private EstimatedRobotPose estimatedRobotPose; 
 
-  private AprilTagFieldLayout aprilTagFieldLayout;
+  private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
 
 
@@ -56,10 +56,7 @@ public class VisionSubsystem extends SubsystemBase {
     m_gyro = pigeon;
     
     distToTargetX = 1;
-    distToTargetY = 1;
-
-    aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    
+    distToTargetY = 1;    
 
   }
 
