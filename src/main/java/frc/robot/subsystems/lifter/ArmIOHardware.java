@@ -3,6 +3,7 @@ package frc.robot.subsystems.lifter;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
@@ -12,7 +13,15 @@ public class ArmIOHardware {
     private final TalonFX m_armMotor = new TalonFX(ArmConstants.ARM_MOTOR_ID);
 
     // constructor
-    public ArmIOHardware() {}
+    public ArmIOHardware() {
+        var talonFXConfigurator = m_armMotor.getConfigurator();
+        var limitConfigs = new CurrentLimitsConfigs();
+
+        limitConfigs.StatorCurrentLimit = ArmConstants.MOTOR_STATOR_LIMIT;
+        limitConfigs.StatorCurrentLimitEnable = true;
+
+        talonFXConfigurator.apply(limitConfigs);
+    }
 
     // getters
     public double getPosition() {

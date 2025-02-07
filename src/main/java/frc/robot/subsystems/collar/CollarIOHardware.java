@@ -3,17 +3,25 @@ package frc.robot.subsystems.collar;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CollarConstants;
 
 public class CollarIOHardware {
     private final TalonFX m_collarMotor = new TalonFX(CollarConstants.COLLAR_MOTOR_ID);
 
     // constructor
-    public CollarIOHardware() {}
+    public CollarIOHardware() {
+        var talonFXConfigurator = m_collarMotor.getConfigurator();
+        var limitConfigs = new CurrentLimitsConfigs();
+
+        limitConfigs.StatorCurrentLimit = CollarConstants.MOTOR_STATOR_LIMIT;
+        limitConfigs.StatorCurrentLimitEnable = true;
+
+        talonFXConfigurator.apply(limitConfigs);
+    }
 
     // getters
     public double getPosition() {
