@@ -3,10 +3,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 import frc.robot.RobotContainer.RobotState;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.ArmConstants;
 
 
 public class LifterSubsystem extends SubsystemBase {
@@ -21,7 +20,10 @@ public class LifterSubsystem extends SubsystemBase {
     }
 
     public Command moveToCommand(RobotState targetRobotState) {
-        return new WaitCommand(0);
+        return new ParallelCommandGroup(
+            m_elevator.moveToCommand(targetRobotState.getElevatorPos()),
+            m_arm.moveToCommand(targetRobotState.getArmPos())
+        );
     }
 
 }

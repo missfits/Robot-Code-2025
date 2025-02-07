@@ -1,10 +1,12 @@
 package frc.robot.subsystems.lifter;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -31,6 +33,10 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem() {}
 
     // commands
+    public Command moveToCommand(double targetPosition) {
+        return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
+    }
+
     public Command moveToCommand(TrapezoidProfile.State goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
@@ -43,6 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
+        m_goal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
     }

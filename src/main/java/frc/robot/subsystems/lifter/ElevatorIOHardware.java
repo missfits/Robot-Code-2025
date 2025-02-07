@@ -3,7 +3,8 @@ package frc.robot.subsystems.lifter;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.controls.*;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 
 import frc.robot.Constants.ElevatorConstants;
 

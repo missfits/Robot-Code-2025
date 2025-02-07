@@ -4,11 +4,9 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.RobotContainer.RobotState;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase{
@@ -35,6 +33,10 @@ public class ElevatorSubsystem extends SubsystemBase{
     public ElevatorSubsystem() {}
 
     // commands
+    public Command moveToCommand(double targetPosition) {
+        return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
+    }
+
     public Command moveToCommand(TrapezoidProfile.State goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
@@ -47,6 +49,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
+        m_goal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
     }
