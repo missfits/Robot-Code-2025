@@ -22,12 +22,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -90,6 +93,8 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
+
+  private final Field2d m_estPoseField = new Field2d();
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -197,7 +202,7 @@ public class RobotContainer {
     SignalLogger.enableAutoLogging(false);
     // SignalLogger.start();
     
-
+    SmartDashboard.putData("est pose field", m_estPoseField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
@@ -236,6 +241,8 @@ public class RobotContainer {
       // check if new estimated pose and previous pose are less than 1 meter apart
       // if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
         drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+
+        m_estPoseField.setRobotPose(estPose2d);
       // }
     }
   }
