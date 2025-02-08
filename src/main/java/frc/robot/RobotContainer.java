@@ -18,16 +18,20 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -79,6 +83,12 @@ public class RobotContainer {
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
 
+  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+    drivetrain.getKinematics(), 
+    drivetrain.getPigeon2().getRotation2d(), 
+    drivetrain.getState().ModulePositions, 
+    drivetrain.getState().Pose); 
+
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
       .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
@@ -89,6 +99,10 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
+
+  private final Field2d m_estPoseField = new Field2d();
+  private final Field2d m_actualField = new Field2d();
+
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -196,7 +210,8 @@ public class RobotContainer {
     SignalLogger.enableAutoLogging(false);
     // SignalLogger.start();
     
-
+    SmartDashboard.putData("est pose field", m_estPoseField);
+    SmartDashboard.putData("Actual Field", m_actualField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
@@ -227,14 +242,26 @@ public class RobotContainer {
     return m_autoChooser.getSelected();
   }
 
-  public void updatePoseEstWithVision() {
+  public void updatePoseEst() {
+
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
-    Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+    if (estimatedRobotPose != null) {
+      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
     
-    // check if new estimated pose and previous pose are less than 1 meter apart
-    if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
-      drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+      // check if new estimated pose and previous pose are less than 1 meter apart
+      // if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
+        poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+
+        m_estPoseField.setRobotPose(estPose2d);
+      // }
     }
+
+    m_actualField.setRobotPose(drivetrain.getState().Pose);
+
+    drivetrain.resetPose(poseEstimator.update(
+      drivetrain.getPigeon2().getRotation2d(), 
+      drivetrain.getState().ModulePositions)); 
+
   }
 
 }
