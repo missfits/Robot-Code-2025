@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -147,22 +148,25 @@ public class RobotContainer {
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
+    
+    // "temporary" for testing. only press after running rotatetofacereef (right trigger)
+    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision.getTargetPose())); 
 
-    // move lifter to next position 
-    driverJoystick.leftBumper().onTrue(
-      new ParallelCommandGroup(
-        m_lifter.getCommand(nextState),
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
+    // // move lifter to next position 
+    // driverJoystick.leftBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //     m_lifter.getCommand(nextState),
+    //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
 
-    // outtake from collar, then move lifter to the default position
-    driverJoystick.rightBumper().onTrue(
-      m_collar.getCommand(currentState)
+    // // outtake from collar, then move lifter to the default position
+    // driverJoystick.rightBumper().onTrue(
+    //   m_collar.getCommand(currentState)
 
-      .andThen(new ParallelCommandGroup(
-        // move the lifter to the intake (default) position 
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
-        m_lifter.getCommand(currentState))));
+    //   .andThen(new ParallelCommandGroup(
+    //     // move the lifter to the intake (default) position 
+    //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+    //     m_lifter.getCommand(currentState))));
 
 
     // set next state 

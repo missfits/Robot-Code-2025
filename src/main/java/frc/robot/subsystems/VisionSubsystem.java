@@ -70,6 +70,11 @@ public class VisionSubsystem extends SubsystemBase {
     return targetYaw;
   }
 
+  /** returns pose  of target in radians */
+  public Pose2d getTargetPose() {
+    return targetPose;
+  }
+
   public boolean getTargetFound() {
     return targetFound;
   }
@@ -101,6 +106,8 @@ public class VisionSubsystem extends SubsystemBase {
         PhotonTrackedTarget target = result.getBestTarget(); 
 
         targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
+
+        targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
 
         targetFound = true;
       }
