@@ -242,7 +242,7 @@ public class RobotContainer {
     return m_autoChooser.getSelected();
   }
 
-  public void updatePoseEstWithVision() {
+  public void updatePoseEst() {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
