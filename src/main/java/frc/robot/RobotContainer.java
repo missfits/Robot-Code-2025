@@ -83,11 +83,6 @@ public class RobotContainer {
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
 
-  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
-    drivetrain.getKinematics(), 
-    drivetrain.getPigeon2().getRotation2d(), 
-    drivetrain.getState().ModulePositions, 
-    drivetrain.getState().Pose); 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -145,7 +140,7 @@ public class RobotContainer {
     }));
 
     // reset the field-centric heading on left trigger press
-    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
     driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
 
@@ -251,18 +246,14 @@ public class RobotContainer {
     
       // check if new estimated pose and previous pose are less than 1 meter apart
       // if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
-        poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+        drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
 
         m_estPoseField.setRobotPose(estPose2d);
       // }
     }
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
-
-    drivetrain.resetPose(poseEstimator.update(
-      drivetrain.getPigeon2().getRotation2d(), 
-      drivetrain.getState().ModulePositions)); 
-
+    drivetrain.updatePoseWithPoseEst();
   }
 
 }
