@@ -53,7 +53,7 @@ public class RotateToFaceReefCommand extends Command {
     public void execute() {      
     // only get targetRotation once
     if (m_vision.getTargetFound() && !targetFound) {
-      targetRotation = Rotation2d.fromRadians(m_vision.getTargetYaw());
+      targetRotation = Rotation2d.fromRadians(Math.PI + m_vision.getTargetYaw());
       targetFound = true;
     }
 
