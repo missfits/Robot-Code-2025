@@ -25,6 +25,7 @@ public final class Constants {
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kCopilotControllerPort = 1;
     public static final int kTestControllerPort = 2;
 
     public static final double JOYSTICK_DEADBAND = 0.1;
@@ -49,7 +50,8 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final String CAMERA_NAME = "max_camera";  
+    public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
+    
 
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(0.3048, 0); // in meters from center of robot to 2x4 camera mount
