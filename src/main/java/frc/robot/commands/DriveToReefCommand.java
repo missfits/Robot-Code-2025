@@ -37,11 +37,17 @@ public class DriveToReefCommand extends Command {
      */
     public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, Pose2d targetPose) {
       m_drivetrain = drivetrain;
-      
-      // cos and sin offset because the robot has width and is not a point!
+
+      if (targetPose != null) {
+        // cos and sin offset because the robot has width and is not a point!
       m_targetTranslation = new Translation2d(
         targetPose.getX() - DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians()), 
         targetPose.getY() - DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians()));
+    
+      } else {
+        m_targetTranslation = drivetrain.getState().Pose.getTranslation();
+      }
+      
     
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(drivetrain);
