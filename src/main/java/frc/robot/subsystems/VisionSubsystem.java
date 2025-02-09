@@ -90,6 +90,8 @@ public class VisionSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
+    SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);
+
     SmartDashboard.putBoolean("inTarget", isWithinTarget());
     SmartDashboard.putNumber("Target X Distance", targetTranslation2d.getX());
     SmartDashboard.putNumber("Target Y Distance", targetTranslation2d.getY());
