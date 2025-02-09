@@ -20,6 +20,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -72,6 +73,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     
     private Pigeon2 m_gyro = getPigeon2();
+    public final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+        this.getKinematics(), 
+        this.getPigeon2().getRotation2d(), 
+        this.getState().ModulePositions, 
+        this.getState().Pose); 
 
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
@@ -171,7 +177,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         AutoBuilder.configure(
             () -> getState().Pose,   // Supplier of current robot pose
-            this::resetPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
+            this::setNewPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
             () -> getState().Speeds, // Supplier of current robot speeds. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> setControl(
                     m_pathApplyRobotSpeeds.withSpeeds(speeds)
@@ -239,10 +245,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public SwerveDrivePoseEstimator getPoseEstimator(){
+        return poseEstimator;
+    }
+
     public Rotation2d getRobotRotation(){
         return this.getState().Pose.getRotation();
     } 
     
+    public void updatePoseWithPoseEst(){
+        this.resetPose(poseEstimator.update(
+            this.getPigeon2().getRotation2d(), 
+            this.getState().ModulePositions)); 
+    }
+
+    public void setNewPose(Pose2d newPose){
+        poseEstimator.resetPose(newPose);
+        this.resetPose(newPose);
+    }
+
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
     public void setBrake(boolean brake) {
         this.configNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
