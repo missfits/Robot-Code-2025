@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -38,9 +39,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.RobotStateConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -157,28 +160,51 @@ public class RobotContainer {
     // reset the field-centric heading on left trigger press
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+    driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
 
+    // move lifter to next position 
     driverJoystick.leftBumper().onTrue(
       new ParallelCommandGroup(
         m_lifter.getCommand(nextState),
         new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
-    driverJoystick.rightBumper().onTrue(m_collar.getCommand(currentState));
+
+    // outtake from collar, then move lifter to the default position
+    driverJoystick.rightBumper().onTrue(
+      m_collar.getCommand(currentState)
+
+      .andThen(new ParallelCommandGroup(
+        // move the lifter to the intake (default) position, reset LED
+        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+        m_lifter.getCommand(currentState),
+        m_ledSubsystem.runBlinkGreen().withTimeout(LEDConstants.BLINK_TIME))));
 
 
+    // set next state, change LED colors accordingly 
     copilotJoystick.leftTrigger().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+      m_ledSubsystem.runSolidRed())); 
     copilotJoystick.rightTrigger().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+      m_ledSubsystem.runSolidOrange())); 
     copilotJoystick.leftBumper().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
+      m_ledSubsystem.runSolidYellow())); 
     copilotJoystick.rightBumper().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
+      m_ledSubsystem.runSolidWhite())); 
     copilotJoystick.a().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}),
+      m_ledSubsystem.runSolidPurple())); 
     copilotJoystick.y().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
+      m_ledSubsystem.runSolidPink())); 
 
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
@@ -196,7 +222,6 @@ public class RobotContainer {
     testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
