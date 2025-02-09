@@ -42,6 +42,7 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -132,7 +133,7 @@ public class RobotContainer {
     // reset the field-centric heading on left trigger press
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    driverJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+    driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
 
     // move lifter to next position 
     driverJoystick.leftBumper().onTrue(
