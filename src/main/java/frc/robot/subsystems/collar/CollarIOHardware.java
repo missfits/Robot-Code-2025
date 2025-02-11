@@ -1,8 +1,12 @@
 package frc.robot.subsystems.collar;
 
 import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -11,6 +15,8 @@ import frc.robot.Constants.CollarConstants;
 
 public class CollarIOHardware {
     private final TalonFX m_collarMotor = new TalonFX(CollarConstants.COLLAR_MOTOR_ID);
+    private final StatusSignal<Angle> m_positionSignal = m_collarMotor.getPosition();
+    private final StatusSignal<AngularVelocity> m_velocitySignal = m_collarMotor.getVelocity();
 
     // constructor
     public CollarIOHardware() {
@@ -25,13 +31,11 @@ public class CollarIOHardware {
 
     // getters
     public double getPosition() {
-        double angle = m_collarMotor.getPosition().getValue().in(Revolutions);
-        return angle*CollarConstants.METERS_PER_ROTATION;
+        return m_positionSignal.getValue().in(Revolutions)*CollarConstants.METERS_PER_ROTATION;
     }
 
     public double getVelocity() {
-        double speed = m_collarMotor.getVelocity().getValue().in(RevolutionsPerSecond);
-        return speed*CollarConstants.METERS_PER_ROTATION;
+        return m_velocitySignal.getValue().in(RevolutionsPerSecond)*CollarConstants.METERS_PER_ROTATION;
     }
 
     // setters
