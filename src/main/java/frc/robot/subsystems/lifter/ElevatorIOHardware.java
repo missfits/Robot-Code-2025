@@ -1,8 +1,11 @@
 package frc.robot.subsystems.lifter;
 
 import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -11,7 +14,9 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOHardware {
     private final TalonFX m_elevatorMotor = new TalonFX(ElevatorConstants.ELEVATOR_MOTOR_ID);
-    
+    private final StatusSignal<Angle> m_positionSignal = m_elevatorMotor.getPosition();
+    private final StatusSignal<AngularVelocity> m_velocitySignal = m_elevatorMotor.getVelocity();
+
     // constructor
     public ElevatorIOHardware() {
         var talonFXConfigurator = m_elevatorMotor.getConfigurator();
@@ -26,13 +31,11 @@ public class ElevatorIOHardware {
     // ----- MOTOR METHODS -----
     // getters
     public double getPosition() {
-        double angle = m_elevatorMotor.getPosition().getValue().in(Revolutions);
-        return angle*ElevatorConstants.METERS_PER_ROTATION;
+        return m_positionSignal.getValue().in(Revolutions)*ElevatorConstants.METERS_PER_ROTATION;
     }
 
     public double getVelocity() {
-        double speed = m_elevatorMotor.getVelocity().getValue().in(RevolutionsPerSecond);
-        return speed*ElevatorConstants.METERS_PER_ROTATION;
+        return m_velocitySignal.getValue().in(RevolutionsPerSecond)*ElevatorConstants.METERS_PER_ROTATION;
     }
 
     // setters
