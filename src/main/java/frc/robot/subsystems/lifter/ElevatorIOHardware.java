@@ -50,7 +50,10 @@ public class ElevatorIOHardware {
     }
 
     public void setVoltage(double value) {
-        m_elevatorMotor.setControl(new VoltageOut(value));
+        if (this.getPosition() > ElevatorConstants.POSITION_LOWER_LIMIT && 
+            this.getPosition() < ElevatorConstants.POSITION_UPPER_LIMIT) {
+            m_elevatorMotor.setControl(new VoltageOut(value));
+        } 
     }
     
     public void setVoltage(PositionVoltage request) {
