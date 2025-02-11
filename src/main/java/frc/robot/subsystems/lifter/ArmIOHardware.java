@@ -26,7 +26,7 @@ public class ArmIOHardware {
     // getters
     public double getPosition() {
         double angle = m_armMotor.getPosition().getValue().in(Revolutions);
-        return angle*ArmConstants.DEGREES_PER_ROTATION;
+        return angle*ArmConstants.DEGREES_PER_ROTATION/360;
     }
 
     public double getVelocity() {
