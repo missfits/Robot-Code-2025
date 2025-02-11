@@ -41,14 +41,15 @@ public class ArmSubsystem extends SubsystemBase {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            interrupted -> m_IO.motorOff(),
-            () -> m_profile.isFinished(0.02),
+            (interrupted) -> {},
+            () -> false,
             this
         );
     }
 
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
+        m_controller.reset();
         m_goal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
