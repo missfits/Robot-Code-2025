@@ -31,11 +31,11 @@ public class CollarIOHardware {
 
     // getters
     public double getPosition() {
-        return m_positionSignal.getValue().in(Revolutions)*CollarConstants.METERS_PER_ROTATION;
+        return m_positionSignal.refresh().getValue().in(Revolutions)*CollarConstants.METERS_PER_ROTATION;
     }
 
     public double getVelocity() {
-        return m_velocitySignal.getValue().in(RevolutionsPerSecond)*CollarConstants.METERS_PER_ROTATION;
+        return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*CollarConstants.METERS_PER_ROTATION;
     }
 
     // setters

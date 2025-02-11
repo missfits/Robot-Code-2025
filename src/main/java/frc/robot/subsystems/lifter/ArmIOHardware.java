@@ -30,11 +30,11 @@ public class ArmIOHardware {
 
     // getters
     public double getPosition() {
-        return m_positionSignal.getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION;
+        return m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
     public double getVelocity() {
-        return m_velocitySignal.getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
+        return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
     // setters
