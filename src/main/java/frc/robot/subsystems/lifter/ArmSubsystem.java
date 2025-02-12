@@ -30,7 +30,9 @@ public class ArmSubsystem extends SubsystemBase {
     private TrapezoidProfile m_profile;
 
     // constructor
-    public ArmSubsystem() {}
+    public ArmSubsystem() {
+        m_controller.enableContinuousInput(0, 360);
+    }
 
     // commands
     public Command moveToCommand(double targetPosition) {
