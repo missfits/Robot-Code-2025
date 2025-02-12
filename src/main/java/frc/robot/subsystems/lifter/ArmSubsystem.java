@@ -54,7 +54,7 @@ public class ArmSubsystem extends SubsystemBase {
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();
         m_goal = goal;
-        m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, m_IO.getVelocity());
+        m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
     }
 
@@ -63,10 +63,10 @@ public class ArmSubsystem extends SubsystemBase {
         m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_goal);
         
         // calculate part of the power based on target velocity 
-        double feedForwardPower = m_feedforward.calculate(m_profiledReference.position, m_profiledReference.velocity);
+        double feedForwardPower = m_feedforward.calculate(m_profiledReference.position - ArmConstants.POSITION_OFFSET, m_profiledReference.velocity);
 
         // calculate part of the power based on target position + current position
-        double PIDPower = m_controller.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, m_profiledReference.position);
+        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
     }
