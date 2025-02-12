@@ -46,15 +46,15 @@ public final class Constants {
 
   public static class ElevatorConstants {
     public static final int ELEVATOR_MOTOR_ID = 21; // placeholder
-    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
   
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
+    public static final double INITIAL_POSITION = 0;
     public static final double METERS_PER_ROTATION = 0.0; 
-    
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
+    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     // not tuned
     public static final double kS = 0;
@@ -73,14 +73,16 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 22; // placeholder
-    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
+    public static final double INITIAL_POSITION = 0; // facing down
+    public static final double POSITION_OFFSET = Math.PI/2; // difference between pid 0 (horizontal) and our 0 (down)
     public static final double DEGREES_PER_ROTATION = 0.0; 
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
+    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     public static final double kS = 0;
     public static final double kG = 0;
@@ -134,19 +136,19 @@ public final class Constants {
   }
 
   public static class RobotStateConstants {
-    public static final double C1_ELEVATOR_POS = 0.0;
-    public static final double C1_ARM_POS = 0.0;
-    public static final double C2_ELEVATOR_POS = 0.0;
-    public static final double C2_ARM_POS = 0.0;
-    public static final double C3_ELEVATOR_POS = 0.0;
-    public static final double C3_ARM_POS = 0.0;
-    public static final double C4_ELEVATOR_POS = 0.0;
-    public static final double C4_ARM_POS = 0.0;
-    public static final double A2_ELEVATOR_POS = 0.0;
-    public static final double A2_ARM_POS = 0.0;
-    public static final double A3_ELEVATOR_POS = 0.0;
-    public static final double A3_ARM_POS = 0.0;
-    public static final double IN_ELEVATOR_POS = 0.0;
-    public static final double IN_ARM_POS = 0.0;
+    public static final double C1_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C1_ARM_POS = Math.toRadians(0.0);
+    public static final double C2_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C2_ARM_POS = Math.toRadians(0.0);
+    public static final double C3_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C3_ARM_POS = Math.toRadians(0.0);
+    public static final double C4_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C4_ARM_POS = Math.toRadians(0.0);
+    public static final double A2_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double A2_ARM_POS = Math.toRadians(0.0);
+    public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double A3_ARM_POS = Math.toRadians(0.0);
+    public static final double IN_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double IN_ARM_POS = Math.toRadians(0.0);
   }
 }

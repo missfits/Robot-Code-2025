@@ -30,6 +30,10 @@ public class ArmIOHardware {
 
     // getters
     public double getPosition() {
+        return Math.toRadians(m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION);
+    }
+
+    public double getPositionDegrees() {
         return m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
@@ -48,7 +52,7 @@ public class ArmIOHardware {
     }
 
     public void resetPosition() {
-        setPosition(0);
+        setPosition(ArmConstants.INITIAL_POSITION);
     }
 
     public void setVoltage(double value) {

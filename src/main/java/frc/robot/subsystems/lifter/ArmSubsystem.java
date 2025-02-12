@@ -31,6 +31,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     // constructor
     public ArmSubsystem() {
+        m_IO.resetPosition();
         m_controller.enableContinuousInput(0, 360);
     }
 
@@ -65,7 +66,7 @@ public class ArmSubsystem extends SubsystemBase {
         double feedForwardPower = m_feedforward.calculate(m_profiledReference.position, m_profiledReference.velocity);
 
         // calculate part of the power based on target position + current position
-        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
+        double PIDPower = m_controller.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
     }
