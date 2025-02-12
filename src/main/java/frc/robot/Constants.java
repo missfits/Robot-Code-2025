@@ -46,7 +46,7 @@ public final class Constants {
 
   public static class ElevatorConstants {
     public static final int ELEVATOR_MOTOR_ID = 21; // placeholder
-    public static final int MOTOR_STATOR_LIMIT = 80; // needs to be tuned
+    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
   
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
@@ -73,7 +73,7 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 22; // placeholder
-    public static final int MOTOR_STATOR_LIMIT = 80; // needs to be tuned
+    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
