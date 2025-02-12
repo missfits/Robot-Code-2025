@@ -48,7 +48,7 @@ public class ElevatorIOHardware {
     }
 
     public void resetPosition() {
-        setPosition(0);
+        setPosition(ElevatorConstants.INITIAL_POSITION);
     }
 
     public void setVoltage(double value) {
