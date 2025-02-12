@@ -49,7 +49,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
-import frc.robot.subsystems.lifter.LifterSubsystem;
+import frc.robot.subsystems.lifter.LifterCommandFactory;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.commands.AutoAlignCommand;
 
@@ -75,8 +75,9 @@ public class RobotContainer {
   private final VisionSubsystem m_vision = new VisionSubsystem();
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
-  private final LifterSubsystem m_lifter = new LifterSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
+
+  private final LifterCommandFactory m_lifter = new LifterCommandFactory();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
