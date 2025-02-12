@@ -17,15 +17,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class DriveToReefCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final CommandSwerveDrivetrain m_drivetrain;
-  private final Translation2d m_targetTranslation;
-  private final PIDController xController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
-  private final PIDController yController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
+  private Translation2d m_targetTranslation = new Translation2d();
+  private final VisionSubsystem m_vision;
+
+  private final PIDController xController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
+  private final PIDController yController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
   private final SwerveRequest.ApplyFieldSpeeds driveRequest = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.Velocity);
   
   
@@ -35,19 +37,9 @@ public class DriveToReefCommand extends Command {
      * @param drivetrain The drivetrain subsystem used by this command.
      * @param Pose2d The target pose (but only Translation) used by this command.
      */
-    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, Pose2d targetPose) {
+    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision) {
       m_drivetrain = drivetrain;
-
-      if (targetPose != null) {
-        // cos and sin offset because the robot has width and is not a point!
-      m_targetTranslation = new Translation2d(
-        targetPose.getX() - DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians()), 
-        targetPose.getY() - DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians()));
-    
-      } else {
-        m_targetTranslation = drivetrain.getState().Pose.getTranslation();
-      }
-      
+      m_vision = vision;
     
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(drivetrain);
@@ -57,6 +49,21 @@ public class DriveToReefCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+      Pose2d targetPose = m_vision.getTargetPose();
+      if (targetPose != null) {
+        // cos and sin offset because the robot has width and is not a point!
+      m_targetTranslation = new Translation2d(
+        targetPose.getX()
+        + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians()), 
+        targetPose.getY()
+         + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians()));
+    
+      } else {
+        m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
+      }
+      
+
+      SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
     }
   
     // Called every time the scheduler runs while the command is scheduled.

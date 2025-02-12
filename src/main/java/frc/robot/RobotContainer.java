@@ -145,7 +145,7 @@ public class RobotContainer {
     driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
     
     // "temporary" for testing. only press after running rotatetofacereef (right trigger)
-    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision.getTargetPose())); 
+    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision)); 
 
     // // move lifter to next position 
     // driverJoystick.leftBumper().onTrue(
