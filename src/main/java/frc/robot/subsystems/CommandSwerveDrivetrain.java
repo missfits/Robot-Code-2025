@@ -20,12 +20,15 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -73,11 +76,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     
     private Pigeon2 m_gyro = getPigeon2();
+
+    private final Vector<N3> stateStdDevs = VecBuilder.fill(1, 1,1);
+    private final Vector<N3> visionStdDevs = VecBuilder.fill(1, 1, 1);
+
     public final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
         this.getKinematics(), 
         this.getPigeon2().getRotation2d(), 
         this.getState().ModulePositions, 
-        this.getState().Pose); 
+        this.getState().Pose,
+        stateStdDevs,
+        visionStdDevs); 
 
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
