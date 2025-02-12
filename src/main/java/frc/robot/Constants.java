@@ -43,6 +43,75 @@ public final class Constants {
 
     public static final double WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
   }
+
+  public static class ElevatorConstants {
+    public static final int ELEVATOR_MOTOR_ID = 21; // placeholder
+  
+    public static final int COUNTS_PER_REV = 42; // may need to be updated
+
+    public static final double INITIAL_POSITION = 0;
+    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double MAX_SPEED = 0.0; 
+    public static final double SPEED_LOWER_LIMIT = 0.0;
+    public static final double SPEED_UPPER_LIMIT = 0.0;
+    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
+
+    // not tuned
+    public static final double kS = 0;
+    public static final double kG = 0;
+    public static final double kV = 12/MAX_SPEED; // may need to be updated
+    public static final double kA = 0;
+
+    public static final double kP = 0; 
+    public static final double kI = 0;
+    public static final double kD = 0; 
+
+    public static final double kMaxV = 0;
+    public static final double kMaxA = 0; 
+
+  }
+
+  public static class ArmConstants {
+    public static final int ARM_MOTOR_ID = 22; // placeholder
+
+    public static final int COUNTS_PER_REV = 42; // may need to be updated
+
+    public static final double INITIAL_POSITION = 0; // facing down
+    public static final double POSITION_OFFSET = Math.PI/2; // difference between pid 0 (horizontal) and our 0 (down)
+    public static final double DEGREES_PER_ROTATION = 0.0; 
+    public static final double MAX_SPEED = 0.0; 
+    public static final double SPEED_LOWER_LIMIT = 0.0;
+    public static final double SPEED_UPPER_LIMIT = 0.0;
+    public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
+
+    public static final double kS = 0;
+    public static final double kG = 0;
+    public static final double kV = 12/MAX_SPEED; // may need to be updated
+    public static final double kA = 0;
+
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    
+    public static final double kMaxV = 0;
+    public static final double kMaxA = 0; 
+  }
+
+  public static class CollarConstants {
+    public static final int COLLAR_MOTOR_ID = 23; // placeholder
+    public static final int MOTOR_STATOR_LIMIT = 20; // needs to be tuned
+
+    public static final int COUNTS_PER_REV = 42; // may need to be updated
+
+    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double MAX_SPEED = 0.0; 
+    public static final double SPEED_LOWER_LIMIT = 0.0;
+    public static final double SPEED_UPPER_LIMIT = 0.0;
+  }
+
+  public static class RampConstants {
+
+  }
   
   public static class LEDConstants {
     public static final int KPORT = 0;
@@ -64,5 +133,22 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int LASER_CAN_ID = 14;
+  }
+
+  public static class RobotStateConstants {
+    public static final double C1_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C1_ARM_POS = Math.toRadians(0.0);
+    public static final double C2_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C2_ARM_POS = Math.toRadians(0.0);
+    public static final double C3_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C3_ARM_POS = Math.toRadians(0.0);
+    public static final double C4_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double C4_ARM_POS = Math.toRadians(0.0);
+    public static final double A2_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double A2_ARM_POS = Math.toRadians(0.0);
+    public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double A3_ARM_POS = Math.toRadians(0.0);
+    public static final double IN_ELEVATOR_POS = Math.toRadians(0.0);
+    public static final double IN_ARM_POS = Math.toRadians(0.0);
   }
 }

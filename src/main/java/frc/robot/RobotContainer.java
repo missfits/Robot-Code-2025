@@ -49,17 +49,14 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
-import frc.robot.subsystems.lifter.ElevatorAndArmSubsystem;
+import frc.robot.subsystems.lifter.LifterCommandFactory;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.commands.AutoAlignCommand;
 
 
 public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
-
-  public enum RobotState { 
-    L1_CORAL, L2_CORAL, L3_CORAL, L4_CORAL, L2_ALGAE, L3_ALGAE, INTAKE
-  } 
 
   private RobotState currentState = RobotState.INTAKE;
   private RobotState nextState = RobotState.INTAKE;
@@ -78,7 +75,9 @@ public class RobotContainer {
   private final VisionSubsystem m_vision = new VisionSubsystem();
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
-  private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
+  private final RampSubsystem m_ramp = new RampSubsystem();
+
+  private final LifterCommandFactory m_lifter = new LifterCommandFactory();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -195,7 +194,6 @@ public class RobotContainer {
     testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-    
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
