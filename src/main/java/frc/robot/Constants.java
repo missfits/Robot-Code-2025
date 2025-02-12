@@ -54,6 +54,10 @@ public final class Constants {
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
+    
+    public static final double POSITION_LOWER_LIMIT = 0.0;
+    public static final double POSITION_UPPER_LIMIT = 0.0;
+    
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     // not tuned
@@ -69,6 +73,7 @@ public final class Constants {
     public static final double kMaxV = 0;
     public static final double kMaxA = 0; 
 
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 0.0;
   }
 
   public static class ArmConstants {
@@ -95,6 +100,8 @@ public final class Constants {
     
     public static final double kMaxV = 0;
     public static final double kMaxA = 0; 
+
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 0.0;
   }
 
   public static class CollarConstants {
@@ -107,6 +114,8 @@ public final class Constants {
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
+
+    public static final double OUTTAKE_MOTOR_SPEED = 0.0;
   }
 
   public static class RampConstants {
