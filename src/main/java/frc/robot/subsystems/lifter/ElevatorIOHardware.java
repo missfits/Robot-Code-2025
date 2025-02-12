@@ -56,7 +56,7 @@ public class ElevatorIOHardware {
         m_elevatorMotor.setControl(new VoltageOut(value));
     }
     
-    public void setVoltage(PositionVoltage request) {
-        m_elevatorMotor.setControl(request);
+    public void requestClosedLoopPosition(double value) {
+        m_elevatorMotor.setControl(new PositionVoltage(value));
     }
 }

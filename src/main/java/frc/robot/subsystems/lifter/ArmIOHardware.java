@@ -55,7 +55,7 @@ public class ArmIOHardware {
         m_armMotor.setControl(new VoltageOut(value));
     }
     
-    public void setVoltage(PositionVoltage request) {
-        m_armMotor.setControl(request);
+    public void requestClosedLoopPosition(double value) {
+        m_armMotor.setControl(new PositionVoltage(value));
     }
 }

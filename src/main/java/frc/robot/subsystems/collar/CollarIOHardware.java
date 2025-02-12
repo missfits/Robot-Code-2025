@@ -56,7 +56,7 @@ public class CollarIOHardware {
         m_collarMotor.setControl(new VoltageOut(value));
     }
     
-    public void setVoltage(PositionVoltage request) {
-        m_collarMotor.setControl(request);
+    public void requestClosedLoopPosition(double value) {
+        m_collarMotor.setControl(new PositionVoltage(value));
     }
 }
