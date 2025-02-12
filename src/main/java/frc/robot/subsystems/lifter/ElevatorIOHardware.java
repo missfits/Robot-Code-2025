@@ -40,7 +40,6 @@ public class ElevatorIOHardware {
 
     // setters
     public void motorOff() {
-        m_elevatorMotor.setVoltage(0);
         m_elevatorMotor.stopMotor();
     }
 

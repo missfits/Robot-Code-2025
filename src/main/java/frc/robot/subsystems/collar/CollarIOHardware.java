@@ -40,7 +40,6 @@ public class CollarIOHardware {
 
     // setters
     public void motorOff() {
-        m_collarMotor.setVoltage(0);
         m_collarMotor.stopMotor();
     }
 

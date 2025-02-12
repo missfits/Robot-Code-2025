@@ -43,7 +43,6 @@ public class ArmIOHardware {
 
     // setters
     public void motorOff() {
-        m_armMotor.setVoltage(0);
         m_armMotor.stopMotor();
     }
 
