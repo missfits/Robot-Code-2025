@@ -31,7 +31,9 @@ public class ElevatorSubsystem extends SubsystemBase{
     private TrapezoidProfile m_profile;
 
     // constructor
-    public ElevatorSubsystem() {}
+    public ElevatorSubsystem() {
+        m_IO.resetPosition();
+    }
 
     // commands
     public Command manualMoveCommand() {

@@ -30,16 +30,19 @@ public class ArmIOHardware {
 
     // getters
     public double getPosition() {
-        return m_positionSignal.getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION;
+        return Math.toRadians(m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION);
+    }
+
+    public double getPositionDegrees() {
+        return m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
     public double getVelocity() {
-        return m_velocitySignal.getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
+        return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
     // setters
     public void motorOff() {
-        m_armMotor.setVoltage(0);
         m_armMotor.stopMotor();
     }
 
@@ -48,14 +51,14 @@ public class ArmIOHardware {
     }
 
     public void resetPosition() {
-        setPosition(0);
+        setPosition(ArmConstants.INITIAL_POSITION);
     }
 
     public void setVoltage(double value) {
         m_armMotor.setControl(new VoltageOut(value));
     }
     
-    public void setVoltage(PositionVoltage request) {
-        m_armMotor.setControl(request);
+    public void requestClosedLoopPosition(double value) {
+        m_armMotor.setControl(new PositionVoltage(value));
     }
 }

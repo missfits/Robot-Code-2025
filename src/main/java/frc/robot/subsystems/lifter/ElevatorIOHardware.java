@@ -31,16 +31,15 @@ public class ElevatorIOHardware {
     // ----- MOTOR METHODS -----
     // getters
     public double getPosition() {
-        return m_positionSignal.getValue().in(Revolutions)*ElevatorConstants.METERS_PER_ROTATION;
+        return m_positionSignal.refresh().getValue().in(Revolutions)*ElevatorConstants.METERS_PER_ROTATION;
     }
 
     public double getVelocity() {
-        return m_velocitySignal.getValue().in(RevolutionsPerSecond)*ElevatorConstants.METERS_PER_ROTATION;
+        return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ElevatorConstants.METERS_PER_ROTATION;
     }
 
     // setters
     public void motorOff() {
-        m_elevatorMotor.setVoltage(0);
         m_elevatorMotor.stopMotor();
     }
 
@@ -49,7 +48,7 @@ public class ElevatorIOHardware {
     }
 
     public void resetPosition() {
-        setPosition(0);
+        setPosition(ElevatorConstants.INITIAL_POSITION);
     }
 
     public void setVoltage(double value) {
@@ -59,7 +58,7 @@ public class ElevatorIOHardware {
         } 
     }
     
-    public void setVoltage(PositionVoltage request) {
-        m_elevatorMotor.setControl(request);
+    public void requestClosedLoopPosition(double value) {
+        m_elevatorMotor.setControl(new PositionVoltage(value));
     }
 }

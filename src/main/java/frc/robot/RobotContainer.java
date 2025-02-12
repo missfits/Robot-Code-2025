@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.RobotStateConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstants;
@@ -50,7 +49,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
-import frc.robot.subsystems.lifter.LifterSubsystem;
+import frc.robot.subsystems.lifter.LifterCommandFactory;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.commands.AutoAlignCommand;
 
@@ -58,34 +57,6 @@ import frc.robot.commands.AutoAlignCommand;
 public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
-
-  public enum RobotState { 
-    L1_CORAL(RobotStateConstants.C1_ELEVATOR_POS, RobotStateConstants.C1_ARM_POS), 
-    L2_CORAL(RobotStateConstants.C2_ELEVATOR_POS, RobotStateConstants.C2_ARM_POS), 
-    L3_CORAL(RobotStateConstants.C3_ELEVATOR_POS, RobotStateConstants.C3_ARM_POS), 
-    L4_CORAL(RobotStateConstants.C4_ELEVATOR_POS, RobotStateConstants.C4_ARM_POS), 
-    L2_ALGAE(RobotStateConstants.A2_ELEVATOR_POS, RobotStateConstants.A2_ARM_POS), 
-    L3_ALGAE(RobotStateConstants.A3_ELEVATOR_POS, RobotStateConstants.A3_ARM_POS), 
-    INTAKE(RobotStateConstants.IN_ELEVATOR_POS, RobotStateConstants.IN_ARM_POS);
-
-    private final double elevatorPos;
-    private final double armPos;
-
-    // constructor
-    private RobotState(double ep, double ap) {
-      elevatorPos = ep;
-      armPos = ap;
-    }
-
-    // getters
-    public double getElevatorPos() {
-      return elevatorPos;
-    }
-
-    public double getArmPos() {
-      return armPos;
-    }
-  } 
 
   private RobotState currentState = RobotState.INTAKE;
   private RobotState nextState = RobotState.INTAKE;
@@ -104,8 +75,9 @@ public class RobotContainer {
   private final VisionSubsystem m_vision = new VisionSubsystem();
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
-  private final LifterSubsystem m_lifter = new LifterSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
+
+  private final LifterCommandFactory m_lifter = new LifterCommandFactory();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband

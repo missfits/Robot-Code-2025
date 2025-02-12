@@ -14,7 +14,7 @@ public class CollarSubsystem extends SubsystemBase {
     
     // constructor
     public CollarSubsystem() {
-        
+        m_IO.resetPosition();
     }
 
     public Command getCommand(RobotState targetRobotState) {

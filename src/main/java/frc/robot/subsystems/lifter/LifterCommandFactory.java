@@ -1,19 +1,17 @@
 package frc.robot.subsystems.lifter;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.RobotState;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
-import frc.robot.RobotContainer.RobotState;
 
-
-public class LifterSubsystem extends SubsystemBase {
+public class LifterCommandFactory {
     private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
     private final ArmSubsystem m_arm = new ArmSubsystem();
 
     // constructor
-    public LifterSubsystem() {}
+    public LifterCommandFactory() {}
 
     public Command getCommand(RobotState targetRobotState) {
         return new WaitCommand(0);

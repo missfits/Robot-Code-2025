@@ -31,16 +31,15 @@ public class CollarIOHardware {
 
     // getters
     public double getPosition() {
-        return m_positionSignal.getValue().in(Revolutions)*CollarConstants.METERS_PER_ROTATION;
+        return m_positionSignal.refresh().getValue().in(Revolutions)*CollarConstants.METERS_PER_ROTATION;
     }
 
     public double getVelocity() {
-        return m_velocitySignal.getValue().in(RevolutionsPerSecond)*CollarConstants.METERS_PER_ROTATION;
+        return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*CollarConstants.METERS_PER_ROTATION;
     }
 
     // setters
     public void motorOff() {
-        m_collarMotor.setVoltage(0);
         m_collarMotor.stopMotor();
     }
 
@@ -56,7 +55,7 @@ public class CollarIOHardware {
         m_collarMotor.setControl(new VoltageOut(value));
     }
     
-    public void setVoltage(PositionVoltage request) {
-        m_collarMotor.setControl(request);
+    public void requestClosedLoopPosition(double value) {
+        m_collarMotor.setControl(new PositionVoltage(value));
     }
 }

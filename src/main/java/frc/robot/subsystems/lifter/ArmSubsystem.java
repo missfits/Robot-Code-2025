@@ -31,7 +31,10 @@ public class ArmSubsystem extends SubsystemBase {
     private TrapezoidProfile m_profile;
 
     // constructor
-    public ArmSubsystem() {}
+    public ArmSubsystem() {
+        m_IO.resetPosition();
+        m_controller.enableContinuousInput(0, 360);
+    }
 
     // commands
     public Command manualMoveCommand() {
@@ -70,7 +73,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_goal);
         
         // calculate part of the power based on target velocity 
-        double feedForwardPower = m_feedforward.calculate(m_profiledReference.position, m_profiledReference.velocity);
+        double feedForwardPower = m_feedforward.calculate(m_profiledReference.position - ArmConstants.POSITION_OFFSET, m_profiledReference.velocity);
 
         // calculate part of the power based on target position + current position
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
