@@ -65,19 +65,19 @@ public class DriveToReefCommand extends Command {
           m_targetTranslation = new Translation2d(
             targetPose.getX()
             + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians())
-            + AutoAlignConstants.REEF_OFFSET_RIGHT * Math.cos(targetPose.getRotation().getRadians()), 
+            + AutoAlignConstants.REEF_OFFSET_RIGHT * Math.cos(Math.PI/2 + targetPose.getRotation().getRadians()), 
             targetPose.getY()
             + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians())
-            + AutoAlignConstants.REEF_OFFSET_RIGHT * Math.sin(targetPose.getRotation().getRadians()));
+            + AutoAlignConstants.REEF_OFFSET_RIGHT * Math.sin(Math.PI/2 + targetPose.getRotation().getRadians()));
         } else {
           // for the left side subtract reef offset value
           m_targetTranslation = new Translation2d(
             targetPose.getX()
             + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians())
-            - AutoAlignConstants.REEF_OFFSET_LEFT * Math.cos(targetPose.getRotation().getRadians()), 
+            - AutoAlignConstants.REEF_OFFSET_LEFT * Math.cos(Math.PI/2 + targetPose.getRotation().getRadians()), 
             targetPose.getY()
             + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians())
-            - AutoAlignConstants.REEF_OFFSET_LEFT * Math.sin(targetPose.getRotation().getRadians()));
+            - AutoAlignConstants.REEF_OFFSET_LEFT * Math.sin(Math.PI/2 + targetPose.getRotation().getRadians()));
         }
         
     
