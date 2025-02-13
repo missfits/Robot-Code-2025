@@ -47,6 +47,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
+import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -144,8 +145,11 @@ public class RobotContainer {
 
     driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
     
-    // "temporary" for testing. only press after running rotatetofacereef (right trigger)
-    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision)); 
+    // "temporary" for testing. moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
+    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
+
+    // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
+    driverJoystick.leftBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
 
     // // move lifter to next position 
     // driverJoystick.leftBumper().onTrue(

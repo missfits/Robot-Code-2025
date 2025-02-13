@@ -54,6 +54,11 @@ public final class Constants {
     public static final int KLENGTH = 30;
   }
 
+  public static class AutoAlignConstants {
+    public static final double REEF_OFFSET_RIGHT = 0.3;
+    public static final double REEF_OFFSET_LEFT = 0.3;
+  }
+
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 

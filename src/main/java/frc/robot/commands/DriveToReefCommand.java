@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionSubsystem;
@@ -21,10 +22,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class DriveToReefCommand extends Command {
+
+  public enum ReefPosition {
+    LEFT, RIGHT
+  }
+
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final CommandSwerveDrivetrain m_drivetrain;
   private Translation2d m_targetTranslation = new Translation2d();
   private final VisionSubsystem m_vision;
+  private final ReefPosition m_side;
 
   private final PIDController xController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
   private final PIDController yController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
@@ -37,9 +44,10 @@ public class DriveToReefCommand extends Command {
      * @param drivetrain The drivetrain subsystem used by this command.
      * @param Pose2d The target pose (but only Translation) used by this command.
      */
-    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision) {
+    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision, ReefPosition side) {
       m_drivetrain = drivetrain;
       m_vision = vision;
+      m_side = side;
     
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(drivetrain);
@@ -51,12 +59,27 @@ public class DriveToReefCommand extends Command {
     public void initialize() {
       Pose2d targetPose = m_vision.getTargetPose();
       if (targetPose != null) {
-        // cos and sin offset because the robot has width and is not a point!
-      m_targetTranslation = new Translation2d(
-        targetPose.getX()
-        + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians()), 
-        targetPose.getY()
-         + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians()));
+        // offset with robot size because the robot has width and is not a point!
+        if (m_side.equals(ReefPosition.RIGHT)) {
+          // for the right side add reef offset value
+          m_targetTranslation = new Translation2d(
+            targetPose.getX()
+            + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians())
+            + AutoAlignConstants.REEF_OFFSET_RIGHT * Math.cos(targetPose.getRotation().getRadians()), 
+            targetPose.getY()
+            + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians())
+            + AutoAlignConstants.REEF_OFFSET_RIGHT * Math.sin(targetPose.getRotation().getRadians()));
+        } else {
+          // for the left side subtract reef offset value
+          m_targetTranslation = new Translation2d(
+            targetPose.getX()
+            + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.cos(targetPose.getRotation().getRadians())
+            - AutoAlignConstants.REEF_OFFSET_LEFT * Math.cos(targetPose.getRotation().getRadians()), 
+            targetPose.getY()
+            + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians())
+            - AutoAlignConstants.REEF_OFFSET_LEFT * Math.sin(targetPose.getRotation().getRadians()));
+        }
+        
     
       } else {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
