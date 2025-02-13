@@ -10,10 +10,15 @@ import frc.robot.subsystems.VisionSubsystem;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.DriverStation;
+
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 
 public class RotateToFaceReefCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -21,7 +26,7 @@ public class RotateToFaceReefCommand extends Command {
   private final VisionSubsystem m_vision;
   private Rotation2d targetRotation;
   private  boolean targetFound = false;;
-  private final SwerveRequest.FieldCentricFacingAngle snapToAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withVelocityX(0).withVelocityY(0);
+  private final SwerveRequest.FieldCentricFacingAngle snapToAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withVelocityX(0).withVelocityY(0).withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
   
   
     /**
@@ -53,7 +58,8 @@ public class RotateToFaceReefCommand extends Command {
     public void execute() {      
     // only get targetRotation once
     if (m_vision.getTargetFound() && !targetFound) {
-      targetRotation = Rotation2d.fromRadians(m_vision.getTargetYaw());
+      targetRotation = Rotation2d.fromRadians(Math.PI + m_vision.getTargetYaw());
+
       targetFound = true;
     }
 

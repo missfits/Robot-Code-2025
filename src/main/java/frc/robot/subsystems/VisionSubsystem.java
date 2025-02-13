@@ -98,37 +98,19 @@ public class VisionSubsystem extends SubsystemBase {
       }
 
       if (result.hasTargets()) {
-        PhotonTrackedTarget target = result.getBestTarget(); 
+        PhotonTrackedTarget target = result.getBestTarget();
+        double biggestTargetArea = 0;
+        for (PhotonTrackedTarget sampleTarget : result.getTargets()){ 
+          //loops through every sample target in results.getTargets()
+          //if the sample target's area is bigger than the biggestTargetArea, then the sample target
+          // is set to the target, and the biggest Target Area is set to the sample's target area
+          if (sampleTarget.getArea() > biggestTargetArea){
+            biggestTargetArea = sampleTarget.getArea();
+            target = sampleTarget;
+          }
+        }
 
         targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
-
-        // calculate currentPose of robot relative to field
-        // currentPose = PhotonUtils.estimateFieldToRobot(
-        //   VisionConstants.CAMERA_HEIGHT, 
-        //   VisionConstants.CAMERA_PITCH, 
-        //   VisionConstants.TARGET_HEIGHT, 
-        //   VisionConstants.TARGET_PITCH, 
-        //   new Rotation2d(target.getYaw()), 
-        //   new Rotation2d(m_gyro.getYaw().getValue()), 
-        //   targetPose, 
-        //   new Transform2d(VisionConstants.ROBOT_TO_CAM, new Rotation2d(0)));
-
-
-        // targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
-
-        // calculate distance to the target
-        // targetDistanceMeters =
-        //   PhotonUtils.calculateDistanceToTargetMeters(
-        //     VisionConstants.CAMERA_HEIGHT,
-        //     VisionConstants.TARGET_HEIGHT,
-        //     VisionConstants.CAMERA_PITCH,
-        //     Units.degreesToRadians(target.getPitch()));
-
-        // euclidean distance between currentPose and targetPose
-        // targetDistanceMeters = PhotonUtils.getDistanceToPose(currentPose, targetPose);
-
-        // translation 2d between currentPose and targetPose
-        // targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
 
         targetFound = true;
       }
@@ -139,6 +121,8 @@ public class VisionSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
+    SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);
+
     SmartDashboard.putBoolean("inTarget", isWithinTarget());
     SmartDashboard.putNumber("Target X Distance", targetTranslation2d.getX());
     SmartDashboard.putNumber("Target Y Distance", targetTranslation2d.getY());
