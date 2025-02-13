@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -141,15 +142,20 @@ public class VisionSubsystem extends SubsystemBase {
     return isWithinTarget(currentPose,1, 1);
   }
 
-  public Trigger isWithinTargetTrigger(Pose2d currentPose) {
-    return new Trigger(() -> isWithinTarget(currentPose));
+  public Trigger isWithinTargetTrigger(Supplier<Pose2d> currentPoseSupplier) {
+    return new Trigger(() -> isWithinTarget(currentPoseSupplier.get()));
   }
 
   public boolean isWithinTarget(Pose2d currentPose, double toleranceX, double toleranceY) {
-    targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
+    if (targetPose != null) {
+      targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
     
     return (targetFound
-            && Math.abs(targetTranslation2d.getX() - distToTargetX) < toleranceX
-            && Math.abs(targetTranslation2d.getY() - distToTargetY) < toleranceY);
+            && Math.abs(targetTranslation2d.getX()) < toleranceX
+            && Math.abs(targetTranslation2d.getY()) < toleranceY);
+    } else {
+      return false;
+    }
+    
   }
 }
