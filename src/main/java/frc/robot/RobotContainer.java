@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DriveAutoAlignCommand;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
@@ -251,12 +252,12 @@ public class RobotContainer {
     if (estimatedRobotPose != null) {
       Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
     
-      // check if new estimated pose and previous pose are less than 1 meter apart
-      // if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
+      // check if new estimated pose and previous pose are less than 2 meters apart
+      if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
         drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+      }
 
-        m_estPoseField.setRobotPose(estPose2d);
-      // }
+      m_estPoseField.setRobotPose(estPose2d);
     }
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
