@@ -37,8 +37,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
@@ -132,7 +134,9 @@ public class RobotContainer {
     // reset the field-centric heading on left trigger press
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
+    // set lifter controller constants using smartdashboard values
+    driverJoystick.rightTrigger().whileTrue(
+      new InstantCommand( () -> resetControllerConstantsSmartDashboard()));
 
     // move lifter to next position 
     driverJoystick.leftBumper().onTrue(
@@ -200,6 +204,30 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
+  private void resetControllerConstantsSmartDashboard() {
+    ArmConstants.kS = SmartDashboard.getNumber("arm constants/kS", 0);
+    ArmConstants.kG = SmartDashboard.getNumber("arm constants/kG", 0);
+    ArmConstants.kV = SmartDashboard.getNumber("arm constants/kV", 0);
+    ArmConstants.kA = SmartDashboard.getNumber("arm constants/kA", 0);
+    ArmConstants.kP = SmartDashboard.getNumber("arm constants/kP", 0);
+    ArmConstants.kI = SmartDashboard.getNumber("arm constants/kI", 0);
+    ArmConstants.kD = SmartDashboard.getNumber("arm constants/kD", 0);
+    ArmConstants.kMaxV = SmartDashboard.getNumber("arm constants/kMaxV", 0);
+    ArmConstants.kMaxA = SmartDashboard.getNumber("arm constants/kMaxA", 0);
+
+    ElevatorConstants.kS = SmartDashboard.getNumber("elevator constants/kS", 0);
+    ElevatorConstants.kG = SmartDashboard.getNumber("elevator constants/kG", 0);
+    ElevatorConstants.kV = SmartDashboard.getNumber("elevator constants/kV", 0);
+    ElevatorConstants.kA = SmartDashboard.getNumber("elevator constants/kA", 0);
+    ElevatorConstants.kP = SmartDashboard.getNumber("elevator constants/kP", 0);
+    ElevatorConstants.kI = SmartDashboard.getNumber("elevator constants/kI", 0);
+    ElevatorConstants.kD = SmartDashboard.getNumber("elevator constants/kD", 0);
+    ElevatorConstants.kMaxV = SmartDashboard.getNumber("elevator constants/kMaxV", 0);
+    ElevatorConstants.kMaxA = SmartDashboard.getNumber("elevator constants/kMaxA", 0);
+    
+    m_lifter.resetControllers();
+  }
+
   public RobotContainer() {
     DataLogManager.start(); // log networktable 
     DriverStation.startDataLog(DataLogManager.getLog()); // log ds state, joystick data to /u/logs w/ usb stick, or home/lvuser/logs without. 
@@ -220,6 +248,28 @@ public class RobotContainer {
     // Creating the tab for auto chooser in shuffleboard (under tab named "Comp HUD")
     ShuffleboardTab compTab = Shuffleboard.getTab("Comp HUD");
     compTab.add("Auto Chooser", m_autoChooser).withSize(3, 2);
+
+
+    // setup adjustable values in smartdashboard (set them to existing values if they exist)
+    SmartDashboard.putNumber("arm constants/kS", SmartDashboard.getNumber("arm constants/kS", ArmConstants.kS));
+    SmartDashboard.putNumber("arm constants/kG", SmartDashboard.getNumber("arm constants/kG", ArmConstants.kG));
+    SmartDashboard.putNumber("arm constants/kV", SmartDashboard.getNumber("arm constants/kV", ArmConstants.kV));
+    SmartDashboard.putNumber("arm constants/kA", SmartDashboard.getNumber("arm constants/kA", ArmConstants.kA));
+    SmartDashboard.putNumber("arm constants/kP", SmartDashboard.getNumber("arm constants/kP", ArmConstants.kP));
+    SmartDashboard.putNumber("arm constants/kI", SmartDashboard.getNumber("arm constants/kI", ArmConstants.kI));
+    SmartDashboard.putNumber("arm constants/kD", SmartDashboard.getNumber("arm constants/kD", ArmConstants.kD));
+    SmartDashboard.putNumber("arm constants/kMaxV", SmartDashboard.getNumber("arm constants/kMaxV", ArmConstants.kMaxV));
+    SmartDashboard.putNumber("arm constants/kMaxA", SmartDashboard.getNumber("arm constants/kMaxA", ArmConstants.kMaxA));
+
+    SmartDashboard.putNumber("elevator constants/kS", SmartDashboard.getNumber("elevator constants/kS", ElevatorConstants.kS));
+    SmartDashboard.putNumber("elevator constants/kG", SmartDashboard.getNumber("elevator constants/kG", ElevatorConstants.kG));
+    SmartDashboard.putNumber("elevator constants/kV", SmartDashboard.getNumber("elevator constants/kV", ElevatorConstants.kV));
+    SmartDashboard.putNumber("elevator constants/kA", SmartDashboard.getNumber("elevator constants/kA", ElevatorConstants.kA));
+    SmartDashboard.putNumber("elevator constants/kP", SmartDashboard.getNumber("elevator constants/kP", ElevatorConstants.kP));
+    SmartDashboard.putNumber("elevator constants/kI", SmartDashboard.getNumber("elevator constants/kI", ElevatorConstants.kI));
+    SmartDashboard.putNumber("elevator constants/kD", SmartDashboard.getNumber("elevator constants/kD", ElevatorConstants.kD));
+    SmartDashboard.putNumber("elevator constants/kMaxV", SmartDashboard.getNumber("elevator constants/kMaxV", ElevatorConstants.kMaxV));
+    SmartDashboard.putNumber("elevator constants/kMaxA", SmartDashboard.getNumber("elevator constants/kMaxA", ElevatorConstants.kMaxA));
 
     configureBindings();
 

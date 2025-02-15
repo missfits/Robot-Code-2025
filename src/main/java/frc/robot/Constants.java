@@ -57,17 +57,17 @@ public final class Constants {
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     // not tuned
-    public static final double kS = 0;
-    public static final double kG = 0;
-    public static final double kV = 12/MAX_SPEED; // may need to be updated
-    public static final double kA = 0;
+    public static double kS = 0;
+    public static double kG = 0;
+    public static double kV = 12/MAX_SPEED; // may need to be updated
+    public static double kA = 0;
 
-    public static final double kP = 0; 
-    public static final double kI = 0;
-    public static final double kD = 0; 
+    public static double kP = 0; 
+    public static double kI = 0;
+    public static double kD = 0; 
 
-    public static final double kMaxV = 0;
-    public static final double kMaxA = 0; 
+    public static double kMaxV = 0;
+    public static double kMaxA = 0; 
 
   }
 
@@ -84,17 +84,17 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
-    public static final double kS = 0;
-    public static final double kG = 0;
-    public static final double kV = 12/MAX_SPEED; // may need to be updated
-    public static final double kA = 0;
+    public static double kS = 0;
+    public static double kG = 0;
+    public static double kV = 12/MAX_SPEED; // may need to be updated
+    public static double kA = 0;
 
-    public static final double kP = 0;
-    public static final double kI = 0;
-    public static final double kD = 0;
+    public static double kP = 0;
+    public static double kI = 0;
+    public static double kD = 0;
     
-    public static final double kMaxV = 0;
-    public static final double kMaxA = 0; 
+    public static double kMaxV = 0;
+    public static double kMaxA = 0; 
   }
 
   public static class CollarConstants {

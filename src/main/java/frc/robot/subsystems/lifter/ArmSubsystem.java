@@ -11,18 +11,18 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
     private final ArmIOHardware m_IO = new ArmIOHardware();
-    private final ArmFeedforward m_feedforward = new ArmFeedforward(
+    private ArmFeedforward m_feedforward = new ArmFeedforward(
         ArmConstants.kS,
         ArmConstants.kG,
         ArmConstants.kV,
         ArmConstants.kA
     );
-    private final PIDController m_controller = new PIDController(
+    private PIDController m_controller = new PIDController(
         ArmConstants.kP,
         ArmConstants.kI,
         ArmConstants.kD
     );
-    private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
+    private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ArmConstants.kMaxV, ArmConstants.kMaxA
     );
     private TrapezoidProfile.State m_goal;
@@ -69,5 +69,22 @@ public class ArmSubsystem extends SubsystemBase {
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
+    }
+
+    public void resetControllers() {
+        m_feedforward = new ArmFeedforward(
+            ArmConstants.kS,
+            ArmConstants.kG,
+            ArmConstants.kV,
+            ArmConstants.kA
+        );
+        m_controller = new PIDController(
+            ArmConstants.kP,
+            ArmConstants.kI,
+            ArmConstants.kD
+        );
+            m_constraints = new TrapezoidProfile.Constraints(
+            ArmConstants.kMaxV, ArmConstants.kMaxA
+        );
     }
 }

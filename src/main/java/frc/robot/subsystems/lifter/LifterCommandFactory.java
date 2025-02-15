@@ -24,4 +24,10 @@ public class LifterCommandFactory {
         );
     }
 
+    public void resetControllers() {
+        m_elevator.resetControllers();
+        m_arm.resetControllers();
+
+    }
+
 }
