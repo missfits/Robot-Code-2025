@@ -36,6 +36,13 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     // commands
+    public Command keepInPlaceCommand() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(m_feedforward.calculate(m_IO.getPosition(), 0)),
+            () -> m_IO.motorOff()
+        );
+    }
+
     public Command manualMoveCommand() {
         return new StartEndCommand(
             () -> m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
