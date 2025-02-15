@@ -3,6 +3,7 @@ package frc.robot.subsystems.lifter;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -85,5 +86,11 @@ public class ElevatorSubsystem extends SubsystemBase{
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
+        SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
     }
 }
