@@ -180,15 +180,15 @@ public class RobotContainer {
     //   new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
     //   m_ledSubsystem.runSolidWhite())); 
 
-    copilotJoystick.a().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}),
-      m_ledSubsystem.runSolidPurple())); 
+    // copilotJoystick.a().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}),
+    //   m_ledSubsystem.runSolidPurple())); 
 
-    copilotJoystick.y().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
-      m_ledSubsystem.runSolidPink())); 
+    // copilotJoystick.y().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
+    //   m_ledSubsystem.runSolidPink())); 
 
     //open loop control testing:
     copilotJoystick.leftTrigger().whileTrue(
@@ -202,6 +202,12 @@ public class RobotContainer {
     
     copilotJoystick.rightBumper().whileTrue(
       m_arm.manualMoveBackwardCommand());
+
+    copilotJoystick.a().whileTrue(
+      m_collar.runCollar());
+    
+    copilotJoystick.y().whileTrue(
+      m_collar.runCollarBackward());
     
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());

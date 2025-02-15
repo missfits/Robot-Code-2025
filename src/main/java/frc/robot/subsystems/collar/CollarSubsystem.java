@@ -28,4 +28,12 @@ public class CollarSubsystem extends SubsystemBase {
             this
         );
     }
+
+    public Command runCollarBackward() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(CollarConstants.OUTTAKE_MOTOR_SPEED),
+            () -> m_IO.motorOff(),
+            this
+        );
+    }
 }
