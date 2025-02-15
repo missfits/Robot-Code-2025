@@ -44,6 +44,14 @@ public class ElevatorSubsystem extends SubsystemBase{
         );
     }
 
+    public Command manualMoveBackwardCommand() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> m_IO.motorOff(),
+            this
+        );
+    }
+
     public Command moveToCommand(double targetPosition) {
         return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
     }

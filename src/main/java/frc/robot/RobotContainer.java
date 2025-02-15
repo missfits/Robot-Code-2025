@@ -49,9 +49,13 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
+import frc.robot.subsystems.lifter.ArmSubsystem;
+import frc.robot.subsystems.lifter.ElevatorIOHardware;
+import frc.robot.subsystems.lifter.ElevatorSubsystem;
 import frc.robot.subsystems.lifter.LifterCommandFactory;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.commands.AutoAlignCommand;
+
 
 
 public class RobotContainer {
@@ -78,6 +82,9 @@ public class RobotContainer {
   private final RampSubsystem m_ramp = new RampSubsystem();
 
   private final LifterCommandFactory m_lifter = new LifterCommandFactory();
+  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+
+  private final ArmSubsystem m_arm = new ArmSubsystem();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -153,31 +160,49 @@ public class RobotContainer {
 
 
     // set next state, change LED colors accordingly 
-    copilotJoystick.leftTrigger().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
-      m_ledSubsystem.runSolidRed())); 
-    copilotJoystick.rightTrigger().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
-      m_ledSubsystem.runSolidOrange())); 
-    copilotJoystick.leftBumper().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
-      m_ledSubsystem.runSolidYellow())); 
-    copilotJoystick.rightBumper().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
-      m_ledSubsystem.runSolidWhite())); 
+    //copilotJoystick.leftTrigger().onTrue(
+      //new ParallelCommandGroup(
+      //new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+      //m_ledSubsystem.runSolidRed())); 
+
+    //copilotJoystick.rightTrigger().onTrue(
+      //new ParallelCommandGroup(
+      //new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+      //m_ledSubsystem.runSolidOrange())); 
+
+    // copilotJoystick.leftBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
+    //   m_ledSubsystem.runSolidYellow())); 
+
+    // copilotJoystick.rightBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
+    //   m_ledSubsystem.runSolidWhite())); 
+
     copilotJoystick.a().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}),
       m_ledSubsystem.runSolidPurple())); 
+
     copilotJoystick.y().onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
       m_ledSubsystem.runSolidPink())); 
 
+    //open loop control testing:
+    copilotJoystick.leftTrigger().whileTrue(
+      m_elevator.manualMoveCommand());
+    
+    copilotJoystick.rightTrigger().whileTrue(
+      m_arm.manualMoveCommand());
+
+    copilotJoystick.leftBumper().whileTrue(
+      m_elevator.manualMoveBackwardCommand());
+    
+    copilotJoystick.rightBumper().whileTrue(
+      m_arm.manualMoveBackwardCommand());
+    
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
 

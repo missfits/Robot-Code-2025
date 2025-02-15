@@ -55,7 +55,7 @@ public class ElevatorIOHardware {
         if (this.getPosition() > ElevatorConstants.POSITION_LOWER_LIMIT && 
             this.getPosition() < ElevatorConstants.POSITION_UPPER_LIMIT) {
             m_elevatorMotor.setControl(new VoltageOut(value));
-        } 
+        }
     }
     
     public void requestClosedLoopPosition(double value) {

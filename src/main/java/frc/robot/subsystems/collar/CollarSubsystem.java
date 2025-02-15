@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 import frc.robot.Constants.CollarConstants;
-import frc.robot.RobotContainer.RobotState;
+import frc.robot.RobotState;
 
 public class CollarSubsystem extends SubsystemBase {
     private final CollarIOHardware m_IO = new CollarIOHardware();

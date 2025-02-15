@@ -44,6 +44,13 @@ public class ArmSubsystem extends SubsystemBase {
             this
         );
     }
+    public Command manualMoveBackwardCommand() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(-ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> m_IO.motorOff(),
+            this
+        );
+    }
 
 
     public Command moveToCommand(double targetPosition) {
