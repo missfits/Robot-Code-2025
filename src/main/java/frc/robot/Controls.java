@@ -7,7 +7,7 @@ import frc.robot.RobotContainer.JoystickVals;
 public class Controls {
     
     public static JoystickVals adjustInputs(double x, double y, boolean slowmode) {
-        return adjustSlowmode(inputShape(x, y), slowmode);
+        return adjustSlowmode(inputShape(-x, -y), slowmode); // negated x and y input for DYNAMENE
     }
 
 
