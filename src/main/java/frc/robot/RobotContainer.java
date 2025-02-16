@@ -140,8 +140,13 @@ public class RobotContainer {
     }));
 
     // reset the field-centric heading on left trigger press
-    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
+    driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
+    // reset fused vision pose estimator on left bumper press
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetRobotPoseWithDrivePoseEst()));
+
+
+    // auto rotate to face reef command
     driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
 
     // move lifter to next position 
@@ -254,18 +259,19 @@ public class RobotContainer {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
-      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d(); // estimated robot pose of vision
     
-      // check if new estimated pose and previous pose are less than 1 meter apart
-      // if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
-        drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+      // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+      if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
+        drivetrain.fusedPoseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+      }
 
         m_estPoseField.setRobotPose(estPose2d);
-      // }
     }
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
-    drivetrain.updatePoseWithPoseEst();
+    drivetrain.updateRobotPoseWithFusedPoseEst();
+    drivetrain.updateDrivePoseWithOdometry();
   }
 
 }

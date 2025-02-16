@@ -80,7 +80,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final Vector<N3> stateStdDevs = VecBuilder.fill(1, 1,1);
     private final Vector<N3> visionStdDevs = VecBuilder.fill(1, 1, 1);
 
-    public final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+    // fusePoseEstimator stores vision + drivetrain pose
+    public final SwerveDrivePoseEstimator fusedPoseEstimator = new SwerveDrivePoseEstimator(
         this.getKinematics(), 
         this.getPigeon2().getRotation2d(), 
         this.getState().ModulePositions, 
@@ -88,6 +89,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         stateStdDevs,
         visionStdDevs); 
 
+        // drivePoseEstimator stores just drivetrain pose
+        public final SwerveDrivePoseEstimator drivePoseEstimator = new SwerveDrivePoseEstimator(
+            this.getKinematics(), 
+            this.getPigeon2().getRotation2d(), 
+            this.getState().ModulePositions, 
+            this.getState().Pose); 
+        
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
     private DoubleArrayPublisher voltagePublisher = NetworkTableInstance.getDefault().getDoubleArrayTopic("drivetrain/moduleVoltages").publish();
@@ -254,24 +262,43 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
-    public SwerveDrivePoseEstimator getPoseEstimator(){
-        return poseEstimator;
+    public SwerveDrivePoseEstimator getFusedPoseEstimator(){
+        return fusedPoseEstimator;
+    }
+
+    public SwerveDrivePoseEstimator getDrivePoseEstimator(){
+        return drivePoseEstimator;
     }
 
     public Rotation2d getRobotRotation(){
         return this.getState().Pose.getRotation();
     } 
     
-    public void updatePoseWithPoseEst(){
-        this.resetPose(poseEstimator.update(
+    public void updateRobotPoseWithFusedPoseEst(){
+        this.resetPose(fusedPoseEstimator.update(
             this.getPigeon2().getRotation2d(), 
             this.getState().ModulePositions)); 
     }
 
+    // doesn't change robot pose, hust stored SwerveDrivePoseEst
+    public void updateDrivePoseWithOdometry(){
+        drivePoseEstimator.update(
+            this.getPigeon2().getRotation2d(),
+            this.getState().ModulePositions);
+    }
+
+    // updates both fused pose and drivetrain only pose
     public void setNewPose(Pose2d newPose){
-        poseEstimator.resetPose(newPose);
+        drivePoseEstimator.resetPose(newPose);
+        fusedPoseEstimator.resetPose(newPose);
         this.resetPose(newPose);
     }
+
+    // resets fusedPoseEst to drivePoseEst
+    public void resetRobotPoseWithDrivePoseEst(){
+        setNewPose(drivePoseEstimator.getEstimatedPosition());
+    }
+
 
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
     public void setBrake(boolean brake) {
