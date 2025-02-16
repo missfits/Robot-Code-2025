@@ -208,6 +208,10 @@ public class RobotContainer {
     
     copilotJoystick.y().whileTrue(
       m_collar.runCollarBackward());
+
+    m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
+    m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
+
     
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
