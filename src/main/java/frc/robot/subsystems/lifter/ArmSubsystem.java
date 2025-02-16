@@ -38,6 +38,13 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     // commands
+    public Command keepInPlaceCommand() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0)),
+            () -> m_IO.motorOff()
+        );
+    }
+
     public Command manualMoveCommand() {
         return new StartEndCommand(
             () -> m_IO.setVoltage(ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
@@ -52,7 +59,6 @@ public class ArmSubsystem extends SubsystemBase {
             this
         );
     }
-
 
     public Command moveToCommand(double targetPosition) {
         return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
