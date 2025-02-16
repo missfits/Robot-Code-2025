@@ -211,6 +211,8 @@ public class RobotContainer {
 
     m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
+    m_collar.setDefaultCommand(m_collar.runCollarOff());
+
 
     
     // run command runSolidGreen continuously if robot isWithinTarget()
