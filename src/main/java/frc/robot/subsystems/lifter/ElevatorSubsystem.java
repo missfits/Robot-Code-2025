@@ -40,7 +40,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public Command keepInPlaceCommand() {
         return new StartEndCommand(
             () -> m_IO.setVoltage(m_feedforward.calculate(m_IO.getPosition(), 0)),
-            () -> m_IO.motorOff()
+            () -> m_IO.motorOff(),
+            this
         );
     }
 
