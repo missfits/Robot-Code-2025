@@ -99,7 +99,17 @@ public class VisionSubsystem extends SubsystemBase {
       }
 
       if (result.hasTargets()) {
-        PhotonTrackedTarget target = result.getBestTarget(); 
+        PhotonTrackedTarget target = result.getBestTarget();
+        double biggestTargetArea = 0;
+        for (PhotonTrackedTarget sampleTarget : result.getTargets()){ 
+          //loops through every sample target in results.getTargets()
+          //if the sample target's area is bigger than the biggestTargetArea, then the sample target
+          // is set to the target, and the biggest Target Area is set to the sample's target area
+          if (sampleTarget.getArea() > biggestTargetArea){
+            biggestTargetArea = sampleTarget.getArea();
+            target = sampleTarget;
+          }
+        }
 
         targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
 
@@ -126,6 +136,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
+    SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);
     SmartDashboard.putNumber("Target X Distance", targetTranslation2d.getX());
     SmartDashboard.putNumber("Target Y Distance", targetTranslation2d.getY());
 
