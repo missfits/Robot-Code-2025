@@ -6,6 +6,7 @@ package frc.robot;
 
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
 
 
 /**
@@ -50,15 +51,19 @@ public final class Constants {
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
     public static final double INITIAL_POSITION = 0;
-    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double METERS_PER_ROTATION = Units.Meters.convertFrom(1.751 * Math.PI/5, Units.Inches); // temp
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
+    
+    public static final double POSITION_LOWER_LIMIT = 0.01;
+    public static final double POSITION_UPPER_LIMIT = 0.71;
+    
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     // not tuned
     public static double kS = 0;
-    public static double kG = 0;
+    public static double kG = 0.2;
     public static double kV = 12/MAX_SPEED; // may need to be updated
     public static double kA = 0;
 
@@ -69,6 +74,7 @@ public final class Constants {
     public static double kMaxV = 0;
     public static double kMaxA = 0; 
 
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 2.0;
   }
 
   public static class ArmConstants {
@@ -78,7 +84,7 @@ public final class Constants {
 
     public static final double INITIAL_POSITION = 0; // facing down
     public static final double POSITION_OFFSET = Math.PI/2; // difference between pid 0 (horizontal) and our 0 (down)
-    public static final double DEGREES_PER_ROTATION = 0.0; 
+    public static final double DEGREES_PER_ROTATION = 1;  // temp
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
@@ -95,6 +101,8 @@ public final class Constants {
     
     public static double kMaxV = 0;
     public static double kMaxA = 0; 
+
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
   }
 
   public static class CollarConstants {
@@ -107,6 +115,8 @@ public final class Constants {
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
+
+    public static final double OUTTAKE_MOTOR_SPEED = 4.0;
   }
 
   public static class RampConstants {

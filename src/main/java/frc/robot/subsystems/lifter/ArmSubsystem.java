@@ -3,8 +3,11 @@ package frc.robot.subsystems.lifter;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.ArmConstants;
@@ -36,6 +39,26 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     // commands
+    public Command keepInPlaceCommand() {
+        return new RunCommand(
+            () -> m_IO.setVoltage(0), 
+            this
+        );
+    }
+
+    public Command manualMoveCommand() {
+        return new RunCommand(
+            () -> m_IO.setVoltage(ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            this
+        );
+    }
+    public Command manualMoveBackwardCommand() {
+        return new RunCommand(
+            () -> m_IO.setVoltage(-ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            this
+        );
+    }
+
     public Command moveToCommand(double targetPosition) {
         return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
     }
@@ -86,5 +109,11 @@ public class ArmSubsystem extends SubsystemBase {
             m_constraints = new TrapezoidProfile.Constraints(
             ArmConstants.kMaxV, ArmConstants.kMaxA
         );
+    } 
+    
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("arm/position", m_IO.getPosition());
+        SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
     }
 }
