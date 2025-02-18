@@ -213,7 +213,6 @@ public class RobotContainer {
     // copilotJoystick.y().whileTrue(
     //   m_collar.runCollarBackward());
 
-    m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
     m_collar.setDefaultCommand(m_collar.runCollarOff());
 
 

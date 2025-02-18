@@ -37,7 +37,7 @@ public class ArmSubsystem extends SubsystemBase {
     // constructor
     public ArmSubsystem() {
         m_IO.resetPosition();
-        m_controller.enableContinuousInput(0, 360);
+        m_controller.enableContinuousInput(0, Math.PI*2);
     }
 
     // commands
