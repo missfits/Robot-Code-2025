@@ -42,7 +42,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DrivetrainConstants;
 
-import frc.robot.generated.TunerConstantsDynamene.TunerSwerveDrivetrain;
+import frc.robot.generated.TunerSwerveDrivetrainContainer.TunerSwerveDrivetrain;
 
 
 /**
