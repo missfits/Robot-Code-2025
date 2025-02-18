@@ -5,8 +5,11 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.math.geometry.Translation3d;
 
 
 /**
@@ -34,6 +37,8 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
+
+    public static final double ROBOT_SIZE_X = 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -130,15 +135,29 @@ public final class Constants {
     public static final double BLINK_TIME = 1; // in seconds for after intake/outtake
   }
 
+  public static class AutoAlignConstants {
+    public static final double REEF_OFFSET_RIGHT = 0.3;
+    public static final double REEF_OFFSET_LEFT = 0.3;
+  }
+
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
+    public static final double ROBOT_TO_CAM_X = 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = 0.1397; // in meters from the floor?
+    
+
     public static final Translation2d ROBOT_TO_CAM = 
-      new Translation2d(0.3048, 0); // in meters from center of robot to 2x4 camera mount
+      new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
+
+    public static final Transform3d ROBOT_TO_CAM_3D = 
+      new Transform3d(new Translation3d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y, ROBOT_TO_CAM_Z), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
     
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
+    public static final double TARGET_PITCH = 0; 
   }
 
   public static class IntakeConstants {

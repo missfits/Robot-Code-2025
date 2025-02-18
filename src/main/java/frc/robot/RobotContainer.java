@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.photonvision.EstimatedRobotPose;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -18,16 +19,20 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,8 +47,10 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsDynamene;
+import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
@@ -76,7 +83,7 @@ public class RobotContainer {
   
   private final CommandSwerveDrivetrain drivetrain = TunerConstantsDynamene.createDrivetrain(); // My drivetrain
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
-  private final VisionSubsystem m_vision = new VisionSubsystem();
+  private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
@@ -85,6 +92,7 @@ public class RobotContainer {
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
 
   private final ArmSubsystem m_arm = new ArmSubsystem();
+
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -96,6 +104,10 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
+
+  private final Field2d m_estPoseField = new Field2d();
+  private final Field2d m_actualField = new Field2d();
+
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -137,26 +149,31 @@ public class RobotContainer {
     }));
 
     // reset the field-centric heading on left trigger press
-    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
     driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
+    
+    // "temporary" for testing. moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
+    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
 
-    // move lifter to next position 
-    driverJoystick.leftBumper().onTrue(
-      new ParallelCommandGroup(
-        m_lifter.getCommand(nextState),
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
+    // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
+    driverJoystick.leftBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
+
+    // // move lifter to next position 
+    // driverJoystick.leftBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //     m_lifter.getCommand(nextState),
+    //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
 
-    // outtake from collar, then move lifter to the default position
-    driverJoystick.rightBumper().onTrue(
-      m_collar.getCommand(currentState)
+    // // outtake from collar, then move lifter to the default position
+    // driverJoystick.rightBumper().onTrue(
+    //   m_collar.getCommand(currentState)
 
-      .andThen(new ParallelCommandGroup(
-        // move the lifter to the intake (default) position, reset LED
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
-        m_lifter.getCommand(currentState),
-        m_ledSubsystem.runBlinkGreen().withTimeout(LEDConstants.BLINK_TIME))));
+    //   .andThen(new ParallelCommandGroup(
+    //     // move the lifter to the intake (default) position 
+    //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+    //     m_lifter.getCommand(currentState))));
 
 
     // set next state, change LED colors accordingly 
@@ -245,7 +262,8 @@ public class RobotContainer {
     SignalLogger.enableAutoLogging(false);
     // SignalLogger.start();
     
-
+    SmartDashboard.putData("est pose field", m_estPoseField);
+    SmartDashboard.putData("Actual Field", m_actualField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
@@ -274,6 +292,24 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
+  }
+
+  public void updatePoseEst() {
+
+    EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
+    if (estimatedRobotPose != null) {
+      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+    
+      // check if new estimated pose and previous pose are less than 2 meters apart
+      if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
+        drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+      }
+
+      m_estPoseField.setRobotPose(estPose2d);
+    }
+
+    m_actualField.setRobotPose(drivetrain.getState().Pose);
+    drivetrain.updatePoseWithPoseEst();
   }
 
 }
