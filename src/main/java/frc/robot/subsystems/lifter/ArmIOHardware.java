@@ -3,6 +3,7 @@ package frc.robot.subsystems.lifter;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -57,6 +58,7 @@ public class ArmIOHardware {
 
     public void setVoltage(double value) {
         m_armMotor.setControl(new VoltageOut(value));
+        SmartDashboard.putNumber("arm/voltage", value);
     }
     
     public void requestClosedLoopPosition(double value) {
