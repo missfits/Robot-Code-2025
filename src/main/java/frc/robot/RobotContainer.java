@@ -227,7 +227,12 @@ public class RobotContainer {
     testJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
     testJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
 
-    testJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+    testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+    testJoystick.rightTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+    
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
