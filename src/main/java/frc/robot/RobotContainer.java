@@ -231,6 +231,29 @@ public class RobotContainer {
     testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    
+    //sysID routines for mechanisms 
+    //(comment out other mechanisms while running one of them since they are all bound
+    //to the same buttons )
+    //or change the bindings buttons haha
+    //run sysID routines for collar
+    testJoystick.a().whileTrue(m_collar.sysIdDynamic(Direction.kForward));
+    testJoystick.b().whileTrue(m_collar.sysIdDynamic(Direction.kReverse));
+    testJoystick.x().whileTrue(m_collar.sysIdQuasistatic(Direction.kForward));
+    testJoystick.y().whileTrue(m_collar.sysIdQuasistatic(Direction.kReverse));
+
+    //run sysID routines for elevator
+    testJoystick.a().whileTrue(m_elevator.sysIdDynamic(Direction.kForward));
+    testJoystick.b().whileTrue(m_elevator.sysIdDynamic(Direction.kReverse));
+    testJoystick.x().whileTrue(m_elevator.sysIdQuasistatic(Direction.kForward));
+    testJoystick.y().whileTrue(m_elevator.sysIdQuasistatic(Direction.kReverse));
+
+    //run sysID routines for arm
+    testJoystick.a().whileTrue(m_arm.sysIdDynamic(Direction.kForward));
+    testJoystick.b().whileTrue(m_arm.sysIdDynamic(Direction.kReverse));
+    testJoystick.x().whileTrue(m_arm.sysIdQuasistatic(Direction.kForward));
+    testJoystick.y().whileTrue(m_arm.sysIdQuasistatic(Direction.kReverse));
+
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
