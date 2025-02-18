@@ -119,4 +119,8 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
     }
+
+    public void setBrake(boolean brake) {
+        m_IO.setBrake(brake);
+     }
 }

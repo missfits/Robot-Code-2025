@@ -315,11 +315,14 @@ public class RobotContainer {
   // set motors to appropriate neutral modes for an enabled robot
   public void setEnabledNeutralMode() {
     drivetrain.setBrake(true);
+    m_lifter.setEnabledNeutralMode();
   }
 
   // set motors to appropriate neutral modes for an disabled robot
   public void setDisabledNeutralMode() {
     drivetrain.setBrake(false);
+    m_lifter.setDisabledNeutralMode();
+
   }
 
   public Command getAutonomousCommand() {

@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -73,5 +74,9 @@ public class ElevatorIOHardware {
     
     public void requestClosedLoopPosition(double value) {
         m_elevatorMotor.setControl(new PositionVoltage(value));
+    }
+
+    public void setBrake(boolean brake) {
+        m_elevatorMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
 }

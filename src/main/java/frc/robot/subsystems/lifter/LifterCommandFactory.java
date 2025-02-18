@@ -30,4 +30,14 @@ public class LifterCommandFactory {
 
     }
 
+    public void setDisabledNeutralMode() {
+        m_arm.setBrake(false);
+        m_elevator.setBrake(true);
+    }
+
+    public void setEnabledNeutralMode() {
+        m_arm.setBrake(true);
+        m_elevator.setBrake(true);
+        
+    }
 }

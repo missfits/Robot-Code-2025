@@ -5,6 +5,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -60,5 +61,9 @@ public class ArmIOHardware {
     
     public void requestClosedLoopPosition(double value) {
         m_armMotor.setControl(new PositionVoltage(value));
+    }
+
+    public void setBrake(boolean brake) {
+        m_armMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
 }
