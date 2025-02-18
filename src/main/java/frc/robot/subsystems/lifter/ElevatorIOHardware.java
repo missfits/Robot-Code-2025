@@ -56,7 +56,7 @@ public class ElevatorIOHardware {
     }
 
     public void setVoltage(double value) {
-        value = MathUtil.clamp(value, -3, 3);
+        value = MathUtil.clamp(value, -6, 6);
 
         // if position is too low, only run the elevator up 
         if (this.getPosition() < ElevatorConstants.POSITION_LOWER_LIMIT) {
