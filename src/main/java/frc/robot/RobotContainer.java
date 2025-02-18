@@ -10,6 +10,7 @@ import org.photonvision.EstimatedRobotPose;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -43,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.RotateToFaceReefCommand;
@@ -52,17 +54,14 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
-import frc.robot.subsystems.lifter.ElevatorAndArmSubsystem;
+import frc.robot.subsystems.lifter.LifterCommandFactory;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.commands.AutoAlignCommand;
 
 
 public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
-
-  public enum RobotState { 
-    L1_CORAL, L2_CORAL, L3_CORAL, L4_CORAL, L2_ALGAE, L3_ALGAE, INTAKE
-  } 
 
   private RobotState currentState = RobotState.INTAKE;
   private RobotState nextState = RobotState.INTAKE;
@@ -81,7 +80,9 @@ public class RobotContainer {
   private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
-  private final ElevatorAndArmSubsystem m_lifter = new ElevatorAndArmSubsystem();
+  private final RampSubsystem m_ramp = new RampSubsystem();
+
+  private final LifterCommandFactory m_lifter = new LifterCommandFactory();
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -155,24 +156,37 @@ public class RobotContainer {
       m_collar.getCommand(currentState)
 
       .andThen(new ParallelCommandGroup(
-        // move the lifter to the intake (default) position 
+        // move the lifter to the intake (default) position, reset LED
         new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
-        m_lifter.getCommand(currentState))));
+        m_lifter.getCommand(currentState),
+        m_ledSubsystem.runBlinkGreen().withTimeout(LEDConstants.BLINK_TIME))));
 
 
-    // set next state 
+    // set next state, change LED colors accordingly 
     copilotJoystick.leftTrigger().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+      m_ledSubsystem.runSolidRed())); 
     copilotJoystick.rightTrigger().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+      m_ledSubsystem.runSolidOrange())); 
     copilotJoystick.leftBumper().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
+      m_ledSubsystem.runSolidYellow())); 
     copilotJoystick.rightBumper().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
+      m_ledSubsystem.runSolidWhite())); 
     copilotJoystick.a().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L3_ALGAE;}),
+      m_ledSubsystem.runSolidPurple())); 
     copilotJoystick.y().onTrue(
-      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}));
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
+      m_ledSubsystem.runSolidPink())); 
 
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
@@ -190,7 +204,6 @@ public class RobotContainer {
     testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
