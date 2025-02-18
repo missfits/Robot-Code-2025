@@ -1,16 +1,35 @@
 package frc.robot.subsystems.lifter;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorConstants;
+
+
 
 public class ElevatorSubsystem extends SubsystemBase{
     private final ElevatorIOHardware m_IO = new ElevatorIOHardware();
@@ -99,4 +118,38 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
     }
+
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+    private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+    // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+    private final MutDistance m_distance = Meters.mutable(0);
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+    private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
+
+
+    private final SysIdRoutine m_sysIDRoutineElevatorRoutine = new SysIdRoutine(
+        new SysIdRoutine.Config(Volts.per(Seconds).of(0.5), Volts.of(3), Seconds.of(10)),
+        new SysIdRoutine.Mechanism(
+            output -> m_IO.setVoltage(output.in(Volts)), 
+            log -> {
+                // Record a frame for the shooter motor.
+                log.motor("elevatorsysID")
+                    .voltage(
+                        m_appliedVoltage.mut_replace(
+                            m_IO.getVoltage(), Volts))
+                    .linearPosition(m_distance.mut_replace(m_IO.getPosition(), Meters))
+                    .linearVelocity(
+                        m_velocity.mut_replace(m_IO.getVelocity(), MetersPerSecond));
+              },
+            this
+        )
+    );
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return m_sysIDRoutineElevatorRoutine.quasistatic(direction);
+      }
+      
+      public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return m_sysIDRoutineElevatorRoutine.dynamic(direction);
+      }
 }
