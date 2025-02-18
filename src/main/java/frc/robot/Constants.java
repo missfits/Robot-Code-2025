@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
+import frc.robot.RobotContainer.RobotName;
 import edu.wpi.first.math.geometry.Translation3d;
 
 
@@ -38,7 +39,7 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X = 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? 0.8 : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -143,9 +144,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? 0.33 : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? -0.06 : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? 0.135 : 0.1397; // in meters from the floor?
     
 
     public static final Translation2d ROBOT_TO_CAM = 
