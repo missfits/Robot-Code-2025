@@ -92,6 +92,9 @@ public class ElevatorSubsystem extends SubsystemBase{
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
+
+        SmartDashboard.putNumber("elevator/target position", m_profiledReference.position);
+        SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
     }
     
     public void resetControllers() {

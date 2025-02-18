@@ -92,6 +92,10 @@ public class ArmSubsystem extends SubsystemBase {
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
+
+        SmartDashboard.putNumber("arm/target position", m_profiledReference.position);
+        SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
+
     }
 
     public void resetControllers() {
