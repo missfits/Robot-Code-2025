@@ -41,6 +41,10 @@ public class ArmIOHardware {
     }
 
     public double getVelocity() {
+        return Math.toRadians(m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION);
+    }
+
+    public double getVelocityDegrees() {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
