@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 
 /**
@@ -133,9 +134,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = Units.inchesToMeters(-3); // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = Units.inchesToMeters(-10.25); // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = Units.inchesToMeters(10); // in meters from the floor?
     
 
     public static final Translation2d ROBOT_TO_CAM = 
