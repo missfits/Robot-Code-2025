@@ -1,5 +1,6 @@
 package frc.robot.subsystems.lifter;
 
+import edu.wpi.first.math.MathUtil;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -57,6 +58,7 @@ public class ArmIOHardware {
     }
 
     public void setVoltage(double value) {
+        value = MathUtil.clamp(value, -3, 3);
         m_armMotor.setControl(new VoltageOut(value));
         SmartDashboard.putNumber("arm/voltage", value);
     }
