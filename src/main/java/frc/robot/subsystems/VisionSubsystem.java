@@ -8,6 +8,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -16,9 +17,16 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
@@ -26,27 +34,29 @@ import frc.robot.Constants.VisionConstants;
 
 
 public class VisionSubsystem extends SubsystemBase {
-  private final PhotonCamera m_camera;
+  private final PhotonCamera m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+  private final Pigeon2 m_gyro;
   // private final LEDSubsystem m_ledSubsystem;
   private Translation2d targetTranslation2d = new Translation2d(0,0); // distance to the target; updated every periodic() call if target is found 
   private boolean targetFound; // true if the translation2d was updated last periodic() call
   private Pose2d targetPose;
   private double targetYaw; // in radians, relative to field
   private Pose2d currentPose; // current robot pose, updates periodically
+  private EstimatedRobotPose estimatedRobotPose; 
 
-  private AprilTagFieldLayout aprilTagFieldLayout;
+  private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
+
 
   private double distToTargetX;
   private double distToTargetY;
 
   /** Creates a new Vision Subsystem. */
-  public VisionSubsystem() {
-    m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+  public VisionSubsystem(Pigeon2 pigeon) {
+    m_gyro = pigeon;
     
     distToTargetX = 1;
-    distToTargetY = 1;
-
-    aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    distToTargetY = 1;    
 
   }
 
@@ -60,9 +70,19 @@ public class VisionSubsystem extends SubsystemBase {
     return targetYaw;
   }
 
+  /** returns pose  of target in radians */
+  public Pose2d getTargetPose() {
+    return targetPose;
+  }
+
   public boolean getTargetFound() {
     return targetFound;
   }
+
+  public EstimatedRobotPose getEstimatedRobotPose() {
+    return estimatedRobotPose;
+  }
+
 
   @Override
   public void periodic() {
@@ -75,6 +95,12 @@ public class VisionSubsystem extends SubsystemBase {
       // Camera processed a new frame since last
       // Get the last one in the list.
       var result = results.get(results.size() - 1);
+
+      // update the estimated robot pose if the pose estimator outputs something
+      Optional<EstimatedRobotPose> poseEstimatorOutput = poseEstimator.update(result);
+      if (poseEstimatorOutput.isPresent()) {
+        estimatedRobotPose = poseEstimatorOutput.get(); 
+      }
 
       if (result.hasTargets()) {
         PhotonTrackedTarget target = result.getBestTarget();
@@ -90,6 +116,8 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
+
+        targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
 
         targetFound = true;
       }
