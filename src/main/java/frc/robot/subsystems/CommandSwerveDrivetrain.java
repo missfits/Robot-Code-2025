@@ -76,7 +76,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     
     private Pigeon2 m_gyro = getPigeon2();
-
     private final Vector<N3> stateStdDevs = VecBuilder.fill(1, 1,1);
     private final Vector<N3> visionStdDevs = VecBuilder.fill(1, 1, 1);
 

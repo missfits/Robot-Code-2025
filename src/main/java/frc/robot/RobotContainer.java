@@ -81,7 +81,6 @@ public class RobotContainer {
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
-
   private final LifterCommandFactory m_lifter = new LifterCommandFactory();
 
 
@@ -257,11 +256,11 @@ public class RobotContainer {
       Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
     
       // check if new estimated pose and previous pose are less than 1 meter apart
-      // if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
+      if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 1) {
         drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
 
         m_estPoseField.setRobotPose(estPose2d);
-      // }
+      }
     }
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
