@@ -70,7 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> false,
+            () -> Math.abs(m_IO.getPosition()-goal.position) < 0.025, // equivalent to 1 degree
             this
         );
     }
