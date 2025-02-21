@@ -113,58 +113,51 @@ public class RobotContainer {
    
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
-    driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
-      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
-      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
-        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
-        .withTargetDirection(Rotation2d.fromDegrees(0));
-    }));
-    driverJoystick.x().whileTrue(drivetrain.getCommandFromRequest(() -> {
-      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
-      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
-        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
-        .withTargetDirection(Rotation2d.fromDegrees(90));
-    }));
-    driverJoystick.a().whileTrue(drivetrain.getCommandFromRequest(() -> {
-      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
-      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
-        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
-        .withTargetDirection(Rotation2d.fromDegrees(180));
-    }));
-    driverJoystick.b().whileTrue(drivetrain.getCommandFromRequest(() -> {
-      JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
-      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
-        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
-        .withTargetDirection(Rotation2d.fromDegrees(270));
-    }));
+    // driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    //   JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
+    //   return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+    //     .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+    //     .withTargetDirection(Rotation2d.fromDegrees(0));
+    // }));
+    // driverJoystick.x().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    //   JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
+    //   return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+    //     .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+    //     .withTargetDirection(Rotation2d.fromDegrees(90));
+    // }));
+    // driverJoystick.a().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    //   JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
+    //   return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+    //     .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+    //     .withTargetDirection(Rotation2d.fromDegrees(180));
+    // }));
+    // driverJoystick.b().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    //   JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
+    //   return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+    //     .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+    //     .withTargetDirection(Rotation2d.fromDegrees(270));
+    // }));
 
     // reset the field-centric heading on left trigger press
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // set lifter controller constants using smartdashboard values
-    // driverJoystick.rightTrigger().whileTrue(
-    //   new InstantCommand( () -> resetControllerConstantsSmartDashboard()));
-    testJoystick.rightTrigger().and(testJoystick.b()).whileTrue(
-      new InstantCommand( () -> resetControllerConstantsSmartDashboard())
-    );
-    
-
     // move lifter to next position 
     driverJoystick.leftBumper().onTrue(
       new ParallelCommandGroup(
-        m_lifter.moveToCommand(nextState),
+        // m_lifter.moveToCommand(nextState),
         new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
 
     // outtake from collar, then move lifter to the default position
-    driverJoystick.rightBumper().onTrue(
-      m_collar.getCommand(currentState)
+    // driverJoystick.rightBumper().whileTrue(
+      // m_collar.manualMoveCommand());
+      // m_collar.getCommand(currentState)
 
-      .andThen(new ParallelCommandGroup(
-        // move the lifter to the intake (default) position, reset LED
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
-        m_lifter.getCommand(currentState),
-        m_ledSubsystem.runBlinkGreen().withTimeout(LEDConstants.BLINK_TIME))));
+      // .andThen(new ParallelCommandGroup(
+      //   // move the lifter to the intake (default) position, reset LED
+      //   new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+      //   m_lifter.getCommand(currentState),
+      //   m_ledSubsystem.runBlinkGreen().withTimeout(LEDConstants.BLINK_TIME))));
 
 
     // set next state, change LED colors accordingly 
