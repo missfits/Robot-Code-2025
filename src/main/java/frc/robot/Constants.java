@@ -107,7 +107,7 @@ public final class Constants {
     public static double kMaxV = 2;
     public static double kMaxA = 2; 
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 1.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 2.0;
   }
 
   public static class CollarConstants {
