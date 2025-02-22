@@ -136,8 +136,8 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = 0.3;
-    public static final double REEF_OFFSET_LEFT = 0.3;
+    public static final double REEF_OFFSET_RIGHT = Units.Meters.convertFrom(1, Units.Inches);
+    public static final double REEF_OFFSET_LEFT = Units.Meters.convertFrom(12, Units.Inches);
   }
 
   public static class VisionConstants {
