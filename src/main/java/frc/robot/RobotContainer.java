@@ -114,7 +114,7 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
       drivetrain.getCommandFromRequest(() -> {
-        JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightTrigger().getAsBoolean());
+        JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean());
         return drive.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
           .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
           .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
@@ -161,17 +161,13 @@ public class RobotContainer {
     // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
 
-    // move lifter to next position 
-    driverJoystick.a().whileTrue(
-      new ParallelCommandGroup(
-        m_lifter.moveToCommand(nextState),
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
+    // // move lifter to next position 
+    // driverJoystick.a().whileTrue(
+    //   new ParallelCommandGroup(
+        // m_lifter.moveToCommand(() -> nextState),
+        // new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
-    driverJoystick.b().onTrue(
-      m_collar.runCollar()); 
 
-    driverJoystick.x().onTrue(
-      m_collar.runCollarBackward()); 
 
     // // outtake from collar, then move lifter to the default position
     // driverJoystick.rightBumper().onTrue(
@@ -183,26 +179,38 @@ public class RobotContainer {
     //     m_lifter.getCommand(currentState))));
 
 
+    copilotJoystick.rightTrigger().whileTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+    copilotJoystick.leftTrigger().whileTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+    copilotJoystick.rightBumper().whileTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+    copilotJoystick.leftBumper().whileTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+
+
+    copilotJoystick.b().whileTrue(
+      m_collar.runCollar()); 
+
+      copilotJoystick.x().whileTrue(
+      m_collar.runCollarBackward()); 
+
     // set next state, change LED colors accordingly 
-    copilotJoystick.leftTrigger().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
-      m_ledSubsystem.runSolidRed())); 
+    // copilotJoystick.leftTrigger().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+    //   m_ledSubsystem.runSolidRed())); 
 
-    copilotJoystick.rightTrigger().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
-      m_ledSubsystem.runSolidOrange())); 
+    // copilotJoystick.rightTrigger().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+    //   m_ledSubsystem.runSolidOrange())); 
 
-    copilotJoystick.leftBumper().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
-      m_ledSubsystem.runSolidYellow())); 
+    // copilotJoystick.leftBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
+    //   m_ledSubsystem.runSolidYellow())); 
 
-    copilotJoystick.rightBumper().onTrue(
-      new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
-      m_ledSubsystem.runSolidWhite())); 
+    // copilotJoystick.rightBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
+    //   m_ledSubsystem.runSolidWhite())); 
 
     // copilotJoystick.a().onTrue(
     //   new ParallelCommandGroup(
@@ -215,17 +223,17 @@ public class RobotContainer {
     //   m_ledSubsystem.runSolidPink())); 
 
     // backup commands
-    copilotJoystick.a().whileTrue(
-      m_elevator.manualMoveCommand());
+    // copilotJoystick.a().whileTrue(
+    //   m_elevator.manualMoveCommand());
     
-    copilotJoystick.y().whileTrue(
-      m_arm.manualMoveCommand());
+    // copilotJoystick.y().whileTrue(
+    //   m_arm.manualMoveCommand());
 
-    copilotJoystick.b().whileTrue(
-      m_elevator.manualMoveBackwardCommand());
+    // copilotJoystick.b().whileTrue(
+    //   m_elevator.manualMoveBackwardCommand());
     
-    copilotJoystick.x().whileTrue(
-      m_arm.manualMoveBackwardCommand());
+    // copilotJoystick.x().whileTrue(
+    //   m_arm.manualMoveBackwardCommand());
 
     //open loop control testing:
     // copilotJoystick.leftTrigger().whileTrue(
