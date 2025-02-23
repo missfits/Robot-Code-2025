@@ -161,13 +161,11 @@ public class RobotContainer {
     // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
 
-    // // move lifter to next position 
-    // driverJoystick.a().whileTrue(
-    //   new ParallelCommandGroup(
-        // m_lifter.moveToCommand(() -> nextState),
-        // new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
-
-
+    // move lifter to next position 
+    copilotJoystick.a().whileTrue(
+      new ParallelCommandGroup(
+        m_lifter.moveToCommand(() -> nextState),
+        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
     // // outtake from collar, then move lifter to the default position
     // driverJoystick.rightBumper().onTrue(
