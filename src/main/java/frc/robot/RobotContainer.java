@@ -19,8 +19,10 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -259,14 +261,17 @@ public class RobotContainer {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
-      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d(); // estimated robot pose of vision
-    
-      // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-      if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
-        drivetrain.fusedPoseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
-      }
+      Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
 
-        m_estPoseField.setRobotPose(estPose2d);
+      if (estPose3d.getZ() < 0.5){ // ignore vision est if too big
+
+        // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+        if (estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
+          drivetrain.fusedPoseEstimator.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
+          drivetrain.fusedPoseEstimator.addVisionMeasurement(estPose3d.toPose2d(), estimatedRobotPose.timestampSeconds);
+        }
+          m_estPoseField.setRobotPose(estPose3d.toPose2d());
+      }
     }
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);

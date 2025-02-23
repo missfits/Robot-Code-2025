@@ -5,10 +5,14 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 
 /**
@@ -130,6 +134,9 @@ public final class Constants {
     public static final double ROBOT_TO_CAM_Y = -0.0508; // in meters from center of robot 
     public static final double ROBOT_TO_CAM_Z = 0.1397; // in meters from the floor?
     
+    // default vision standard deviation
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
