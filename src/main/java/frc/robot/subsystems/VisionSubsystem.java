@@ -71,6 +71,11 @@ public class VisionSubsystem extends SubsystemBase {
     return targetYaw;
   }
 
+  /** returns pose  of target in radians */
+  public Pose2d getTargetPose() {
+    return targetPose;
+  }
+
   public boolean getTargetFound() {
     return targetFound;
   }

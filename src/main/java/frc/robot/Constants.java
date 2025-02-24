@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 
 /**
@@ -36,6 +37,8 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
+
+    public static final double ROBOT_SIZE_X = 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -132,12 +135,17 @@ public final class Constants {
     public static final double BLINK_TIME = 1; // in seconds for after intake/outtake
   }
 
+  public static class AutoAlignConstants {
+    public static final double REEF_OFFSET_RIGHT = 0.3;
+    public static final double REEF_OFFSET_LEFT = 0.3;
+  }
+
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = Units.inchesToMeters(-3); // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = Units.inchesToMeters(-10.25); // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = Units.inchesToMeters(10); // in meters from the floor?
     
 
     public static final Translation2d ROBOT_TO_CAM = 

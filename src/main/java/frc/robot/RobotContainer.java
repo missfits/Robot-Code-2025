@@ -47,7 +47,9 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
+import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -149,23 +151,28 @@ public class RobotContainer {
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
     driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
+    
+    // "temporary" for testing. moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
+    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
 
-    // move lifter to next position 
-    driverJoystick.leftBumper().onTrue(
-      new ParallelCommandGroup(
-        m_lifter.getCommand(nextState),
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
+    // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
+    driverJoystick.leftBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
+
+    // // move lifter to next position 
+    // driverJoystick.leftBumper().onTrue(
+    //   new ParallelCommandGroup(
+    //     m_lifter.getCommand(nextState),
+    //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
 
 
-    // outtake from collar, then move lifter to the default position
-    driverJoystick.rightBumper().onTrue(
-      m_collar.getCommand(currentState)
+    // // outtake from collar, then move lifter to the default position
+    // driverJoystick.rightBumper().onTrue(
+    //   m_collar.getCommand(currentState)
 
-      .andThen(new ParallelCommandGroup(
-        // move the lifter to the intake (default) position, reset LED
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
-        m_lifter.getCommand(currentState),
-        m_ledSubsystem.runBlinkGreen().withTimeout(LEDConstants.BLINK_TIME))));
+    //   .andThen(new ParallelCommandGroup(
+    //     // move the lifter to the intake (default) position 
+    //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
+    //     m_lifter.getCommand(currentState))));
 
 
     // set next state, change LED colors accordingly 
