@@ -14,18 +14,18 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase{
     private final ElevatorIOHardware m_IO = new ElevatorIOHardware();
-    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(
+    private ElevatorFeedforward m_feedforward = new ElevatorFeedforward(
         ElevatorConstants.kS,
         ElevatorConstants.kG,
         ElevatorConstants.kV,
         ElevatorConstants.kA
     );
-    private final PIDController m_controller = new PIDController(
+    private PIDController m_controller = new PIDController(
         ElevatorConstants.kP,
         ElevatorConstants.kI,
         ElevatorConstants.kD
     );
-    private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
+    private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
     );
     private TrapezoidProfile.State m_goal;
@@ -93,6 +93,24 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
     }
+    
+    public void resetControllers() {
+        m_feedforward = new ElevatorFeedforward(
+            ElevatorConstants.kS,
+            ElevatorConstants.kG,
+            ElevatorConstants.kV,
+            ElevatorConstants.kA
+        );
+        m_controller = new PIDController(
+            ElevatorConstants.kP,
+            ElevatorConstants.kI,
+            ElevatorConstants.kD
+        );
+        m_constraints = new TrapezoidProfile.Constraints(
+            ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
+        );
+    }
+
 
     @Override
     public void periodic() {
