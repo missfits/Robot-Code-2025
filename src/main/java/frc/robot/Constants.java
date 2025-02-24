@@ -122,6 +122,8 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
+
+    public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
 
   public static class RampConstants {
@@ -160,8 +162,9 @@ public final class Constants {
     public static final double TARGET_PITCH = 0; 
   }
 
-  public static class IntakeConstants {
+  public static class LaserCanConstants {
     public static final int LASER_CAN_ID = 14;
+    public static final double MIN_CORAL_SEEN_DISTANCE = 10; // in mm
   }
 
   public static class RobotStateConstants {

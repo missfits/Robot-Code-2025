@@ -39,10 +39,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.CollarConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -54,7 +57,7 @@ import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LaserCanSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
@@ -86,7 +89,7 @@ public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstantsDynamene.createDrivetrain(); // My drivetrain
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
-  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
+  private final LaserCanSubsystem m_laserCan = new LaserCanSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
 
@@ -259,6 +262,11 @@ public class RobotContainer {
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
 
+    // when a coral is seen, wait some time then stop the collar
+    m_laserCan.coralSeen().onTrue(
+      new SequentialCommandGroup(
+        new WaitCommand(CollarConstants.INTAKE_STOP_OFFSET),
+        m_collar.runCollarOff()));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());

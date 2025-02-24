@@ -5,21 +5,27 @@ import au.grapplerobotics.CanBridge;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.LaserCanConstants;
 
 
-public class IntakeSubsystem extends SubsystemBase {
+public class LaserCanSubsystem extends SubsystemBase {
   private LaserCan lc;
+  private LaserCan.Measurement measurement;
 
-  public IntakeSubsystem() {
+  public LaserCanSubsystem() {
     CanBridge.runTCP(); // allow grapplehook to communicate w/ lasercan:)
-    lc = new LaserCan(IntakeConstants.LASER_CAN_ID);
+    lc = new LaserCan(LaserCanConstants.LASER_CAN_ID);
+  }
+
+  public Trigger coralSeen() {
+    return new Trigger(() -> measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurement.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE);
   }
 
   @Override
   public void periodic() {
-    LaserCan.Measurement measurement = lc.getMeasurement();
+    measurement = lc.getMeasurement();
     if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
       SmartDashboard.putNumber("LaserCAN Distance", measurement.distance_mm);
     } else {
