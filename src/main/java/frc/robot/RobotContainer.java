@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -261,12 +263,21 @@ public class RobotContainer {
     m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
-
-    // when a coral is seen, wait some time then stop the collar
     m_laserCan.coralSeen().onTrue(
-      new SequentialCommandGroup(
-        new WaitCommand(CollarConstants.INTAKE_STOP_OFFSET),
-        m_collar.runCollarOff()));
+      new ParallelCommandGroup(
+        // controller rumble
+        new StartEndCommand(
+          () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 1); driverJoystick.setRumble(RumbleType.kBothRumble, 1);},
+          () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 0); driverJoystick.setRumble(RumbleType.kBothRumble, 0);})
+          .withTimeout(2), 
+
+        // set LED color
+        m_ledSubsystem.runSolidGreen(),
+
+        // wait some time then stop the collar
+        new SequentialCommandGroup(
+          new WaitCommand(CollarConstants.INTAKE_STOP_OFFSET),
+          m_collar.runCollarOff())));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
