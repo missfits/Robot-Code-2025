@@ -1,5 +1,7 @@
 package frc.robot.subsystems.lifter;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -9,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase{
@@ -100,6 +102,10 @@ public class ElevatorSubsystem extends SubsystemBase{
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
     } 
+
+    public Trigger atPositionTrigger(DoubleSupplier goalSupplier) {
+        return new Trigger(() -> isAtPosition(goalSupplier.getAsDouble()));
+    }
     
     public void resetControllers() {
         m_feedforward = new ElevatorFeedforward(

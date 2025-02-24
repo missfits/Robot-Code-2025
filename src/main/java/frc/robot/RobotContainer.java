@@ -238,11 +238,13 @@ public class RobotContainer {
       m_collar.runCollarBackward());
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
-    m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
-    m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
 
-    
+    // run keepInPlace when at target position
+    m_elevator.atPositionTrigger(() -> currentState.getElevatorPos()).onTrue(m_elevator.keepInPlaceCommand());
+    m_arm.atPositionTrigger(() -> currentState.getArmPos()).onTrue(m_arm.keepInPlaceCommand());
+
+
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
