@@ -70,7 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> Math.abs(m_IO.getPosition()-goal.position) < 0.025, // equivalent to 1 degree
+            () -> isAtPosition(goal.position),
             this
         );
     }
@@ -99,6 +99,10 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
 
     }
+
+    private boolean isAtPosition(double goal) {
+        return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
+    } 
 
     public void resetControllers() {
         m_feedforward = new ArmFeedforward(

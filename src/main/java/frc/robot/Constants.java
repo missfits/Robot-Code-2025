@@ -81,6 +81,8 @@ public final class Constants {
     public static double kMaxA = 1; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
+
+    public static final double MAX_POSITION_TOLERANCE = 0.005;
   }
 
   public static class ArmConstants {
@@ -109,6 +111,8 @@ public final class Constants {
     public static double kMaxA = 1; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.0;
+
+    public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
   }
 
   public static class CollarConstants {

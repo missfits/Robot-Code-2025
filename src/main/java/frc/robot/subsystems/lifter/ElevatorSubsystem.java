@@ -68,7 +68,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> Math.abs(m_IO.getPosition()-goal.position) < 0.005,
+            () -> isAtPosition(goal.position),
             this
         );
     }
@@ -96,6 +96,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("elevator/target position", m_profiledReference.position);
         SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
     }
+
+    private boolean isAtPosition(double goal) {
+        return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
+    } 
     
     public void resetControllers() {
         m_feedforward = new ElevatorFeedforward(
