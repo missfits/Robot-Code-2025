@@ -110,7 +110,7 @@ public final class Constants {
     public static double kMaxV = 1;
     public static double kMaxA = 1; 
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 1.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
   }
