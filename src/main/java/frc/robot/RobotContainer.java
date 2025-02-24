@@ -16,6 +16,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -276,6 +278,10 @@ public class RobotContainer {
     m_lifter.resetControllers();
   }
 
+  private Command createScoreCommand(Command lifterCommand){
+    return Commands.sequence(lifterCommand, m_collar.runCollar().withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE));
+  }
+
   public RobotContainer() {
     DataLogManager.start(); // log networktable 
     DriverStation.startDataLog(DataLogManager.getLog()); // log ds state, joystick data to /u/logs w/ usb stick, or home/lvuser/logs without. 
@@ -283,10 +289,17 @@ public class RobotContainer {
 
     SignalLogger.enableAutoLogging(false);
     // SignalLogger.start();
-    
+      
 
-  
-    // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
+    // elevator moveTo auto commands
+    NamedCommands.registerCommand("intakeCoral", m_collar.runCollar().withTimeout(0.5)); // update to use grapplehook instead
+    NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
+    NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
+    NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
+    NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+
+
+    // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
     // To set a different default auto, put its name (as a String) below as a parameter
     m_autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
