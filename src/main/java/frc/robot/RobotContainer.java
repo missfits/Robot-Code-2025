@@ -51,8 +51,9 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
+import frc.robot.generated.TunerConstantsCeridwen;
+import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
@@ -70,11 +71,18 @@ import frc.robot.commands.AutoAlignCommand;
 public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
+  
+  public enum RobotName {
+      CERIDWEN,
+      DYNAMENE
+  }
+
+  public static RobotName name = RobotName.DYNAMENE;
 
   private RobotState currentState = RobotState.INTAKE;
   private RobotState nextState = RobotState.INTAKE;
 
-  private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
+  private double MaxSpeed = TunerConstantsDynamene.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -83,7 +91,9 @@ public class RobotContainer {
   private final CommandXboxController testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort); // test joystick
 
   
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
+  private final CommandSwerveDrivetrain drivetrain = 
+   name == RobotName.DYNAMENE ? TunerConstantsDynamene.createDrivetrain() : TunerConstantsCeridwen.createDrivetrain(); // My drivetrain
+
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
@@ -228,6 +238,8 @@ public class RobotContainer {
 
     m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
+    m_collar.setDefaultCommand(m_collar.runCollarOff());
+
 
     
     // run command runSolidGreen continuously if robot isWithinTarget()
