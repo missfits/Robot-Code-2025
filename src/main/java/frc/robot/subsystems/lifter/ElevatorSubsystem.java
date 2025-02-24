@@ -3,8 +3,10 @@ package frc.robot.subsystems.lifter;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.ElevatorConstants;
@@ -35,6 +37,30 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     // commands
+    public Command keepInPlaceCommand() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(m_feedforward.calculate(m_IO.getPosition(), 0)),
+            () -> m_IO.motorOff(),
+            this
+        );
+    }
+
+    public Command manualMoveCommand() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> m_IO.motorOff(),
+            this
+        );
+    }
+
+    public Command manualMoveBackwardCommand() {
+        return new StartEndCommand(
+            () -> m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> m_IO.motorOff(),
+            this
+        );
+    }
+
     public Command moveToCommand(double targetPosition) {
         return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
     }
@@ -87,4 +113,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         );
     }
 
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
+        SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+    }
 }

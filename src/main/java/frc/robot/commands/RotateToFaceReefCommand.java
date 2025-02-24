@@ -25,7 +25,7 @@ public class RotateToFaceReefCommand extends Command {
   private final CommandSwerveDrivetrain m_drivetrain;
   private final VisionSubsystem m_vision;
   private Rotation2d targetRotation;
-  private  boolean targetFound = false;;
+  private  boolean targetFound = false;
   private final SwerveRequest.FieldCentricFacingAngle snapToAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withVelocityX(0).withVelocityY(0).withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
   
   
@@ -71,7 +71,9 @@ public class RotateToFaceReefCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    targetFound = false; // reset so diff target can be chosen in the next run of the command
+  }
 
   // Returns true when the command should end.
   @Override
