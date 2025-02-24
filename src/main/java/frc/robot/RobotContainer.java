@@ -188,12 +188,25 @@ public class RobotContainer {
     copilotJoystick.leftTrigger().whileTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
     copilotJoystick.rightBumper().whileTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
     copilotJoystick.leftBumper().whileTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+    
 
+    // TEMP; two different conditions for automatic intake stop
+      
+    // stop collar after coral is seen and a delay in seconds
+    // copilotJoystick.b().whileTrue(
+    //   Commands.sequence(
+    //     m_collar.runCollar().until(m_laserCan.coralSeenAfterRamp()),
+    //     m_collar.runCollar().withTimeout(CollarConstants.INTAKE_STOP_OFFSET),
+    //     m_collar.runCollarOff())); 
 
+    // stop collar after coral passes entirely through the collar
     copilotJoystick.b().whileTrue(
-      m_collar.runCollar()); 
+      Commands.sequence(
+        m_collar.runCollar().until(m_laserCan.coralSeen()),
+        m_collar.runCollar().until(m_laserCan.coralSeen().negate()),
+        m_collar.runCollarOff())); 
 
-      copilotJoystick.x().whileTrue(
+    copilotJoystick.x().whileTrue(
       m_collar.runCollarBackward()); 
 
     // set next state, change LED colors accordingly 
@@ -263,6 +276,7 @@ public class RobotContainer {
     m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
+    // LED and rumble feedback when coral is seen in ramp
     m_laserCan.coralSeen().onTrue(
       new ParallelCommandGroup(
         // controller rumble
@@ -272,12 +286,7 @@ public class RobotContainer {
           .withTimeout(2), 
 
         // set LED color
-        m_ledSubsystem.runSolidGreen(),
-
-        // wait some time then stop the collar
-        new SequentialCommandGroup(
-          new WaitCommand(CollarConstants.INTAKE_STOP_OFFSET),
-          m_collar.runCollarOff())));
+        m_ledSubsystem.runSolidGreen()));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
