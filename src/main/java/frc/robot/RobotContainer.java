@@ -97,7 +97,6 @@ public class RobotContainer {
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
-
   private final LifterCommandFactory m_lifter = new LifterCommandFactory();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
 
@@ -243,7 +242,7 @@ public class RobotContainer {
 
     
     // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
+    m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
     //set buttons to LED lights
     // a to flash yellow
@@ -313,10 +312,11 @@ public class RobotContainer {
       // check if new estimated pose and previous pose are less than 2 meters apart
       if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
         drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
-      }
 
-      m_estPoseField.setRobotPose(estPose2d);
+        m_estPoseField.setRobotPose(estPose2d);
+      }
     }
+    
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
     drivetrain.updatePoseWithPoseEst();
