@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.RobotContainer.RobotName;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
@@ -38,7 +39,7 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X = 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? 0.8 : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -56,19 +57,19 @@ public final class Constants {
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
     public static final double INITIAL_POSITION = 0;
-    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double METERS_PER_ROTATION = Units.inchesToMeters(1.751 * Math.PI/5); // temp
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
-    public static final double POSITION_LOWER_LIMIT = 0.0;
-    public static final double POSITION_UPPER_LIMIT = 0.0;
+    public static final double POSITION_LOWER_LIMIT = 0.01;
+    public static final double POSITION_UPPER_LIMIT = 0.71;
     
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     // not tuned
     public static final double kS = 0;
-    public static final double kG = 0;
+    public static final double kG = 0.2;
     public static final double kV = 12/MAX_SPEED; // may need to be updated
     public static final double kA = 0;
 
@@ -79,7 +80,7 @@ public final class Constants {
     public static final double kMaxV = 0;
     public static final double kMaxA = 0; 
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 0.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 2.0;
   }
 
   public static class ArmConstants {
@@ -89,7 +90,7 @@ public final class Constants {
 
     public static final double INITIAL_POSITION = 0; // facing down
     public static final double POSITION_OFFSET = Math.PI/2; // difference between pid 0 (horizontal) and our 0 (down)
-    public static final double DEGREES_PER_ROTATION = 0.0; 
+    public static final double DEGREES_PER_ROTATION = 1;  // temp
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
@@ -107,7 +108,7 @@ public final class Constants {
     public static final double kMaxV = 0;
     public static final double kMaxA = 0; 
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 0.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
   }
 
   public static class CollarConstants {
@@ -121,7 +122,7 @@ public final class Constants {
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
-    public static final double OUTTAKE_MOTOR_SPEED = 0.0;
+    public static final double OUTTAKE_MOTOR_SPEED = 4.0;
   }
 
   public static class RampConstants {
@@ -143,11 +144,10 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = Units.inchesToMeters(-3); // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = Units.inchesToMeters(-10.25); // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = Units.inchesToMeters(10); // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-3) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-10.25) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(10) : 0.1397; // in meters from the floor?
     
-
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
 
