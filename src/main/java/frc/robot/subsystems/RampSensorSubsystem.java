@@ -10,16 +10,16 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.LaserCanConstants;
 
 
-public class LaserCanSubsystem extends SubsystemBase {
+public class RampSensorSubsystem extends SubsystemBase {
   private LaserCan lc;
   private LaserCan.Measurement measurement;
 
-  public LaserCanSubsystem() {
+  public RampSensorSubsystem() {
     CanBridge.runTCP(); // allow grapplehook to communicate w/ lasercan:)
     lc = new LaserCan(LaserCanConstants.LASER_CAN_ID);
   }
 
-  public Trigger coralSeen() {
+  public Trigger coralSeenAfterRamp() {
     return new Trigger(() -> measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurement.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE);
   }
 

@@ -59,7 +59,7 @@ import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LaserCanSubsystem;
+import frc.robot.subsystems.RampSensorSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
@@ -91,7 +91,7 @@ public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstantsDynamene.createDrivetrain(); // My drivetrain
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
-  private final LaserCanSubsystem m_laserCan = new LaserCanSubsystem(); 
+  private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
 
@@ -195,15 +195,15 @@ public class RobotContainer {
     // stop collar after coral is seen and a delay in seconds
     // copilotJoystick.b().whileTrue(
     //   Commands.sequence(
-    //     m_collar.runCollar().until(m_laserCan.coralSeenAfterRamp()),
+    //     m_collar.runCollar().until(m_rampSensor.coralSeenAfterRamp()),
     //     m_collar.runCollar().withTimeout(CollarConstants.INTAKE_STOP_OFFSET),
     //     m_collar.runCollarOff())); 
 
     // stop collar after coral passes entirely through the collar
     copilotJoystick.b().whileTrue(
       Commands.sequence(
-        m_collar.runCollar().until(m_laserCan.coralSeen()),
-        m_collar.runCollar().until(m_laserCan.coralSeen().negate()),
+        m_collar.runCollar().until(m_rampSensor.coralSeenAfterRamp()),
+        m_collar.runCollar().until(m_rampSensor.coralSeenAfterRamp().negate()),
         m_collar.runCollarOff())); 
 
     copilotJoystick.x().whileTrue(
@@ -277,7 +277,7 @@ public class RobotContainer {
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
     // LED and rumble feedback when coral is seen in ramp
-    m_laserCan.coralSeen().onTrue(
+    m_rampSensor.coralSeenAfterRamp().onTrue(
       new ParallelCommandGroup(
         // controller rumble
         new StartEndCommand(
