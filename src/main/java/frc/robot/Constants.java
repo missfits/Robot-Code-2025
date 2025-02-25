@@ -168,7 +168,7 @@ public final class Constants {
     public static final int LASER_CAN_ID = 14;
   }
 
-  public static class RobotStateConstants {
+  public static class LifterStateConstants {
     public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION;
     public static final double C1_ARM_POS = ArmConstants.INITIAL_POSITION;
     public static final double C2_ELEVATOR_POS = 0.3752;

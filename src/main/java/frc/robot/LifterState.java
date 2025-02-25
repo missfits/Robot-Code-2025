@@ -1,15 +1,15 @@
 package frc.robot;
 
-import frc.robot.Constants.RobotStateConstants;
+import frc.robot.Constants.LifterStateConstants;
 
 public enum LifterState { 
-    L1_CORAL(RobotStateConstants.C1_ELEVATOR_POS, RobotStateConstants.C1_ARM_POS), 
-    L2_CORAL(RobotStateConstants.C2_ELEVATOR_POS, RobotStateConstants.C2_ARM_POS), 
-    L3_CORAL(RobotStateConstants.C3_ELEVATOR_POS, RobotStateConstants.C3_ARM_POS), 
-    L4_CORAL(RobotStateConstants.C4_ELEVATOR_POS, RobotStateConstants.C4_ARM_POS), 
-    L2_ALGAE(RobotStateConstants.A2_ELEVATOR_POS, RobotStateConstants.A2_ARM_POS), 
-    L3_ALGAE(RobotStateConstants.A3_ELEVATOR_POS, RobotStateConstants.A3_ARM_POS), 
-    INTAKE(RobotStateConstants.IN_ELEVATOR_POS, RobotStateConstants.IN_ARM_POS);
+    L1_CORAL(LifterStateConstants.C1_ELEVATOR_POS, LifterStateConstants.C1_ARM_POS), 
+    L2_CORAL(LifterStateConstants.C2_ELEVATOR_POS, LifterStateConstants.C2_ARM_POS), 
+    L3_CORAL(LifterStateConstants.C3_ELEVATOR_POS, LifterStateConstants.C3_ARM_POS), 
+    L4_CORAL(LifterStateConstants.C4_ELEVATOR_POS, LifterStateConstants.C4_ARM_POS), 
+    L2_ALGAE(LifterStateConstants.A2_ELEVATOR_POS, LifterStateConstants.A2_ARM_POS), 
+    L3_ALGAE(LifterStateConstants.A3_ELEVATOR_POS, LifterStateConstants.A3_ARM_POS), 
+    INTAKE(LifterStateConstants.IN_ELEVATOR_POS, LifterStateConstants.IN_ARM_POS);
 
     private final double elevatorPos;
     private final double armPos;
