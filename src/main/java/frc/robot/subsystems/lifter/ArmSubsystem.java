@@ -106,8 +106,8 @@ public class ArmSubsystem extends SubsystemBase {
         return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
     } 
 
-    public Trigger atPositionTrigger(DoubleSupplier goalSupplier) {
-        return new Trigger(() -> isAtPosition(goalSupplier.getAsDouble()));
+    public Trigger atPositionTrigger() {
+        return new Trigger(() -> isAtPosition(m_goal.position));
     }
     
 

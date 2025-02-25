@@ -103,8 +103,8 @@ public class ElevatorSubsystem extends SubsystemBase{
         return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
     } 
 
-    public Trigger atPositionTrigger(DoubleSupplier goalSupplier) {
-        return new Trigger(() -> isAtPosition(goalSupplier.getAsDouble()));
+    public Trigger atPositionTrigger() {
+        return new Trigger(() -> isAtPosition(m_goal.position));
     }
     
     public void resetControllers() {
