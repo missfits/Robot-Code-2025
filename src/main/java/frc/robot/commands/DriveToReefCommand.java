@@ -60,6 +60,7 @@ public class DriveToReefCommand extends Command {
       Pose2d targetPose = m_vision.getTargetPose();
       if (targetPose != null) {
         // offset with robot size because the robot has width and is not a point!
+        // see images/drive to reef with offset.png for right/left offset math
         if (m_side.equals(ReefPosition.RIGHT)) {
           // for the right side add reef offset value
           m_targetTranslation = new Translation2d(

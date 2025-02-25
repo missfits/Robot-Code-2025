@@ -8,8 +8,9 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.robot.RobotContainer.RobotName;
+import edu.wpi.first.math.util.Units;
 
 
 /**
@@ -38,7 +39,7 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X = 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? 0.8 : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -56,8 +57,8 @@ public final class Constants {
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
     public static final double INITIAL_POSITION = 0;
-    public static final double METERS_PER_ROTATION = Units.Meters.convertFrom(1.751 * Math.PI/5, Units.Inches); // temp
-    public static final double MAX_SPEED = METERS_PER_ROTATION*100; // motor rotates at ~ 100 rot/sec at free speed
+    public static final double METERS_PER_ROTATION = Units.inchesToMeters(1.751 * Math.PI/5); // temp
+    public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
@@ -107,7 +108,7 @@ public final class Constants {
     public static double kMaxV = 1;
     public static double kMaxA = 1; 
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 2.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
   }
 
   public static class CollarConstants {
@@ -136,18 +137,17 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.Meters.convertFrom(1, Units.Inches);
-    public static final double REEF_OFFSET_LEFT = Units.Meters.convertFrom(12, Units.Inches);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(1);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(12);
   }
 
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = Units.Meters.convertFrom(-3, Units.Inches); // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = Units.Meters.convertFrom(-10.25, Units.Inches); // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = Units.Meters.convertFrom(10, Units.Inches); // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-3) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-10.25) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(10) : 0.1397; // in meters from the floor?
     
-
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
 
