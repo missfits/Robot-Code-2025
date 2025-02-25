@@ -58,7 +58,7 @@ public final class Constants {
 
     public static final double INITIAL_POSITION = 0;
     public static final double METERS_PER_ROTATION = Units.inchesToMeters(1.751 * Math.PI/5); // temp
-    public static final double MAX_SPEED = 0.0; 
+    public static final double MAX_SPEED = METERS_PER_ROTATION*100; // motor rotates at ~ 100 rot/sec at free speed
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
@@ -81,6 +81,8 @@ public final class Constants {
     public static double kMaxA = 1; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
+
+    public static final double MAX_POSITION_TOLERANCE = 0.005;
   }
 
   public static class ArmConstants {
@@ -109,6 +111,8 @@ public final class Constants {
     public static double kMaxA = 1; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
+
+    public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
   }
 
   public static class CollarConstants {
