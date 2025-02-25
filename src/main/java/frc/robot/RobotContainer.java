@@ -52,6 +52,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
+import frc.robot.generated.TunerConstantsCeridwen;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -71,6 +72,13 @@ import frc.robot.commands.AutoAlignCommand;
 public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
+  
+  public enum RobotName {
+      CERIDWEN,
+      DYNAMENE
+  }
+
+  public static RobotName name = RobotName.DYNAMENE;
 
   private RobotState currentState = RobotState.INTAKE;
   private RobotState nextState = RobotState.INTAKE;
@@ -84,13 +92,14 @@ public class RobotContainer {
   private final CommandXboxController testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort); // test joystick
 
   
-  private final CommandSwerveDrivetrain drivetrain = TunerConstantsDynamene.createDrivetrain(); // My drivetrain
+  private final CommandSwerveDrivetrain drivetrain = 
+   name == RobotName.DYNAMENE ? TunerConstantsDynamene.createDrivetrain() : TunerConstantsCeridwen.createDrivetrain(); // My drivetrain
+
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
-
   private final LifterCommandFactory m_lifter = new LifterCommandFactory();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
 
@@ -254,7 +263,7 @@ public class RobotContainer {
 
     
     // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
+    m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
     //set buttons to LED lights
     // a to flash yellow
@@ -380,10 +389,11 @@ public class RobotContainer {
       // check if new estimated pose and previous pose are less than 2 meters apart
       if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
         drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
-      }
 
-      m_estPoseField.setRobotPose(estPose2d);
+        m_estPoseField.setRobotPose(estPose2d);
+      }
     }
+    
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
     drivetrain.updatePoseWithPoseEst();
