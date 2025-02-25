@@ -2,7 +2,7 @@ package frc.robot.subsystems.ramp;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.RobotState;
+import frc.robot.LifterState;
 
 public class RampSubsystem {
 
@@ -11,7 +11,7 @@ public class RampSubsystem {
         
     }
 
-    public Command getCommand(RobotState targetRobotState) {
+    public Command getCommand(LifterState targetLifterState) {
         return new WaitCommand(0);
     }
 }

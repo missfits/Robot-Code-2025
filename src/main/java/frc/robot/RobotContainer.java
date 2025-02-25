@@ -80,8 +80,8 @@ public class RobotContainer {
 
   public static RobotName name = RobotName.DYNAMENE;
 
-  private RobotState currentState = RobotState.INTAKE;
-  private RobotState nextState = RobotState.INTAKE;
+  private LifterState currentLifterState = LifterState.INTAKE;
+  private LifterState nextLifterState = LifterState.INTAKE;
 
   private double MaxSpeed = TunerConstantsDynamene.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
@@ -173,7 +173,7 @@ public class RobotContainer {
 
     // move lifter to next position 
     copilotJoystick.a().and(copilotJoystick.povCenter()).whileTrue(
-      m_lifter.moveToCommand(() -> {currentState = nextState; return currentState;}));
+      m_lifter.moveToCommand(() -> {currentLifterState = nextLifterState; return currentLifterState;}));
     
     // // outtake from collar
     copilotJoystick.b().and(copilotJoystick.povCenter()).whileTrue(
@@ -190,22 +190,22 @@ public class RobotContainer {
     // set next state, change LED colors accordingly 
     copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
       new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+      new InstantCommand(() -> {nextLifterState = LifterState.L4_CORAL;}),
       m_ledSubsystem.runSolidRed())); 
 
     copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).onTrue(
       new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+      new InstantCommand(() -> {nextLifterState = LifterState.L3_CORAL;}),
       m_ledSubsystem.runSolidOrange())); 
 
     copilotJoystick.rightBumper().and(copilotJoystick.povCenter()).onTrue(
       new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
+      new InstantCommand(() -> {nextLifterState = LifterState.L2_CORAL;}),
       m_ledSubsystem.runSolidYellow())); 
 
     copilotJoystick.leftBumper().and(copilotJoystick.povCenter()).onTrue(
       new ParallelCommandGroup(
-      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
+      new InstantCommand(() -> {nextLifterState = LifterState.L1_CORAL;}),
       m_ledSubsystem.runSolidWhite())); 
 
     // copilotJoystick.a().onTrue(
@@ -270,11 +270,11 @@ public class RobotContainer {
     testJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
     testJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
 
-    testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
-    testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
-    testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
-    testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
-    testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+    testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(LifterState.L1_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(LifterState.L2_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(LifterState.L3_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(LifterState.L4_CORAL));
+    testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(LifterState.INTAKE));
     testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collar.runCollar());
     testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collar.runCollarBackward());
     

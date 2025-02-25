@@ -2,7 +2,7 @@ package frc.robot;
 
 import frc.robot.Constants.RobotStateConstants;
 
-public enum RobotState { 
+public enum LifterState { 
     L1_CORAL(RobotStateConstants.C1_ELEVATOR_POS, RobotStateConstants.C1_ARM_POS), 
     L2_CORAL(RobotStateConstants.C2_ELEVATOR_POS, RobotStateConstants.C2_ARM_POS), 
     L3_CORAL(RobotStateConstants.C3_ELEVATOR_POS, RobotStateConstants.C3_ARM_POS), 
@@ -15,7 +15,7 @@ public enum RobotState {
     private final double armPos;
 
     // constructor
-    private RobotState(double ep, double ap) {
+    private LifterState(double ep, double ap) {
       elevatorPos = ep;
       armPos = ap;
     }
