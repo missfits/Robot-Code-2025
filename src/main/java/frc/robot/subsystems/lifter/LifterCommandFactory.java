@@ -32,8 +32,8 @@ public class LifterCommandFactory {
     public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
         return new SequentialCommandGroup(
             m_arm.moveToCommand(ArmConstants.INITIAL_POSITION),
-            m_elevator.moveToCommand(targetRobotStateSupplier.get().getElevatorPos()),
-            m_arm.moveToCommand(targetRobotStateSupplier.get().getArmPos())
+            m_elevator.moveToCommand(() -> targetRobotStateSupplier.get().getElevatorPos()),
+            m_arm.moveToCommand(() -> targetRobotStateSupplier.get().getArmPos())
         );
     }
 

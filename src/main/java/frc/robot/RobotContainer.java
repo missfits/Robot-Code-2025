@@ -164,10 +164,8 @@ public class RobotContainer {
 
     // move lifter to next position 
     copilotJoystick.a().and(copilotJoystick.povCenter()).whileTrue(
-      new SequentialCommandGroup(
-        new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
-        m_lifter.moveToCommand(() -> currentState)));
-
+      m_lifter.moveToCommand(() -> {currentState = nextState; return currentState;}));
+    
     // // outtake from collar
     copilotJoystick.b().and(copilotJoystick.povCenter()).whileTrue(
       m_collar.runCollar());
