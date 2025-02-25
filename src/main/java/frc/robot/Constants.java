@@ -8,8 +8,8 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.RobotContainer.RobotName;
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.robot.RobotContainer.RobotName;
 import edu.wpi.first.math.util.Units;
 
 
@@ -141,8 +141,8 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = 0.3;
-    public static final double REEF_OFFSET_LEFT = 0.3;
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(1);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(12);
   }
 
   public static class VisionConstants {
