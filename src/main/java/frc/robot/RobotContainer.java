@@ -201,12 +201,12 @@ public class RobotContainer {
     copilotJoystick.rightBumper().and(copilotJoystick.povCenter()).onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
-      m_ledSubsystem.runSolidYellow())); 
+      m_ledSubsystem.runSolidPurple())); 
 
     copilotJoystick.leftBumper().and(copilotJoystick.povCenter()).onTrue(
       new ParallelCommandGroup(
       new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
-      m_ledSubsystem.runSolidWhite())); 
+      m_ledSubsystem.runSolidBlue())); 
 
     // copilotJoystick.a().onTrue(
     //   new ParallelCommandGroup(
