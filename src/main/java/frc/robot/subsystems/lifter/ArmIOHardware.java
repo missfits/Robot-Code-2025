@@ -1,10 +1,13 @@
 package frc.robot.subsystems.lifter;
 
+import edu.wpi.first.math.MathUtil;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -38,6 +41,10 @@ public class ArmIOHardware {
     }
 
     public double getVelocity() {
+        return Math.toRadians(m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION);
+    }
+
+    public double getVelocityDegrees() {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
@@ -55,10 +62,16 @@ public class ArmIOHardware {
     }
 
     public void setVoltage(double value) {
+        value = MathUtil.clamp(value, -3, 3);
         m_armMotor.setControl(new VoltageOut(value));
+        SmartDashboard.putNumber("arm/voltage", value);
     }
     
     public void requestClosedLoopPosition(double value) {
         m_armMotor.setControl(new PositionVoltage(value));
+    }
+
+    public void setBrake(boolean brake) {
+        m_armMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
 }

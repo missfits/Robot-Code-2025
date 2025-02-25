@@ -1,5 +1,7 @@
 package frc.robot.subsystems.lifter;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -35,7 +37,7 @@ public class ArmSubsystem extends SubsystemBase {
     // constructor
     public ArmSubsystem() {
         m_IO.resetPosition();
-        m_controller.enableContinuousInput(0, 360);
+        m_controller.enableContinuousInput(0, Math.PI*2);
     }
 
     // commands
@@ -68,7 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> false,
+            () -> isAtPosition(goal.position),
             this
         );
     }
@@ -92,7 +94,15 @@ public class ArmSubsystem extends SubsystemBase {
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
+
+        SmartDashboard.putNumber("arm/target position", m_profiledReference.position);
+        SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
+
     }
+
+    private boolean isAtPosition(double goal) {
+        return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
+    } 
 
     public void resetControllers() {
         m_feedforward = new ArmFeedforward(
@@ -109,12 +119,16 @@ public class ArmSubsystem extends SubsystemBase {
             m_constraints = new TrapezoidProfile.Constraints(
             ArmConstants.kMaxV, ArmConstants.kMaxA
         );
-
     } 
     
     @Override
     public void periodic() {
         SmartDashboard.putNumber("arm/position", m_IO.getPosition());
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
+    }
+
+    
+    public void setBrake(boolean brake) {
+       m_IO.setBrake(brake);
     }
 }

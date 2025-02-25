@@ -162,9 +162,10 @@ public class RobotContainer {
     // reset the field-centric heading on left trigger press
     driverJoystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
-    // set lifter controller constants using smartdashboard values
-    driverJoystick.rightTrigger().whileTrue(
-      new InstantCommand( () -> resetControllerConstantsSmartDashboard()));
+    driverJoystick.rightTrigger().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
+    
+    // "temporary" for testing. moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
+    driverJoystick.rightBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
 
     // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftBumper().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
@@ -187,15 +188,15 @@ public class RobotContainer {
 
 
     // set next state, change LED colors accordingly 
-    //copilotJoystick.leftTrigger().onTrue(
-      //new ParallelCommandGroup(
-      //new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
-      //m_ledSubsystem.runSolidRed())); 
+    // copilotJoystick.leftTrigger().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+    //   m_ledSubsystem.runSolidRed())); 
 
-    //copilotJoystick.rightTrigger().onTrue(
-      //new ParallelCommandGroup(
-      //new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
-      //m_ledSubsystem.runSolidOrange())); 
+    // copilotJoystick.rightTrigger().onTrue(
+    //   new ParallelCommandGroup(
+    //   new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+    //   m_ledSubsystem.runSolidOrange())); 
 
     // copilotJoystick.leftBumper().onTrue(
     //   new ParallelCommandGroup(
@@ -236,9 +237,9 @@ public class RobotContainer {
     copilotJoystick.y().whileTrue(
       m_collar.runCollarBackward());
 
+    m_collar.setDefaultCommand(m_collar.runCollarOff());
     m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
-    m_collar.setDefaultCommand(m_collar.runCollarOff());
 
 
     
@@ -250,7 +251,14 @@ public class RobotContainer {
     testJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
     testJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
 
-    testJoystick.rightTrigger().whileTrue(new AutoAlignCommand(drivetrain, m_vision));
+    testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+    testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+    testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collar.runCollar());
+    testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collar.runCollarBackward());
+    
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
@@ -310,6 +318,27 @@ public class RobotContainer {
     ShuffleboardTab compTab = Shuffleboard.getTab("Comp HUD");
     compTab.add("Auto Chooser", m_autoChooser).withSize(3, 2);
 
+    // setup adjustable values in smartdashboard (set them to existing values if they exist)
+    SmartDashboard.putNumber("arm constants/kS", SmartDashboard.getNumber("arm constants/kS", ArmConstants.kS));
+    SmartDashboard.putNumber("arm constants/kG", SmartDashboard.getNumber("arm constants/kG", ArmConstants.kG));
+    SmartDashboard.putNumber("arm constants/kV", SmartDashboard.getNumber("arm constants/kV", ArmConstants.kV));
+    SmartDashboard.putNumber("arm constants/kA", SmartDashboard.getNumber("arm constants/kA", ArmConstants.kA));
+    SmartDashboard.putNumber("arm constants/kP", SmartDashboard.getNumber("arm constants/kP", ArmConstants.kP));
+    SmartDashboard.putNumber("arm constants/kI", SmartDashboard.getNumber("arm constants/kI", ArmConstants.kI));
+    SmartDashboard.putNumber("arm constants/kD", SmartDashboard.getNumber("arm constants/kD", ArmConstants.kD));
+    SmartDashboard.putNumber("arm constants/kMaxV", SmartDashboard.getNumber("arm constants/kMaxV", ArmConstants.kMaxV));
+    SmartDashboard.putNumber("arm constants/kMaxA", SmartDashboard.getNumber("arm constants/kMaxA", ArmConstants.kMaxA));
+
+    SmartDashboard.putNumber("elevator constants/kS", SmartDashboard.getNumber("elevator constants/kS", ElevatorConstants.kS));
+    SmartDashboard.putNumber("elevator constants/kG", SmartDashboard.getNumber("elevator constants/kG", ElevatorConstants.kG));
+    SmartDashboard.putNumber("elevator constants/kV", SmartDashboard.getNumber("elevator constants/kV", ElevatorConstants.kV));
+    SmartDashboard.putNumber("elevator constants/kA", SmartDashboard.getNumber("elevator constants/kA", ElevatorConstants.kA));
+    SmartDashboard.putNumber("elevator constants/kP", SmartDashboard.getNumber("elevator constants/kP", ElevatorConstants.kP));
+    SmartDashboard.putNumber("elevator constants/kI", SmartDashboard.getNumber("elevator constants/kI", ElevatorConstants.kI));
+    SmartDashboard.putNumber("elevator constants/kD", SmartDashboard.getNumber("elevator constants/kD", ElevatorConstants.kD));
+    SmartDashboard.putNumber("elevator constants/kMaxV", SmartDashboard.getNumber("elevator constants/kMaxV", ElevatorConstants.kMaxV));
+    SmartDashboard.putNumber("elevator constants/kMaxA", SmartDashboard.getNumber("elevator constants/kMaxA", ElevatorConstants.kMaxA));
+
 
     configureBindings();
 
@@ -318,11 +347,14 @@ public class RobotContainer {
   // set motors to appropriate neutral modes for an enabled robot
   public void setEnabledNeutralMode() {
     drivetrain.setBrake(true);
+    m_lifter.setEnabledNeutralMode();
   }
 
   // set motors to appropriate neutral modes for an disabled robot
   public void setDisabledNeutralMode() {
     drivetrain.setBrake(false);
+    m_lifter.setDisabledNeutralMode();
+
   }
 
   public Command getAutonomousCommand() {

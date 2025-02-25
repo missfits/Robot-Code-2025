@@ -68,7 +68,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> false,
+            () -> isAtPosition(goal.position),
             this
         );
     }
@@ -92,7 +92,14 @@ public class ElevatorSubsystem extends SubsystemBase{
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
+
+        SmartDashboard.putNumber("elevator/target position", m_profiledReference.position);
+        SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
     }
+
+    private boolean isAtPosition(double goal) {
+        return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
+    } 
     
     public void resetControllers() {
         m_feedforward = new ElevatorFeedforward(
@@ -111,10 +118,13 @@ public class ElevatorSubsystem extends SubsystemBase{
         );
     }
 
-
     @Override
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
     }
+
+    public void setBrake(boolean brake) {
+        m_IO.setBrake(brake);
+     }
 }

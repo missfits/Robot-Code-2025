@@ -58,7 +58,7 @@ public final class Constants {
 
     public static final double INITIAL_POSITION = 0;
     public static final double METERS_PER_ROTATION = Units.inchesToMeters(1.751 * Math.PI/5); // temp
-    public static final double MAX_SPEED = 0.0; 
+    public static final double MAX_SPEED = METERS_PER_ROTATION*100; // motor rotates at ~ 100 rot/sec at free speed
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
@@ -71,16 +71,18 @@ public final class Constants {
     public static double kS = 0;
     public static double kG = 0.2;
     public static double kV = 12/MAX_SPEED; // may need to be updated
-    public static double kA = 0;
+    public static double kA = 2;
 
-    public static double kP = 0; 
+    public static double kP = 100; 
     public static double kI = 0;
     public static double kD = 0; 
 
-    public static double kMaxV = 0;
-    public static double kMaxA = 0; 
+    public static double kMaxV = 2;
+    public static double kMaxA = 1; 
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 2.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
+
+    public static final double MAX_POSITION_TOLERANCE = 0.005;
   }
 
   public static class ArmConstants {
@@ -90,25 +92,27 @@ public final class Constants {
 
     public static final double INITIAL_POSITION = 0; // facing down
     public static final double POSITION_OFFSET = Math.PI/2; // difference between pid 0 (horizontal) and our 0 (down)
-    public static final double DEGREES_PER_ROTATION = 1;  // temp
-    public static final double MAX_SPEED = 0.0; 
+    public static final double DEGREES_PER_ROTATION = 1.0/27.0*15.0/54.0*360.0; 
+    public static final double MAX_SPEED = Math.toRadians(DEGREES_PER_ROTATION*100); 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
-    public static double kS = 0;
-    public static double kG = 0;
-    public static double kV = 12/MAX_SPEED; // may need to be updated
+    public static double kS = 0.15;
+    public static double kG = 0.1;
+    public static double kV = 0.4; // may need to be updated
     public static double kA = 0;
 
-    public static double kP = 0;
+    public static double kP = 20;
     public static double kI = 0;
     public static double kD = 0;
     
-    public static double kMaxV = 0;
-    public static double kMaxA = 0; 
+    public static double kMaxV = 1;
+    public static double kMaxA = 1; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
+
+    public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
   }
 
   public static class CollarConstants {
@@ -122,7 +126,7 @@ public final class Constants {
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
-    public static final double OUTTAKE_MOTOR_SPEED = 4.0;
+    public static final double OUTTAKE_MOTOR_SPEED = 8.0;
   }
 
   public static class RampConstants {
@@ -165,19 +169,19 @@ public final class Constants {
   }
 
   public static class RobotStateConstants {
-    public static final double C1_ELEVATOR_POS = Math.toRadians(0.0);
-    public static final double C1_ARM_POS = Math.toRadians(0.0);
-    public static final double C2_ELEVATOR_POS = Math.toRadians(0.0);
-    public static final double C2_ARM_POS = Math.toRadians(0.0);
-    public static final double C3_ELEVATOR_POS = Math.toRadians(0.0);
-    public static final double C3_ARM_POS = Math.toRadians(0.0);
-    public static final double C4_ELEVATOR_POS = Math.toRadians(0.0);
-    public static final double C4_ARM_POS = Math.toRadians(0.0);
+    public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION;
+    public static final double C1_ARM_POS = ArmConstants.INITIAL_POSITION;
+    public static final double C2_ELEVATOR_POS = 0.3752;
+    public static final double C2_ARM_POS = 0.245;
+    public static final double C3_ELEVATOR_POS = 0.71;
+    public static final double C3_ARM_POS = 0.406;
+    public static final double C4_ELEVATOR_POS = 0.71;
+    public static final double C4_ARM_POS = -3.13;
     public static final double A2_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A2_ARM_POS = Math.toRadians(0.0);
     public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A3_ARM_POS = Math.toRadians(0.0);
-    public static final double IN_ELEVATOR_POS = Math.toRadians(0.0);
-    public static final double IN_ARM_POS = Math.toRadians(0.0);
+    public static final double IN_ELEVATOR_POS = 0;
+    public static final double IN_ARM_POS = -0.4;
   }
 }
