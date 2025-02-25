@@ -83,6 +83,8 @@ public final class Constants {
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
     public static final double MAX_POSITION_TOLERANCE = 0.005;
+
+    public static final double MIN_POS_ARM_CLEAR = 0.5; // needs to be measured 
   }
 
   public static class ArmConstants {

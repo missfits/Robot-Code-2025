@@ -20,11 +20,13 @@ public class LifterCommandFactory {
     }
 
     public Command moveToCommand(RobotState targetRobotState) {
-        return new SequentialCommandGroup(
-            m_arm.moveToCommand(ArmConstants.INITIAL_POSITION),
-            m_elevator.moveToCommand(targetRobotState.getElevatorPos()),
-            m_arm.moveToCommand(targetRobotState.getArmPos())
-        );
+        return new ParallelCommandGroup(
+            new SequentialCommandGroup( // arm movement 
+                new WaitCommand(3).until(m_elevator.okToMoveArmBackTrigger()), // wait until elevator is sufficiently up
+                m_arm.moveToCommand(targetRobotState.getElevatorPos())),
+            new SequentialCommandGroup( // elevator movement
+                new WaitCommand(3).until(m_arm.okToMoveElevatorDownTrigger()), // wait until arm is not over the ramp
+                m_elevator.moveToCommand(targetRobotState.getArmPos())));
     }
 
     public void resetControllers() {

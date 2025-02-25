@@ -11,8 +11,9 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.RobotStateConstants;
 
 public class ArmSubsystem extends SubsystemBase {
     private final ArmIOHardware m_IO = new ArmIOHardware();
@@ -102,6 +103,15 @@ public class ArmSubsystem extends SubsystemBase {
 
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
+    } 
+
+
+    public Trigger okToMoveElevatorDownTrigger() {
+        return new Trigger(() -> okToMoveElevatorDown());
+    } 
+
+    private boolean okToMoveElevatorDown() {
+        return m_IO.getPosition() > RobotStateConstants.C4_ARM_POS - ArmConstants.MAX_POSITION_TOLERANCE && m_IO.getPosition() < RobotStateConstants.IN_ELEVATOR_POS;
     } 
 
     public void resetControllers() {
