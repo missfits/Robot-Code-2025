@@ -32,7 +32,7 @@ public class ArmSubsystem extends SubsystemBase {
     private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ArmConstants.kMaxV, ArmConstants.kMaxA
     );
-    private TrapezoidProfile.State m_goal;
+    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0, 0);
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
