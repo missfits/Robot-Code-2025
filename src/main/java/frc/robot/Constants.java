@@ -163,8 +163,12 @@ public final class Constants {
   }
 
   public static class LaserCanConstants {
-    public static final int LASER_CAN_ID = 14;
-    public static final double MIN_CORAL_SEEN_DISTANCE = 10; // in mm
+    public static final int LASER_CAN_RAMP_OUT_ID = 14;
+    public static final int LASER_CAN_RAMP_IN_ID = 15;
+
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 10; // in mm
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 300; // in mm
+
   }
 
   public static class RobotStateConstants {

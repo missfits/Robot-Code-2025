@@ -277,7 +277,7 @@ public class RobotContainer {
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
     // LED and rumble feedback when coral is seen in ramp
-    m_rampSensor.coralSeenAfterRamp().onTrue(
+    m_rampSensor.coralSeenInRamp().onTrue(
       new ParallelCommandGroup(
         // controller rumble
         new StartEndCommand(
