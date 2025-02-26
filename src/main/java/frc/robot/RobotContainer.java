@@ -181,15 +181,13 @@ public class RobotContainer {
 
     // move lifter to next position 
     copilotJoystick.a().and(copilotJoystick.povCenter()).whileTrue(
-      m_lifter.moveToCommand(() -> {currentLifterState = nextLifterState; return currentLifterState;}));
-      // m_lifter.moveToCommand(() -> {
-      //   currentLifterState = nextLifterState; 
-      //   currentRobotState = RobotState.SCORE;
-      //   return currentLifterState;}));
+      m_lifter.moveToCommand(() -> {currentLifterState = nextLifterState; currentRobotState = RobotState.SCORE; return currentLifterState;}));
     
     // outtake from collar/score
     copilotJoystick.b().and(copilotJoystick.povCenter()).whileTrue(
-      m_collar.runCollar());
+      new ParallelCommandGroup(
+        m_collar.runCollar(),
+        new InstantCommand(() -> currentRobotState = RobotState.SCORE)));
 
     // move robot to intake mode
     copilotJoystick.y().and(copilotJoystick.povCenter()).whileTrue(
