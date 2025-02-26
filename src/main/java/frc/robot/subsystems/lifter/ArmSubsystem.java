@@ -107,12 +107,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
-    } 
-
-    // public Trigger atPositionTrigger() {
-    //     return new Trigger(() -> isAtPosition(m_goal.position));
-    // }
-    
+    }
 
     public void resetControllers() {
         m_feedforward = new ArmFeedforward(
