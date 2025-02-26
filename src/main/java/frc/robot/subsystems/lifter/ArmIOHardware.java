@@ -62,7 +62,7 @@ public class ArmIOHardware {
     }
 
     public void setVoltage(double value) {
-        value = MathUtil.clamp(value, -3, 3);
+        value = MathUtil.clamp(value, -5, 5);
         m_armMotor.setControl(new VoltageOut(value));
         SmartDashboard.putNumber("arm/voltage", value);
     }
