@@ -1,28 +1,33 @@
 package frc.robot.subsystems.lifter;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
     private final ArmIOHardware m_IO = new ArmIOHardware();
-    private final ArmFeedforward m_feedforward = new ArmFeedforward(
+    private ArmFeedforward m_feedforward = new ArmFeedforward(
         ArmConstants.kS,
         ArmConstants.kG,
         ArmConstants.kV,
         ArmConstants.kA
     );
-    private final PIDController m_controller = new PIDController(
+    private PIDController m_controller = new PIDController(
         ArmConstants.kP,
         ArmConstants.kI,
         ArmConstants.kD
     );
-    private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
+    private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ArmConstants.kMaxV, ArmConstants.kMaxA
     );
     private TrapezoidProfile.State m_goal;
@@ -32,10 +37,30 @@ public class ArmSubsystem extends SubsystemBase {
     // constructor
     public ArmSubsystem() {
         m_IO.resetPosition();
-        m_controller.enableContinuousInput(0, 360);
+        m_controller.enableContinuousInput(0, Math.PI*2);
     }
 
     // commands
+    public Command keepInPlaceCommand() {
+        return new RunCommand(
+            () -> m_IO.setVoltage(0), 
+            this
+        );
+    }
+
+    public Command manualMoveCommand() {
+        return new RunCommand(
+            () -> m_IO.setVoltage(ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            this
+        );
+    }
+    public Command manualMoveBackwardCommand() {
+        return new RunCommand(
+            () -> m_IO.setVoltage(-ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            this
+        );
+    }
+
     public Command moveToCommand(double targetPosition) {
         return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
     }
@@ -45,7 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> false,
+            () -> isAtPosition(goal.position),
             this
         );
     }
@@ -69,5 +94,41 @@ public class ArmSubsystem extends SubsystemBase {
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
 
         m_IO.setVoltage(feedForwardPower + PIDPower);
+
+        SmartDashboard.putNumber("arm/target position", m_profiledReference.position);
+        SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
+
+    }
+
+    private boolean isAtPosition(double goal) {
+        return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
+    } 
+
+    public void resetControllers() {
+        m_feedforward = new ArmFeedforward(
+            ArmConstants.kS,
+            ArmConstants.kG,
+            ArmConstants.kV,
+            ArmConstants.kA
+        );
+        m_controller = new PIDController(
+            ArmConstants.kP,
+            ArmConstants.kI,
+            ArmConstants.kD
+        );
+            m_constraints = new TrapezoidProfile.Constraints(
+            ArmConstants.kMaxV, ArmConstants.kMaxA
+        );
+    } 
+    
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("arm/position", m_IO.getPosition());
+        SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
+    }
+
+    
+    public void setBrake(boolean brake) {
+       m_IO.setBrake(brake);
     }
 }
