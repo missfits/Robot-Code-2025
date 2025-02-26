@@ -1,10 +1,14 @@
 package frc.robot.subsystems.lifter;
 
 import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -52,10 +56,27 @@ public class ElevatorIOHardware {
     }
 
     public void setVoltage(double value) {
+        value = MathUtil.clamp(value, -6, 6);
+
+        // if position is too low, only run the elevator up 
+        if (this.getPosition() < ElevatorConstants.POSITION_LOWER_LIMIT) {
+            value = MathUtil.clamp(value, 0, 1000);
+        }
+        // if position is too high, only run the elevator down (or in placd)
+        if (this.getPosition() > ElevatorConstants.POSITION_UPPER_LIMIT) {
+            value = MathUtil.clamp(value, -1000, ElevatorConstants.kG);
+
+        }
+
         m_elevatorMotor.setControl(new VoltageOut(value));
+        SmartDashboard.putNumber("elevator/voltage", value);
     }
     
     public void requestClosedLoopPosition(double value) {
         m_elevatorMotor.setControl(new PositionVoltage(value));
+    }
+
+    public void setBrake(boolean brake) {
+        m_elevatorMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
 }
