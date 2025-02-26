@@ -202,8 +202,8 @@ public class RobotContainer {
     // stop collar after coral passes entirely through the collar
     copilotJoystick.b().whileTrue(
       Commands.sequence(
-        m_collar.runCollar().until(m_rampSensor.coralSeenAfterRamp()),
-        m_collar.runCollar().until(m_rampSensor.coralSeenAfterRamp().negate()),
+        m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensor.coralSeenAfterRamp()),
+        m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).withTimeout(0.1),
         m_collar.runCollarOff())); 
 
     copilotJoystick.x().whileTrue(
@@ -301,7 +301,7 @@ public class RobotContainer {
     testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
     testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
     testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
-    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collar.runCollar());
+    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collar.runCollar(CollarConstants.OUTTAKE_MOTOR_SPEED));
     testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collar.runCollarBackward());
     
 
