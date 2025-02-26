@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -54,7 +55,7 @@ public class ArmSubsystem extends SubsystemBase {
         return new FunctionalCommand(
             () -> {}, 
             () -> m_IO.setVoltage(0),
-            (interrupted) -> moveToCommand(m_goal),
+            (interrupted) -> {},
             () -> !isAtPosition(m_goal.position),
             this
         );
@@ -81,7 +82,7 @@ public class ArmSubsystem extends SubsystemBase {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            (interrupted) -> keepInPlaceCommand(),
+            (interrupted) -> CommandScheduler.getInstance().schedule(keepInPlaceCommand()),
             () -> isAtPosition(goal.position),
             this
         );

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -50,8 +51,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public Command keepInPlaceCommand() {
         return new FunctionalCommand(
             () -> {}, 
-            () -> m_IO.setVoltage(0),
-            (interrupted) -> moveToCommand(m_goal),
+            () -> m_IO.setVoltage(ElevatorConstants.kG),
+            (interrupted) -> {},
             () -> !isAtPosition(m_goal.position),
             this
         );
@@ -79,7 +80,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            (interrupted) -> keepInPlaceCommand(),
+            (interrupted) -> CommandScheduler.getInstance().schedule(keepInPlaceCommand()),
             () -> isAtPosition(goal.position),
             this
         );

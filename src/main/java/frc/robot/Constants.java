@@ -69,7 +69,7 @@ public final class Constants {
 
     // not tuned
     public static double kS = 0;
-    public static double kG = 0.2;
+    public static double kG = 0.15;
     public static double kV = 12/MAX_SPEED; // may need to be updated
     public static double kA = 2;
 
@@ -77,12 +77,12 @@ public final class Constants {
     public static double kI = 0;
     public static double kD = 0; 
 
-    public static double kMaxV = 2;
+    public static double kMaxV = 1;
     public static double kMaxA = 1; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
-    public static final double MAX_POSITION_TOLERANCE = 0.005;
+    public static final double MAX_POSITION_TOLERANCE = 0.01;
   }
 
   public static class ArmConstants {
