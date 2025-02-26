@@ -41,13 +41,6 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     // commands
-    // public Command keepInPlaceCommand() {
-    //     return new RunCommand(
-    //         () -> m_IO.setVoltage(ElevatorConstants.kG),
-    //         this
-    //     );
-    // }
-
     public Command keepInPlaceCommand() {
         return new FunctionalCommand(
             () -> {}, 
@@ -112,11 +105,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
-    } 
-
-    // public Trigger atPositionTrigger() {
-    //     return new Trigger(() -> isAtPosition(m_goal.position));
-    // }
+    }
     
     public void resetControllers() {
         m_feedforward = new ElevatorFeedforward(

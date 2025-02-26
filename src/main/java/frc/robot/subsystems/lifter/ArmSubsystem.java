@@ -43,14 +43,6 @@ public class ArmSubsystem extends SubsystemBase {
         m_controller.enableContinuousInput(0, Math.PI*2);
     }
 
-    // commands
-    // public Command keepInPlaceCommand() {
-    //     return new RunCommand(
-    //         () -> m_IO.setVoltage(0), 
-    //         this
-    //     );
-    // }
-
     public Command keepInPlaceCommand() {
         return new FunctionalCommand(
             () -> {}, 
