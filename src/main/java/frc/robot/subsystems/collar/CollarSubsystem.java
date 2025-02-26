@@ -29,9 +29,9 @@ public class CollarSubsystem extends SubsystemBase {
         );
     }
 
-    public Command runCollar() {
+    public Command runCollar(double speed) {
         return new RunCommand(
-            () -> m_IO.setVoltage(CollarConstants.OUTTAKE_MOTOR_SPEED),
+            () -> m_IO.setVoltage(speed),
             this
         );
     }

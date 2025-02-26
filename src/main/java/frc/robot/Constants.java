@@ -5,8 +5,11 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.math.geometry.Translation3d;
 
 
 /**
@@ -34,6 +37,8 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
+
+    public static final double ROBOT_SIZE_X = 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -102,7 +107,7 @@ public final class Constants {
     public static double kMaxV = 1;
     public static double kMaxA = 1; 
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 1.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 2.0;
   }
 
   public static class CollarConstants {
@@ -117,6 +122,12 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_SECONDARY_MOTOR_SPEED = 2.0;
+
+
+
+    public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
 
   public static class RampConstants {
@@ -130,19 +141,38 @@ public final class Constants {
     public static final double BLINK_TIME = 1; // in seconds for after intake/outtake
   }
 
+  public static class AutoAlignConstants {
+    public static final double REEF_OFFSET_RIGHT = Units.Meters.convertFrom(1, Units.Inches);
+    public static final double REEF_OFFSET_LEFT = Units.Meters.convertFrom(12, Units.Inches);
+  }
+
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
+    public static final double ROBOT_TO_CAM_X = Units.Meters.convertFrom(-3, Units.Inches); // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = Units.Meters.convertFrom(-10.25, Units.Inches); // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = Units.Meters.convertFrom(10, Units.Inches); // in meters from the floor?
+    
+
     public static final Translation2d ROBOT_TO_CAM = 
-      new Translation2d(0.3048, 0); // in meters from center of robot to 2x4 camera mount
+      new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
+
+    public static final Transform3d ROBOT_TO_CAM_3D = 
+      new Transform3d(new Translation3d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y, ROBOT_TO_CAM_Z), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
     
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
+    public static final double TARGET_PITCH = 0; 
   }
 
-  public static class IntakeConstants {
-    public static final int LASER_CAN_ID = 14;
+  public static class LaserCanConstants {
+    public static final int LASER_CAN_RAMP_OUT_ID = 14;
+    public static final int LASER_CAN_RAMP_IN_ID = 15;
+
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 10; // in mm
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 300; // in mm
+
   }
 
   public static class RobotStateConstants {
@@ -159,6 +189,6 @@ public final class Constants {
     public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A3_ARM_POS = Math.toRadians(0.0);
     public static final double IN_ELEVATOR_POS = 0;
-    public static final double IN_ARM_POS = -0.4;
+    public static final double IN_ARM_POS = -0.478;
   }
 }
