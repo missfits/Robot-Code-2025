@@ -403,8 +403,8 @@ public class RobotContainer {
 
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
         if (estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
-          drivetrain.fusedPoseEstimator.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.fusedPoseEstimator.addVisionMeasurement(estPose3d.toPose2d(), estimatedRobotPose.timestampSeconds);
+          drivetrain.getFusedPoseEstimator().setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
+          drivetrain.getFusedPoseEstimator().addVisionMeasurement(estPose3d.toPose2d(), estimatedRobotPose.timestampSeconds);
         }
           m_estPoseField.setRobotPose(estPose3d.toPose2d());
       }

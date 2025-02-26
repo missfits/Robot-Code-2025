@@ -80,7 +80,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final Vector<N3> visionStdDevs = VecBuilder.fill(10, 10, 10);
 
     // fusePoseEstimator stores vision + drivetrain pose
-    public final SwerveDrivePoseEstimator fusedPoseEstimator = new SwerveDrivePoseEstimator(
+    private final SwerveDrivePoseEstimator fusedPoseEstimator = new SwerveDrivePoseEstimator(
         this.getKinematics(), 
         this.getPigeon2().getRotation2d(), 
         this.getState().ModulePositions, 
@@ -88,12 +88,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         stateStdDevs,
         visionStdDevs); 
 
-        // drivePoseEstimator stores just drivetrain pose
-        public final SwerveDrivePoseEstimator drivePoseEstimator = new SwerveDrivePoseEstimator(
-            this.getKinematics(), 
-            this.getPigeon2().getRotation2d(), 
-            this.getState().ModulePositions, 
-            this.getState().Pose); 
+    // drivePoseEstimator stores just drivetrain pose
+    private final SwerveDrivePoseEstimator drivePoseEstimator = new SwerveDrivePoseEstimator(
+        this.getKinematics(), 
+        this.getPigeon2().getRotation2d(), 
+        this.getState().ModulePositions, 
+        this.getState().Pose); 
         
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
