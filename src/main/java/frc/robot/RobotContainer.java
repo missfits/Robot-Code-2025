@@ -171,14 +171,23 @@ public class RobotContainer {
     // reset the field-centric heading 
     driverJoystick.b().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
-    driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
+    driverJoystick.y().whileTrue(
+      new ParallelCommandGroup(
+        new RotateToFaceReefCommand(drivetrain, m_vision),
+        new InstantCommand(() -> currentRobotState = RobotState.SCORE)));
     
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
+    driverJoystick.rightTrigger().whileTrue(
+      new ParallelCommandGroup(
+        new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT),
+        new InstantCommand(() -> currentRobotState = RobotState.SCORE)));
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
-
+    driverJoystick.leftTrigger().whileTrue(
+      new ParallelCommandGroup(
+        new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT),
+        new InstantCommand(() -> currentRobotState = RobotState.SCORE)));
+      
     // move lifter to next position 
     copilotJoystick.a().and(copilotJoystick.povCenter()).whileTrue(
       m_lifter.moveToCommand(() -> {currentLifterState = nextLifterState; currentRobotState = RobotState.SCORE; return currentLifterState;}));
