@@ -270,15 +270,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this.getState().ModulePositions);
     }
 
-    public void resetHeading(){
-        if (DriverStation.getAlliance().equals(Alliance.Blue)){
-            this.resetRotation(new Rotation2d(0));
-            drivePoseEstimator.resetRotation(new Rotation2d(0));
-        }
-        else{
-            this.resetRotation(new Rotation2d(180));
-            drivePoseEstimator.resetRotation(new Rotation2d(180)); 
-        }
+    @Override
+    public void resetRotation(Rotation2d rotation){
+        super.resetRotation(rotation);
+        drivePoseEstimator.resetRotation(rotation);
     }
 
     // updates drivetrain only
