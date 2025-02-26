@@ -69,8 +69,8 @@ public final class Constants {
 
     // not tuned
     public static double kS = 0;
-    public static double kG = 0.15;
-    public static double kV = 12/MAX_SPEED; // may need to be updated
+    public static double kG = 0.17;
+    public static double kV = 3; 
     public static double kA = 2;
 
     public static double kP = 100; 
@@ -99,8 +99,8 @@ public final class Constants {
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
 
     public static double kS = 0.15;
-    public static double kG = 0.1;
-    public static double kV = 0.2; // may need to be updated
+    public static double kG = 0;
+    public static double kV = 0.2;
     public static double kA = 0.5;
 
     public static double kP = 50;
