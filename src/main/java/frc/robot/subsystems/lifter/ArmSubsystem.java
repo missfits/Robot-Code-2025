@@ -43,9 +43,19 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     // commands
+    // public Command keepInPlaceCommand() {
+    //     return new RunCommand(
+    //         () -> m_IO.setVoltage(0), 
+    //         this
+    //     );
+    // }
+
     public Command keepInPlaceCommand() {
-        return new RunCommand(
-            () -> m_IO.setVoltage(0), 
+        return new FunctionalCommand(
+            () -> {}, 
+            () -> m_IO.setVoltage(0),
+            (interrupted) -> moveToCommand(m_goal),
+            () -> !isAtPosition(m_goal.position),
             this
         );
     }
@@ -71,7 +81,7 @@ public class ArmSubsystem extends SubsystemBase {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            (interrupted) -> {},
+            (interrupted) -> keepInPlaceCommand(),
             () -> isAtPosition(goal.position),
             this
         );
@@ -106,9 +116,9 @@ public class ArmSubsystem extends SubsystemBase {
         return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
     } 
 
-    public Trigger atPositionTrigger() {
-        return new Trigger(() -> isAtPosition(m_goal.position));
-    }
+    // public Trigger atPositionTrigger() {
+    //     return new Trigger(() -> isAtPosition(m_goal.position));
+    // }
     
 
     public void resetControllers() {

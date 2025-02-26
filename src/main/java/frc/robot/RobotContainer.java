@@ -241,8 +241,8 @@ public class RobotContainer {
 
 
     // run keepInPlace when at target position
-    m_elevator.atPositionTrigger().onTrue(m_elevator.keepInPlaceCommand());
-    m_arm.atPositionTrigger().onTrue(m_arm.keepInPlaceCommand());
+    // m_elevator.atPositionTrigger().onTrue(m_elevator.keepInPlaceCommand());
+    // m_arm.atPositionTrigger().onTrue(m_arm.keepInPlaceCommand());
 
 
     // run command runSolidGreen continuously if robot isWithinTarget()
