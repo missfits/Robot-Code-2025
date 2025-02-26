@@ -6,14 +6,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.util.Units;
@@ -21,7 +17,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -48,7 +43,6 @@ public class VisionSubsystem extends SubsystemBase {
   private double targetYaw; // in radians, relative to field
   private Pose2d currentPose; // current robot pose, updates periodically
   private EstimatedRobotPose estimatedRobotPose; 
-  private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
@@ -84,9 +78,6 @@ public class VisionSubsystem extends SubsystemBase {
     return estimatedRobotPose;
   }
 
-  public Matrix<N3, N1> getCurrentStdDevs(){
-    return curStdDevs;
-  }
 
   @Override
   public void periodic() {
@@ -102,23 +93,14 @@ public class VisionSubsystem extends SubsystemBase {
 
       // update the estimated robot pose if the pose estimator outputs something
       Optional<EstimatedRobotPose> poseEstimatorOutput = poseEstimator.update(result);
-
-      // update standard deviation based on dist 
-      this.updateEstimationStdDevs(poseEstimatorOutput, result.getTargets());
-
       if (poseEstimatorOutput.isPresent()) {
         estimatedRobotPose = poseEstimatorOutput.get(); 
       }
 
       if (result.hasTargets()) {
-        PhotonTrackedTarget target = null;
+        PhotonTrackedTarget target = result.getBestTarget();
         double biggestTargetArea = 0;
-
-        for (PhotonTrackedTarget sampleTarget : result.getTargets()){
-
-          if (sampleTarget.getPoseAmbiguity() > 0.2){
-            continue;
-          }
+        for (PhotonTrackedTarget sampleTarget : result.getTargets()){ 
           //loops through every sample target in results.getTargets()
           //if the sample target's area is bigger than the biggestTargetArea, then the sample target
           // is set to the target, and the biggest Target Area is set to the sample's target area
@@ -128,19 +110,11 @@ public class VisionSubsystem extends SubsystemBase {
           }
         }
 
-        if (target == null){
-          SmartDashboard.putString("vision/targetState", "targetDiscardedAmbiguity");
-          targetFound = false;
-        }
-        else{
-          SmartDashboard.putString("vision/targetState", "targetFound");
-          targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
-          targetFound = true;
-        }
-      }
+        targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
 
+        targetFound = true;
+      }
       else {
-        SmartDashboard.putString("vision/targetState", "noTarget");
         targetFound = false;
       }
     }
@@ -174,45 +148,4 @@ public class VisionSubsystem extends SubsystemBase {
             && Math.abs(targetTranslation2d.getX() - distToTargetX) < toleranceX
             && Math.abs(targetTranslation2d.getY() - distToTargetY) < toleranceY);
   }
-
-  private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
-        if (estimatedPose.isEmpty()) {
-            // No pose input. Default to single-tag std devs
-            curStdDevs = VisionConstants.kSingleTagStdDevs;
-        } 
-        else {
-            // Pose present. Start running Heuristic
-            int numTags = 0;
-            double avgDist = 0;
-
-            // Precalculation - see how many tags we found, and calculate an average-distance metric
-            for (var tgt : targets) {
-                var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-                if (tagPose.isEmpty()) continue;
-                numTags++;
-                avgDist +=
-                        tagPose
-                                .get()
-                                .toPose2d()
-                                .getTranslation()
-                                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-            }
-
-            if (numTags == 0) {
-                // No tags visible. Default to single-tag std devs
-                curStdDevs = VisionConstants.kSingleTagStdDevs;
-            } 
-            else if (numTags == 1 && avgDist > 4){  
-              curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-            }
-            else {
-              var unscaledStdDevs = numTags > 1 ? VisionConstants.kMultiTagStdDevs:VisionConstants.kSingleTagStdDevs;
-            
-              avgDist /= numTags;
-              // increase std devs based on (average) distance
-              curStdDevs = unscaledStdDevs.times(1 + (avgDist * avgDist / 30));
-            }
-          }
-        }
-    }
 }
