@@ -192,43 +192,42 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
-        if (estimatedPose.isEmpty()) {
-            // No pose input. Default to single-tag std devs
-            curStdDevs = VisionConstants.kSingleTagStdDevs;
-        } 
-        else {
-            // Pose present. Start running Heuristic
-            int numTags = 0;
-            double avgDist = 0;
+    if (estimatedPose.isEmpty()) {
+        // No pose input. Default to single-tag std devs
+        curStdDevs = VisionConstants.kSingleTagStdDevs;
+    } 
+    else {
+      // Pose present. Start running Heuristic
+      int numTags = 0;
+      double avgDist = 0;
 
-            // Precalculation - see how many tags we found, and calculate an average-distance metric
-            for (var tgt : targets) {
-                var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-                if (tagPose.isEmpty()) continue;
-                numTags++;
-                avgDist +=
-                        tagPose
-                                .get()
-                                .toPose2d()
-                                .getTranslation()
-                                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-            }
+      // Precalculation - see how many tags we found, and calculate an average-distance metric
+      for (var tgt : targets) {
+          var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+          if (tagPose.isEmpty()) continue;
+          numTags++;
+          avgDist +=
+                  tagPose
+                          .get()
+                          .toPose2d()
+                          .getTranslation()
+                          .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      }
 
-            if (numTags == 0) {
-                // No tags visible. Default to single-tag std devs
-                curStdDevs = VisionConstants.kSingleTagStdDevs;
-            } 
-            else if (numTags == 1 && avgDist > 4){  
-              curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-            }
-            else {
-              var unscaledStdDevs = numTags > 1 ? VisionConstants.kMultiTagStdDevs:VisionConstants.kSingleTagStdDevs;
-            
-              avgDist /= numTags;
-              // increase std devs based on (average) distance
-              curStdDevs = unscaledStdDevs.times(1 + (avgDist * avgDist / 30));
-            }
-          }
-        }
+      if (numTags == 0) {
+          // No tags visible. Default to single-tag std devs
+          curStdDevs = VisionConstants.kSingleTagStdDevs;
+      } 
+      else if (numTags == 1 && avgDist > 4){  
+        curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+      }
+      else {
+        var unscaledStdDevs = numTags > 1 ? VisionConstants.kMultiTagStdDevs:VisionConstants.kSingleTagStdDevs;
+      
+        avgDist /= numTags;
+        // increase std devs based on (average) distance
+        curStdDevs = unscaledStdDevs.times(1 + (avgDist * avgDist / 30));
+      }
     }
+  }
 }
