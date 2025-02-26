@@ -18,10 +18,6 @@ public class CollarSubsystem extends SubsystemBase {
         m_IO.resetPosition();
     }
 
-    public Command getCommand(RobotState targetRobotState) {
-        return new WaitCommand(0);
-    }
-
     public Command runCollarOff() {
         return new RunCommand(
             () -> m_IO.setVoltage(0),
@@ -32,13 +28,6 @@ public class CollarSubsystem extends SubsystemBase {
     public Command runCollar(double speed) {
         return new RunCommand(
             () -> m_IO.setVoltage(speed),
-            this
-        );
-    }
-
-    public Command runCollarBackward() {
-        return new RunCommand(
-            () -> m_IO.setVoltage(-CollarConstants.OUTTAKE_MOTOR_SPEED),
             this
         );
     }

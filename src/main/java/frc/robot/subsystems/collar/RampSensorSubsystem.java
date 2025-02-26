@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.collar;
 
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.CanBridge;

@@ -59,10 +59,11 @@ import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.RampSensorSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
+import frc.robot.subsystems.collar.CollarCommandFactory;
+import frc.robot.subsystems.collar.RampSensorSubsystem;
 import frc.robot.subsystems.lifter.ArmSubsystem;
 import frc.robot.subsystems.lifter.ElevatorIOHardware;
 import frc.robot.subsystems.lifter.ElevatorSubsystem;
@@ -99,6 +100,9 @@ public class RobotContainer {
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
 
   private final ArmSubsystem m_arm = new ArmSubsystem();
+
+  private final CollarCommandFactory m_collarCommandFactory = new CollarCommandFactory(m_collar, m_rampSensor);
+
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -201,13 +205,10 @@ public class RobotContainer {
 
     // stop collar after coral passes entirely through the collar
     copilotJoystick.b().whileTrue(
-      Commands.sequence(
-        m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensor.coralSeenAfterRamp()),
-        m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).withTimeout(0.1),
-        m_collar.runCollarOff())); 
+     m_collarCommandFactory.intakeCoralSequence()); 
 
     copilotJoystick.x().whileTrue(
-      m_collar.runCollarBackward()); 
+      m_collarCommandFactory.runCollarOut()); 
 
     // set next state, change LED colors accordingly 
     // copilotJoystick.leftTrigger().onTrue(
