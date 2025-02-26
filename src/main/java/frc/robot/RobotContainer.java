@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -140,10 +141,10 @@ public class RobotContainer {
     }));
 
     // reset the field-centric heading on left trigger press
-    driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
+    driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.resetHeading()));
 
     // reset fused vision pose estimator on left bumper press
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetRobotPoseWithDrivePoseEst()));
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetPose(drivetrain.getDrivePoseEstimator().getEstimatedPosition())));
 
 
     // auto rotate to face reef command
@@ -263,15 +264,13 @@ public class RobotContainer {
     
       // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
       if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
-        drivetrain.fusedPoseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+        drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
       }
 
         m_estPoseField.setRobotPose(estPose2d);
     }
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
-    drivetrain.updateRobotPoseWithFusedPoseEst();
-    drivetrain.updateDrivePoseWithOdometry();
   }
 
 }
