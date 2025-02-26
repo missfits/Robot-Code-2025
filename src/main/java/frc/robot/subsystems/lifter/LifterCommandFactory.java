@@ -12,11 +12,14 @@ import java.util.function.Supplier;
 
 
 public class LifterCommandFactory {
-    private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
-    private final ArmSubsystem m_arm = new ArmSubsystem();
+    private ElevatorSubsystem m_elevator;
+    private ArmSubsystem m_arm;
 
     // constructor
-    public LifterCommandFactory() {}
+    public LifterCommandFactory(ElevatorSubsystem elevator, ArmSubsystem arm) {
+        m_elevator = elevator;
+        m_arm = arm;
+    }
 
     public Command getCommand(RobotState targetRobotState) {
         return new WaitCommand(0);
