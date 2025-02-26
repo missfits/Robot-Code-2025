@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -159,9 +160,13 @@ public class RobotContainer {
     //     .withTargetDirection(Rotation2d.fromDegrees(270));
     // }));
 
-    // reset the field-centric heading
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
+    // reset the field-centric heading on left trigger press
+    driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : 180))));
 
+    // reset fused vision pose estimator on left bumper press
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetPose(drivetrain.getDrivePoseEstimator().getEstimatedPosition())));
+
+    // auto rotate to reef command
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
     
     // "temporary" for testing. moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
@@ -391,19 +396,18 @@ public class RobotContainer {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
-      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d(); // estimated robot pose of vision
     
-      // check if new estimated pose and previous pose are less than 2 meters apart
+      // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
       if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
-        drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+        drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
+      }
 
         m_estPoseField.setRobotPose(estPose2d);
-      }
     }
     
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
-    drivetrain.updatePoseWithPoseEst();
   }
 
 }
