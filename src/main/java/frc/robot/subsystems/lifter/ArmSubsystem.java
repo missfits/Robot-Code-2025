@@ -47,7 +47,7 @@ public class ArmSubsystem extends SubsystemBase {
     // commands
     public Command keepInPlaceCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(0), 
+            () -> m_IO.setVoltage(ArmConstants.kG), 
             this
         );
     }
