@@ -100,10 +100,10 @@ public class RobotContainer {
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
-  private final LifterCommandFactory m_lifter = new LifterCommandFactory();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
-
   private final ArmSubsystem m_arm = new ArmSubsystem();
+
+  private final LifterCommandFactory m_lifter = new LifterCommandFactory(m_elevator, m_arm);
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
