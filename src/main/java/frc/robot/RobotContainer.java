@@ -281,6 +281,9 @@ public class RobotContainer {
     // run command runSolidGreen continuously if robot isWithinTarget()
     m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
+    drivetrain.isAtTranslation(new Translation2d(10.4, 2)).whileTrue(m_ledSubsystem.runSolidGreen());
+
+
     //set buttons to LED lights
     // a to flash yellow
     testJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
