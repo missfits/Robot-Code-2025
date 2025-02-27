@@ -23,11 +23,19 @@ public class LifterCommandFactory {
     }
 
     public Command moveToCommand(RobotState targetRobotState) {
-        return new SequentialCommandGroup(
-            m_arm.moveToCommand(ArmConstants.INITIAL_POSITION),
-            m_elevator.moveToCommand(targetRobotState.getElevatorPos()),
-            m_arm.moveToCommand(targetRobotState.getArmPos())
-        );
+        if (targetRobotState == RobotState.L4_CORAL) {
+            return new ParallelCommandGroup(
+                new SequentialCommandGroup( // arm movement 
+                    new WaitCommand(3).until(m_elevator.okToMoveArmBackTrigger()), // wait until elevator is sufficiently up
+                    m_arm.moveToCommand(targetRobotState.getArmPos())),
+                m_elevator.moveToCommand(targetRobotState.getElevatorPos()));
+        } else {
+            return new ParallelCommandGroup(
+                m_arm.moveToCommand(targetRobotState.getArmPos()),
+                new SequentialCommandGroup( // elevator movement
+                    new WaitCommand(3).until(m_arm.okToMoveElevatorDownTrigger()), // wait until arm is not over the ramp
+                    m_elevator.moveToCommand(targetRobotState.getElevatorPos())));
+        }
     }
     public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
         return new SequentialCommandGroup(

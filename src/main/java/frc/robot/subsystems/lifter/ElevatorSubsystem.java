@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
-
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.RobotStateConstants;
 
 public class ElevatorSubsystem extends SubsystemBase{
     private final ElevatorIOHardware m_IO = new ElevatorIOHardware();
@@ -116,6 +116,14 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
+    } 
+
+    public Trigger okToMoveArmBackTrigger() {
+        return new Trigger(() -> okToMoveArmBack());
+    } 
+
+    private boolean okToMoveArmBack() {
+        return m_IO.getPosition() > ElevatorConstants.MIN_POS_ARM_CLEAR;
     } 
     
     public void resetControllers() {
