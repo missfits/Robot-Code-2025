@@ -161,10 +161,10 @@ public class RobotContainer {
     // }));
 
     // reset the field-centric heading on left trigger press
-    driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : 180))));
+    driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
     // reset fused vision pose estimator on left bumper press
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetPose(drivetrain.getDrivePoseEstimator().getEstimatedPosition())));
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose()));
 
     // auto rotate to reef command
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));

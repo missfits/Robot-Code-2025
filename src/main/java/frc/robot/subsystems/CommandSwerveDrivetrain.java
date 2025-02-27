@@ -184,7 +184,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         AutoBuilder.configure(
             () -> getState().Pose,   // Supplier of current robot pose
-            this::setNewPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
+            this::resetPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
             () -> getState().Speeds, // Supplier of current robot speeds. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> setControl(
                     m_pathApplyRobotSpeeds.withSpeeds(speeds)
@@ -275,10 +275,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         drivePoseEstimator.resetRotation(rotation);
     }
 
-    // updates drivetrain only
-    public void setNewPose(Pose2d newPose){
+    @Override
+    public void resetPose(Pose2d newPose){
+        super.resetPose(newPose);
         drivePoseEstimator.resetPose(newPose);
-        this.resetPose(newPose);
+    }
+
+    public void resetFusedPose(){
+        this.resetPose(drivePoseEstimator.getEstimatedPosition());
     }
 
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
