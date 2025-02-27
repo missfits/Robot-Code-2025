@@ -28,6 +28,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -120,6 +121,7 @@ public class RobotContainer {
 
   private final Field2d m_estPoseField = new Field2d();
   private final Field2d m_actualField = new Field2d();
+  private final Field2d m_drivePoseField = new Field2d();  
 
 
   private void configureBindings() {
@@ -162,7 +164,8 @@ public class RobotContainer {
     // }));
 
     // reset fused vision pose estimator on right bumper press
-    driverJoystick.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRobotPoseWithDrivePoseEst()));
+    // driverJoystick.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRobotPoseWithDrivePoseEst()));
+    driverJoystick.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(() -> m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
 
     // reset the field-centric heading on left bumper press
     driverJoystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
@@ -338,6 +341,7 @@ public class RobotContainer {
     
     SmartDashboard.putData("est pose field", m_estPoseField);
     SmartDashboard.putData("Actual Field", m_actualField);
+    SmartDashboard.putData("drivetrain odometry field", m_drivePoseField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
@@ -414,6 +418,7 @@ public class RobotContainer {
     m_actualField.setRobotPose(drivetrain.getState().Pose);
     drivetrain.updateRobotPoseWithFusedPoseEst();
     drivetrain.updateDrivePoseWithOdometry();
+    m_drivePoseField.setRobotPose(drivetrain.getDrivePoseEstimator().getEstimatedPosition());
   }
 
 }

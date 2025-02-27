@@ -142,11 +142,11 @@ public class VisionSubsystem extends SubsystemBase {
           SmartDashboard.putString("vision/targetState", "targetFound");
           targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
           targetFound = true;
+
+          targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
+
+          targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
         }
-
-        targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
-
-        targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
       }
 
       else {

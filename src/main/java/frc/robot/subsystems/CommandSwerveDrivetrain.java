@@ -218,6 +218,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             },
             this // Reference to this subsystem to set requirements
         );
+
+        // this.setNewPose(new Pose2d(10,2, new Rotation2d(0)));
     }
 
     public Command getCommandFromRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -293,11 +295,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         this.resetPose(newPose);
     }
 
+    public void setNewPose(Supplier<Pose2d> newPoseSupplier){
+        if (!newPoseSupplier.get().equals(null)){
+            drivePoseEstimator.resetPose(newPoseSupplier.get());
+            fusedPoseEstimator.resetPose(newPoseSupplier.get());
+            this.resetPose(newPoseSupplier.get());
+        }
+    }
+
     // resets fusedPoseEst to drivePoseEst
     public void resetRobotPoseWithDrivePoseEst(){
         setNewPose(drivePoseEstimator.getEstimatedPosition());
     }
-
 
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
     public void setBrake(boolean brake) {
