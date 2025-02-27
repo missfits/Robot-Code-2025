@@ -122,7 +122,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         for (PhotonTrackedTarget sampleTarget : result.getTargets()){
 
-          if (sampleTarget.getPoseAmbiguity() > 0.2){
+          if (sampleTarget.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY){
             continue;
           }
           //loops through every sample target in results.getTargets()
@@ -142,11 +142,9 @@ public class VisionSubsystem extends SubsystemBase {
           SmartDashboard.putString("vision/targetState", "targetFound");
           targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
           targetFound = true;
+
+          targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
         }
-
-        targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
-
-        targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
       }
 
       else {
