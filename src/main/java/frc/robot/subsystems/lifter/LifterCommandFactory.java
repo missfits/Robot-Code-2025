@@ -1,11 +1,14 @@
 package frc.robot.subsystems.lifter;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotState;
 import frc.robot.Constants.ArmConstants;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import java.util.function.Supplier;
 
 
 public class LifterCommandFactory {
@@ -33,6 +36,13 @@ public class LifterCommandFactory {
                     new WaitCommand(3).until(m_arm.okToMoveElevatorDownTrigger()), // wait until arm is not over the ramp
                     m_elevator.moveToCommand(targetRobotState.getElevatorPos())));
         }
+    }
+    public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
+        return new SequentialCommandGroup(
+            m_arm.moveToCommand(ArmConstants.INITIAL_POSITION),
+            m_elevator.moveToCommand(() -> targetRobotStateSupplier.get().getElevatorPos()),
+            m_arm.moveToCommand(() -> targetRobotStateSupplier.get().getArmPos())
+        );
     }
 
     public void resetControllers() {

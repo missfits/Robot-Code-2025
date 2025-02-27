@@ -1,5 +1,8 @@
 package frc.robot.subsystems.lifter;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -58,6 +61,20 @@ public class ArmSubsystem extends SubsystemBase {
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
             () -> m_IO.setVoltage(-ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            this
+        );
+    }
+
+    public Command moveToCommand(DoubleSupplier targetPositionSupplier) {
+        return moveToCommand(() -> new TrapezoidProfile.State(targetPositionSupplier.getAsDouble(), 0));
+    }
+
+    public Command moveToCommand(Supplier<TrapezoidProfile.State> goal) {
+        return new FunctionalCommand(
+            () -> initalizeMoveTo(goal.get()),
+            () -> executeMoveTo(),
+            (interrupted) -> {},
+            () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.025, // equivalent to 1 degree
             this
         );
     }

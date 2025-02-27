@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -159,67 +160,53 @@ public class RobotContainer {
     //     .withTargetDirection(Rotation2d.fromDegrees(270));
     // }));
 
-    // reset the field-centric heading
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
+    // reset the field-centric heading 
+    driverJoystick.b().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
     
-    // "temporary" for testing. moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
+    // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
 
-    // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
+    // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
 
-    // // move lifter to next position 
-    // driverJoystick.a().whileTrue(
-    //   new ParallelCommandGroup(
-        // m_lifter.moveToCommand(() -> nextState),
-        // new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
-
-
-
-    // // outtake from collar, then move lifter to the default position
-    // driverJoystick.rightBumper().onTrue(
-    //   m_collar.getCommand(currentState)
+    // move lifter to next position 
+    copilotJoystick.a().and(copilotJoystick.povCenter()).whileTrue(
+      m_lifter.moveToCommand(() -> {currentState = nextState; return currentState;}));
+    
+    // // outtake from collar
+    copilotJoystick.b().and(copilotJoystick.povCenter()).whileTrue(
+      m_collar.runCollar());
 
     //   .andThen(new ParallelCommandGroup(
     //     // move the lifter to the intake (default) position 
     //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
     //     m_lifter.getCommand(currentState))));
 
-
-    copilotJoystick.rightTrigger().whileTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
-    copilotJoystick.leftTrigger().whileTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
-    copilotJoystick.rightBumper().whileTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
-    copilotJoystick.leftBumper().whileTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
-
-
-    copilotJoystick.b().whileTrue(
-      m_collar.runCollar()); 
-
-      copilotJoystick.x().whileTrue(
+    copilotJoystick.x().and(copilotJoystick.povCenter()).whileTrue(
       m_collar.runCollarBackward()); 
 
     // set next state, change LED colors accordingly 
-    // copilotJoystick.leftTrigger().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
-    //   m_ledSubsystem.runSolidRed())); 
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+      m_ledSubsystem.runSolidRed())); 
 
-    // copilotJoystick.rightTrigger().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
-    //   m_ledSubsystem.runSolidOrange())); 
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+      m_ledSubsystem.runSolidOrange())); 
 
-    // copilotJoystick.leftBumper().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
-    //   m_ledSubsystem.runSolidYellow())); 
+    copilotJoystick.rightBumper().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
+      m_ledSubsystem.runSolidYellow())); 
 
-    // copilotJoystick.rightBumper().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
-    //   m_ledSubsystem.runSolidWhite())); 
+    copilotJoystick.leftBumper().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
+      m_ledSubsystem.runSolidWhite())); 
 
     // copilotJoystick.a().onTrue(
     //   new ParallelCommandGroup(
@@ -231,18 +218,24 @@ public class RobotContainer {
     //   new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
     //   m_ledSubsystem.runSolidPink())); 
 
-    // backup commands
-    // copilotJoystick.a().whileTrue(
-    //   m_elevator.manualMoveCommand());
-    
-    // copilotJoystick.y().whileTrue(
-    //   m_arm.manualMoveCommand());
 
-    // copilotJoystick.b().whileTrue(
-    //   m_elevator.manualMoveBackwardCommand());
+    // copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+    // copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+    // copilotJoystick.rightBumper().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+    // copilotJoystick.leftBumper().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+
+    // backup commands, need to press the POV button thing down (direction does not matter)
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_elevator.manualMoveCommand());
     
-    // copilotJoystick.x().whileTrue(
-    //   m_arm.manualMoveBackwardCommand());
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_arm.manualMoveCommand());
+
+    copilotJoystick.leftBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_elevator.manualMoveBackwardCommand());
+    
+    copilotJoystick.rightBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_arm.manualMoveBackwardCommand());
 
     //open loop control testing:
     // copilotJoystick.leftTrigger().whileTrue(
