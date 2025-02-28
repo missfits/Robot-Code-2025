@@ -350,7 +350,7 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand, m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE));
+    return Commands.sequence(lifterCommand, m_collar.runCollar(CollarConstants.OUTTAKE_MOTOR_SPEED).withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE));
   }
 
   public RobotContainer() {
