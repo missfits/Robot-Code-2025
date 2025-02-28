@@ -39,6 +39,8 @@ public final class Constants {
 
     public static final double JOYSTICK_DEADBAND = 0.1;
     public static final double SLOWMODE_FACTOR = 0.1;
+
+    public static final double SLEW_RATE_LIMIT = 2; // limits how fast operator input (-1 to 1) 
   }
 
   public static class DrivetrainConstants {
