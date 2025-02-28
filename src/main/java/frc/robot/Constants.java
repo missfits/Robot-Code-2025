@@ -186,6 +186,6 @@ public final class Constants {
     public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A3_ARM_POS = Math.toRadians(0.0);
     public static final double IN_ELEVATOR_POS = 0;
-    public static final double IN_ARM_POS = -0.465;
+    public static final double IN_ARM_POS = -0.378;
   }
 }
