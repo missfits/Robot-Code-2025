@@ -11,9 +11,21 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "scoreL4Coral"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "peg i to left feed"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCoral"
           }
         },
         {
@@ -23,15 +35,33 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "scoreL4Coral"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "peg L to left feed"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "intakeCoral"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "left feed to peg K"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL4Coral"
           }
         }
       ]
