@@ -302,8 +302,8 @@ public class RobotContainer {
     testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
     testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
     testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
-    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collar.runCollar(CollarConstants.OUTTAKE_MOTOR_SPEED));
-    testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collar.runCollarBackward());
+    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collarCommandFactory.runCollarOut());
+    testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collarCommandFactory.runCollarBackwards());
     
 
     // Run SysId routines when holding back/start and X/Y.

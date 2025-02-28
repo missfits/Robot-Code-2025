@@ -29,4 +29,8 @@ public class CollarCommandFactory {
     public Command runCollarIn() {
         return m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED);
     }
+
+    public Command runCollarBackwards() {
+        return m_collar.runCollar(CollarConstants.BACKWARDS_MOTOR_SPEED);
+    }
 }
