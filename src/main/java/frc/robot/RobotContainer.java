@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -40,10 +41,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.CollarConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -56,10 +60,11 @@ import frc.robot.generated.TunerConstantsCeridwen;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
+import frc.robot.subsystems.collar.CollarCommandFactory;
+import frc.robot.subsystems.collar.RampSensorSubsystem;
 import frc.robot.subsystems.lifter.ArmSubsystem;
 import frc.robot.subsystems.lifter.ElevatorIOHardware;
 import frc.robot.subsystems.lifter.ElevatorSubsystem;
@@ -97,11 +102,13 @@ public class RobotContainer {
 
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
-  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(); 
+  private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
+
+  private final CollarCommandFactory m_collarCommandFactory = new CollarCommandFactory(m_collar, m_rampSensor);
 
   private final LifterCommandFactory m_lifter = new LifterCommandFactory(m_elevator, m_arm);
 
@@ -174,18 +181,34 @@ public class RobotContainer {
     // move lifter to next position 
     copilotJoystick.a().and(copilotJoystick.povCenter()).whileTrue(
       m_lifter.moveToCommand(() -> {currentState = nextState; return currentState;}));
-    
-    // // outtake from collar
-    copilotJoystick.b().and(copilotJoystick.povCenter()).whileTrue(
-      m_collar.runCollar());
 
     //   .andThen(new ParallelCommandGroup(
     //     // move the lifter to the intake (default) position 
     //     new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;}),
     //     m_lifter.getCommand(currentState))));
 
-    copilotJoystick.x().and(copilotJoystick.povCenter()).whileTrue(
-      m_collar.runCollarBackward()); 
+
+    copilotJoystick.rightTrigger().whileTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+    copilotJoystick.leftTrigger().whileTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+    copilotJoystick.rightBumper().whileTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+    copilotJoystick.leftBumper().whileTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+    
+
+    // TEMP; two different conditions for automatic intake stop
+      
+    // stop collar after coral is seen and a delay in seconds
+    // copilotJoystick.b().whileTrue(
+    //   Commands.sequence(
+    //     m_collar.runCollar().until(m_rampSensor.coralSeenAfterRamp()),
+    //     m_collar.runCollar().withTimeout(CollarConstants.INTAKE_STOP_OFFSET),
+    //     m_collar.runCollarOff())); 
+
+    // stop collar after coral passes entirely through the collar
+    copilotJoystick.b().whileTrue(
+     m_collarCommandFactory.intakeCoralSequence()); 
+
+    copilotJoystick.x().whileTrue(
+      m_collarCommandFactory.runCollarOut()); 
 
     // set next state, change LED colors accordingly 
     copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
@@ -257,9 +280,24 @@ public class RobotContainer {
     //   m_collar.runCollarBackward());
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
+
+    // TODO: make this only run if lifter is in intake pos :) 
+    m_rampSensor.coralSeenAfterRamp().whileTrue(m_collarCommandFactory.runCollarInSecondary()); 
+
     m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
+    // LED and rumble feedback when coral is seen in ramp
+    m_rampSensor.coralSeenInRamp().onTrue(
+      new ParallelCommandGroup(
+        // controller rumble
+        new StartEndCommand(
+          () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 1); driverJoystick.setRumble(RumbleType.kBothRumble, 1);},
+          () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 0); driverJoystick.setRumble(RumbleType.kBothRumble, 0);})
+          .withTimeout(2), 
+
+        // set LED color
+        m_ledSubsystem.runSolidGreen()));
     testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
@@ -270,8 +308,8 @@ public class RobotContainer {
     testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
     testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
     testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
-    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collar.runCollar());
-    testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collar.runCollarBackward());
+    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collarCommandFactory.runCollarOut());
+    testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collarCommandFactory.runCollarBackwards());
     
 
     // Run SysId routines when holding back/start and X/Y.
