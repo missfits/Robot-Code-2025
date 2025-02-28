@@ -154,11 +154,12 @@ public class RobotContainer {
     
 
     // move to intake, start collar 
+    copilotJoystick.x().and(copilotJoystick.povCenter()).onTrue(
+      m_lifter.moveToCommand(RobotState.INTAKE)
+    );
+
     copilotJoystick.x().and(copilotJoystick.povCenter()).whileTrue(
-      new ParallelCommandGroup(
-        m_lifter.moveToCommand(RobotState.INTAKE),
-        m_collarCommandFactory.intakeCoralSequence()
-      )
+      m_collarCommandFactory.intakeCoralSequence()
     );
 
     // outtake from collar
@@ -171,27 +172,27 @@ public class RobotContainer {
     ); 
 
     // set move to state
-    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).whileTrue(
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L4_CORAL)
     ); 
 
-    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).whileTrue(
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L3_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).whileTrue(
+    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_CORAL)
     ); 
 
-    copilotJoystick.leftBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).whileTrue(
+    copilotJoystick.leftBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L1_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a()).whileTrue(
+    copilotJoystick.rightBumper().and(copilotJoystick.a()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
-    copilotJoystick.leftBumper().and(copilotJoystick.a()).whileTrue(
+    copilotJoystick.leftBumper().and(copilotJoystick.a()).onTrue(
       m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
