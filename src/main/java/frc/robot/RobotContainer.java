@@ -350,7 +350,7 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand, m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE));
+    return Commands.sequence(lifterCommand, m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE));
   }
 
   public RobotContainer() {
@@ -363,7 +363,7 @@ public class RobotContainer {
       
 
     // elevator moveTo auto commands
-    NamedCommands.registerCommand("intakeCoral", m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).withTimeout(0.5)); // update to use grapplehook instead
+    NamedCommands.registerCommand("intakeCoral", m_collarCommandFactory.intakeCoralSequence()); // update to use grapplehook instead
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
