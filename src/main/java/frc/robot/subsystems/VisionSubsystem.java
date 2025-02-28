@@ -102,8 +102,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     var results = m_camera.getAllUnreadResults();
 
-    ArrayList<Integer> targetIds = new ArrayList<Integer>();
-
     if (!results.isEmpty()) {
       // Camera processed a new frame since last
       // Get the last one in the list.
@@ -122,9 +120,12 @@ public class VisionSubsystem extends SubsystemBase {
       if (result.hasTargets()) {
         PhotonTrackedTarget target = null;
         double biggestTargetArea = 0;
+        ArrayList<Integer> targetIds = new ArrayList<Integer>();
+        Arraylist<Integer> targetPoseAmbiguity = new Arraylist<>();
 
         for (PhotonTrackedTarget sampleTarget : result.getTargets()){
           targetIds.add(sampleTarget.getFiducialId());
+          targetPoseAmbiguity.add(sampleTarget.getPoseAmbiguity());
 
           if (sampleTarget.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY){
             continue;
@@ -158,6 +159,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     SmartDashboard.putString("Targets Seen", targetIds.toString());
+    SmartDashboard.putString("Target Pose Ambiguities", targetPoseAmbiguity.toString());
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
     SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);

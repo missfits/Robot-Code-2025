@@ -412,6 +412,7 @@ public class RobotContainer {
         }
           m_estPoseField.setRobotPose(estPose3d.toPose2d());
       }
+      SmartDashboard.putString("Vision Pose 3D", estPose3d.toString()); // post vision 3d to smartdashboard
     }
     
 
