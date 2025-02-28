@@ -31,13 +31,15 @@ public class LifterCommandFactory {
                 new SequentialCommandGroup( // arm movement 
                     new WaitCommand(3).until(m_elevator.okToMoveArmBackTrigger()), // wait until elevator is sufficiently up
                     m_arm.moveToCommand(targetRobotState.getArmPos())),
-                m_elevator.moveToCommand(targetRobotState.getElevatorPos()));
+                m_elevator.moveToCommand(targetRobotState.getElevatorPos()))
+                .until(m_arm.isAtGoal().and(m_elevator.isAtGoal()));
         } else {
             return new ParallelCommandGroup(
                 m_arm.moveToCommand(targetRobotState.getArmPos()),
                 new SequentialCommandGroup( // elevator movement
                     new WaitCommand(3).until(m_arm.okToMoveElevatorDownTrigger()), // wait until arm is not over the ramp
-                    m_elevator.moveToCommand(targetRobotState.getElevatorPos())));
+                    m_elevator.moveToCommand(targetRobotState.getElevatorPos())))
+                .until(m_arm.isAtGoal().and(m_elevator.isAtGoal()));
         }
     }
     public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
