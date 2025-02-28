@@ -18,12 +18,16 @@ public class CollarCommandFactory {
     public Command intakeCoralSequence() {
         return Commands.sequence(
             m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRamp()),
-            m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).withTimeout(0.1),
+            m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRamp().negate()),
             m_collar.runCollarOff());
     }
 
     public Command runCollarOut() {
         return m_collar.runCollar(CollarConstants.OUTTAKE_MOTOR_SPEED);
+    }
+
+    public Command runCollarInSecondary() {
+        return m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED);
     }
 
     public Command runCollarIn() {

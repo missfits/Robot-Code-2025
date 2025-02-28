@@ -274,6 +274,10 @@ public class RobotContainer {
     //   m_collar.runCollarBackward());
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
+
+    // TODO: make this only run if lifter is in intake pos :) 
+    m_rampSensor.coralSeenAfterRamp().whileTrue(m_collarCommandFactory.runCollarInSecondary()); 
+
     m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
 
