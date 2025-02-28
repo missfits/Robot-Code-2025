@@ -56,6 +56,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
+import frc.robot.generated.TunerConstantsCeridwen;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -76,6 +77,13 @@ import frc.robot.commands.AutoAlignCommand;
 public class RobotContainer {
 
   record JoystickVals(double x, double y) { }
+  
+  public enum RobotName {
+      CERIDWEN,
+      DYNAMENE
+  }
+
+  public static RobotName name = RobotName.DYNAMENE;
 
   private RobotState currentState = RobotState.INTAKE;
   private RobotState nextState = RobotState.INTAKE;
@@ -89,20 +97,20 @@ public class RobotContainer {
   private final CommandXboxController testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort); // test joystick
 
   
-  private final CommandSwerveDrivetrain drivetrain = TunerConstantsDynamene.createDrivetrain(); // My drivetrain
+  private final CommandSwerveDrivetrain drivetrain = 
+   name == RobotName.DYNAMENE ? TunerConstantsDynamene.createDrivetrain() : TunerConstantsCeridwen.createDrivetrain(); // My drivetrain
+
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
   private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
   private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
-
-  private final LifterCommandFactory m_lifter = new LifterCommandFactory();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
-
   private final ArmSubsystem m_arm = new ArmSubsystem();
 
   private final CollarCommandFactory m_collarCommandFactory = new CollarCommandFactory(m_collar, m_rampSensor);
 
+  private final LifterCommandFactory m_lifter = new LifterCommandFactory(m_elevator, m_arm);
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -159,28 +167,20 @@ public class RobotContainer {
     //     .withTargetDirection(Rotation2d.fromDegrees(270));
     // }));
 
-    // reset the field-centric heading
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
+    // reset the field-centric heading 
+    driverJoystick.b().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
 
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
     
-    // "temporary" for testing. moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
+    // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
 
-    // "temporary" for testing. moves to the LEFT side. only press after running rotatetofacereef (right trigger)
+    // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
 
-    // // move lifter to next position 
-    // driverJoystick.a().whileTrue(
-    //   new ParallelCommandGroup(
-        // m_lifter.moveToCommand(() -> nextState),
-        // new InstantCommand(() -> {currentState = nextState; nextState = RobotState.INTAKE;})));
-
-
-
-    // // outtake from collar, then move lifter to the default position
-    // driverJoystick.rightBumper().onTrue(
-    //   m_collar.getCommand(currentState)
+    // move lifter to next position 
+    copilotJoystick.a().and(copilotJoystick.povCenter()).whileTrue(
+      m_lifter.moveToCommand(() -> {currentState = nextState; return currentState;}));
 
     //   .andThen(new ParallelCommandGroup(
     //     // move the lifter to the intake (default) position 
@@ -211,25 +211,25 @@ public class RobotContainer {
       m_collarCommandFactory.runCollarOut()); 
 
     // set next state, change LED colors accordingly 
-    // copilotJoystick.leftTrigger().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
-    //   m_ledSubsystem.runSolidRed())); 
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L4_CORAL;}),
+      m_ledSubsystem.runSolidRed())); 
 
-    // copilotJoystick.rightTrigger().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
-    //   m_ledSubsystem.runSolidOrange())); 
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L3_CORAL;}),
+      m_ledSubsystem.runSolidOrange())); 
 
-    // copilotJoystick.leftBumper().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
-    //   m_ledSubsystem.runSolidYellow())); 
+    copilotJoystick.rightBumper().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L2_CORAL;}),
+      m_ledSubsystem.runSolidPurple())); 
 
-    // copilotJoystick.rightBumper().onTrue(
-    //   new ParallelCommandGroup(
-    //   new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
-    //   m_ledSubsystem.runSolidWhite())); 
+    copilotJoystick.leftBumper().and(copilotJoystick.povCenter()).onTrue(
+      new ParallelCommandGroup(
+      new InstantCommand(() -> {nextState = RobotState.L1_CORAL;}),
+      m_ledSubsystem.runSolidBlue())); 
 
     // copilotJoystick.a().onTrue(
     //   new ParallelCommandGroup(
@@ -241,18 +241,24 @@ public class RobotContainer {
     //   new InstantCommand(() -> {nextState = RobotState.L2_ALGAE;}),
     //   m_ledSubsystem.runSolidPink())); 
 
-    // backup commands
-    // copilotJoystick.a().whileTrue(
-    //   m_elevator.manualMoveCommand());
-    
-    // copilotJoystick.y().whileTrue(
-    //   m_arm.manualMoveCommand());
 
-    // copilotJoystick.b().whileTrue(
-    //   m_elevator.manualMoveBackwardCommand());
+    // copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+    // copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+    // copilotJoystick.rightBumper().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+    // copilotJoystick.leftBumper().and(copilotJoystick.povCenter()).whileTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+
+    // backup commands, need to press the POV button thing down (direction does not matter)
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_elevator.manualMoveCommand());
     
-    // copilotJoystick.x().whileTrue(
-    //   m_arm.manualMoveBackwardCommand());
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_arm.manualMoveCommand());
+
+    copilotJoystick.leftBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_elevator.manualMoveBackwardCommand());
+    
+    copilotJoystick.rightBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
+      m_arm.manualMoveBackwardCommand());
 
     //open loop control testing:
     // copilotJoystick.leftTrigger().whileTrue(
@@ -292,14 +298,10 @@ public class RobotContainer {
 
         // set LED color
         m_ledSubsystem.runSolidGreen()));
+    testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger().whileTrue(m_ledSubsystem.runSolidGreen());
-
-    //set buttons to LED lights
-    // a to flash yellow
-    testJoystick.pov(0).whileTrue(m_ledSubsystem.runSolidYellow());
-    testJoystick.pov(180).whileTrue(m_ledSubsystem.runSolidBlue());
+    m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
     testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
     testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
@@ -420,10 +422,11 @@ public class RobotContainer {
       // check if new estimated pose and previous pose are less than 2 meters apart
       if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
         drivetrain.poseEstimator.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
-      }
 
-      m_estPoseField.setRobotPose(estPose2d);
+        m_estPoseField.setRobotPose(estPose2d);
+      }
     }
+    
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
     drivetrain.updatePoseWithPoseEst();

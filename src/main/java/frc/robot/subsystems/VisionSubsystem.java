@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -129,8 +130,6 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
     SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);
-
-    SmartDashboard.putBoolean("inTarget", isWithinTarget());
     SmartDashboard.putNumber("Target X Distance", targetTranslation2d.getX());
     SmartDashboard.putNumber("Target Y Distance", targetTranslation2d.getY());
 
@@ -142,17 +141,25 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   // returns bool if camera within tolerance to AprilTag
-  public boolean isWithinTarget(){
-    return isWithinTarget(1, 1);
+  public boolean isWithinTarget(Pose2d currentPose){
+    SmartDashboard.putBoolean("inTarget", isWithinTarget(currentPose,1, 1));
+    return isWithinTarget(currentPose,1, 1);
   }
 
-  public Trigger isWithinTargetTrigger() {
-    return new Trigger(() -> isWithinTarget());
+  public Trigger isWithinTargetTrigger(Supplier<Pose2d> currentPoseSupplier) {
+    return new Trigger(() -> isWithinTarget(currentPoseSupplier.get()));
   }
 
-  public boolean isWithinTarget(double toleranceX, double toleranceY) {
+  public boolean isWithinTarget(Pose2d currentPose, double toleranceX, double toleranceY) {
+    if (targetPose != null) {
+      targetTranslation2d = new Translation2d(currentPose.getX() - targetPose.getX(), currentPose.getY() - targetPose.getY());
+    
     return (targetFound
-            && Math.abs(targetTranslation2d.getX() - distToTargetX) < toleranceX
-            && Math.abs(targetTranslation2d.getY() - distToTargetY) < toleranceY);
+            && Math.abs(targetTranslation2d.getX()) < toleranceX
+            && Math.abs(targetTranslation2d.getY()) < toleranceY);
+    } else {
+      return false;
+    }
+    
   }
 }
