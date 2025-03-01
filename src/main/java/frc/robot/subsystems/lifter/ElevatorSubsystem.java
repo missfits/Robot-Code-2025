@@ -126,8 +126,8 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new Trigger(() -> okToMoveArmBack());
     } 
 
-    private boolean okToMoveArmBack() {
-        return m_IO.getPosition() > ElevatorConstants.MIN_POS_ARM_CLEAR;
+    public boolean okToMoveArmBack() {
+        return m_IO.getPosition() > ElevatorConstants.MIN_POS_ARM_CLEAR - ElevatorConstants.MAX_POSITION_TOLERANCE;
     } 
     
     public void resetControllers() {

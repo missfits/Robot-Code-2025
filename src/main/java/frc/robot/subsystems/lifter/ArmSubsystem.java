@@ -131,8 +131,8 @@ public class ArmSubsystem extends SubsystemBase {
     } 
 
     private boolean okToMoveElevatorDown() {
-        return ! (m_IO.getPosition() > RobotStateConstants.C4_ARM_POS - ArmConstants.MAX_POSITION_TOLERANCE && m_IO.getPosition() < ArmConstants.MIN_POS_ELEVATOR_CLEAR);
-    } 
+        return m_IO.getPosition() > ArmConstants.MIN_POS_ELEVATOR_CLEAR;
+    }
 
     public void resetControllers() {
         m_feedforward = new ArmFeedforward(

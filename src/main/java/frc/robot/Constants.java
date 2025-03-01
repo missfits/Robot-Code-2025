@@ -74,17 +74,18 @@ public final class Constants {
     public static double kA = 2;
 
     public static double kP = 100; 
-    public static double kI = 0;
+    public static double kI = 15;
     public static double kD = 0; 
 
     public static double kMaxV = 2;
-    public static double kMaxA = 1; 
+    public static double kMaxA = 2.5; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
     public static final double MAX_POSITION_TOLERANCE = 0.005;
 
     public static final double MIN_POS_ARM_CLEAR = 0.4; // needs to be measured 
+
   }
 
   public static class ArmConstants {
@@ -116,7 +117,9 @@ public final class Constants {
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
 
-    public static final double MIN_POS_ELEVATOR_CLEAR = -0.4; // needs to be measured
+    public static final double MIN_POS_ELEVATOR_CLEAR = -0.32;
+    public static final double INTERMEDIATE_POS_ELEVATOR_CLEAR = -0.32 + 0.1;
+
   }
 
   public static class CollarConstants {
@@ -134,7 +137,7 @@ public final class Constants {
     public static final double INTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
 
-    public static final double BACKWARDS_MOTOR_SPEED = 0;
+    public static final double BACKWARDS_MOTOR_SPEED = 2.0;
 
     public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
