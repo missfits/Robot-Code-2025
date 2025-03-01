@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotState;
 import frc.robot.Constants.ArmConstants;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -32,14 +33,14 @@ public class LifterCommandFactory {
                     new WaitCommand(3).until(m_elevator.okToMoveArmBackTrigger()), // wait until elevator is sufficiently up
                     m_arm.moveToCommand(targetRobotState.getArmPos())),
                 m_elevator.moveToCommand(targetRobotState.getElevatorPos()))
-                .until(m_arm.isAtGoal().and(m_elevator.isAtGoal()));
+                .until(m_arm.isAtGoal().and(m_elevator.isAtGoal())).withName("lifterMoveToL4");
         } else {
             return new ParallelCommandGroup(
                 m_arm.moveToCommand(targetRobotState.getArmPos()),
                 new SequentialCommandGroup( // elevator movement
                     new WaitCommand(3).until(m_arm.okToMoveElevatorDownTrigger()), // wait until arm is not over the ramp
                     m_elevator.moveToCommand(targetRobotState.getElevatorPos())))
-                .until(m_arm.isAtGoal().and(m_elevator.isAtGoal()));
+                .until(isLifterAtGoal()).withName("lifterMoveTo");
         }
     }
     public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
@@ -48,6 +49,10 @@ public class LifterCommandFactory {
             m_elevator.moveToCommand(() -> targetRobotStateSupplier.get().getElevatorPos()),
             m_arm.moveToCommand(() -> targetRobotStateSupplier.get().getArmPos())
         );
+    }
+
+    private Trigger isLifterAtGoal() {
+        return m_arm.isAtGoal().and(m_elevator.isAtGoal());
     }
 
     public void resetControllers() {
