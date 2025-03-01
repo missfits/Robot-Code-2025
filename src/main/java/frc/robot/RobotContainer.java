@@ -400,12 +400,21 @@ public class RobotContainer {
     if (estimatedRobotPose != null) {
       Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
 
-          drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), estimatedRobotPose.timestampSeconds);
+        // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+        double distance = estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+        SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
+          drivetrain.getFusedPoseEstimator().setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
+          drivetrain.getFusedPoseEstimator().addVisionMeasurement(estPose3d.toPose2d(), estimatedRobotPose.timestampSeconds);
         
           m_estPoseField.setRobotPose(estPose3d.toPose2d());
       }
-      SmartDashboard.putString("Vision Pose 3D", estPose3d.toString()); // post vision 3d to smartdashboard
+      SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+        estPose3d.getX(),
+        estPose3d.getY(),
+        estPose3d.getZ(),
+        estPose3d.getRotation().toRotation2d().getRadians()
+      }); // post vision 3d to smartdashboard
     }
     
 
