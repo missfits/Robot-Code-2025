@@ -193,7 +193,14 @@ public final class Constants {
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(6, 6, 4);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.3);
 
-    public static final double MAX_POSE_AMBIGUITY = 0.4;
+    public static final double MAX_POSE_AMBIGUITY = 0.2;
+    public static final double MAX_VISION_POSE_DISTANCE = 1;
+    public static final double MAX_VISION_POSE_Z = 0.1;
+    public static final double MAX_VISION_POSE_ROLL = 0.05; // in radians
+    public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
+
+
+
 
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
