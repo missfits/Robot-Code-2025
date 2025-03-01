@@ -116,7 +116,7 @@ public final class Constants {
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
 
-    public static final double MIN_POS_ELEVATOR_CLEAR = -0.4; // needs to be measured
+    public static final double MIN_POS_ELEVATOR_CLEAR = -0.32;
   }
 
   public static class CollarConstants {
