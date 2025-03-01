@@ -38,7 +38,7 @@ public class DriveToReefCommand extends Command {
 
   private final ProfiledPIDController xController = new ProfiledPIDController(AutoAlignConstants.ROBOT_POSITION_P, AutoAlignConstants.ROBOT_POSITION_I, AutoAlignConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final ProfiledPIDController yController = new ProfiledPIDController(AutoAlignConstants.ROBOT_POSITION_P, AutoAlignConstants.ROBOT_POSITION_I, AutoAlignConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
-  private final SwerveRequest.ApplyFieldSpeeds driveRequest = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.ApplyFieldSpeeds driveRequest = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.Velocity);
   
   
     /**
@@ -100,8 +100,8 @@ public class DriveToReefCommand extends Command {
     public void execute() {      
       m_drivetrain.setControl(driveRequest
         .withSpeeds(new ChassisSpeeds(
-          xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()),
-          yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()),
+          xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity,
+          yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity,
           0)));
 
       SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
