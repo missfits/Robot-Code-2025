@@ -34,7 +34,7 @@ public class ArmSubsystem extends SubsystemBase {
     private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ArmConstants.kMaxV, ArmConstants.kMaxA
     );
-    private TrapezoidProfile.State m_goal;
+    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
@@ -88,7 +88,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> isAtPosition(goal.position),
+            () -> false,
             this
         );
     }
@@ -122,6 +122,9 @@ public class ArmSubsystem extends SubsystemBase {
         return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
     } 
 
+    public Trigger isAtGoal() {
+        return new Trigger(() -> isAtPosition(m_goal.position));
+    } 
 
     public Trigger okToMoveElevatorDownTrigger() {
         return new Trigger(() -> okToMoveElevatorDown());
