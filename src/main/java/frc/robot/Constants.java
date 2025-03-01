@@ -76,11 +76,11 @@ public final class Constants {
     public static double kA = 2;
 
     public static double kP = 100; 
-    public static double kI = 0;
+    public static double kI = 15;
     public static double kD = 0; 
 
     public static double kMaxV = 2;
-    public static double kMaxA = 1; 
+    public static double kMaxA = 2.5; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
