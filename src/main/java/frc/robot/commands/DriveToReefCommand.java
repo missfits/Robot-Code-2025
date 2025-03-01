@@ -36,9 +36,9 @@ public class DriveToReefCommand extends Command {
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
 
-  private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA) );
-  private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
-  private final SwerveRequest.ApplyFieldSpeeds driveRequest = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.Velocity);
+  private final ProfiledPIDController xController = new ProfiledPIDController(AutoAlignConstants.ROBOT_POSITION_P, AutoAlignConstants.ROBOT_POSITION_I, AutoAlignConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
+  private final ProfiledPIDController yController = new ProfiledPIDController(AutoAlignConstants.ROBOT_POSITION_P, AutoAlignConstants.ROBOT_POSITION_I, AutoAlignConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
+  private final SwerveRequest.ApplyFieldSpeeds driveRequest = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   
   
     /**
