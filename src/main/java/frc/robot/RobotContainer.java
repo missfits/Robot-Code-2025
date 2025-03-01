@@ -63,6 +63,7 @@ import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
 import frc.robot.subsystems.collar.CollarCommandFactory;
 import frc.robot.subsystems.collar.RampSensorSubsystem;
@@ -108,6 +109,8 @@ public class RobotContainer {
   private final RampSubsystem m_ramp = new RampSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
+  private final ClimberSubsystem m_climber = new ClimberSubsystem();
+
 
   private final CollarCommandFactory m_collarCommandFactory = new CollarCommandFactory(m_collar, m_rampSensor);
 
@@ -141,9 +144,6 @@ public class RobotContainer {
     driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
 
-    // reset the field-centric heading 
-    driverJoystick.b().onTrue(drivetrain.runOnce(() -> drivetrain.setNewPose(new Pose2d(0,0,new Rotation2d(0)))));
-
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
     
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
@@ -152,6 +152,8 @@ public class RobotContainer {
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
     
+    driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
+    driverJoystick.x().whileTrue(m_climber.manualMoveCommand());
 
     // move to intake, start collar 
     copilotJoystick.x().and(copilotJoystick.povCenter()).onTrue(
@@ -210,6 +212,7 @@ public class RobotContainer {
       m_arm.manualMoveBackwardCommand());
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
+    m_climber.setDefaultCommand(m_climber.runClimberOff());
 
     // TODO: make this only run if lifter is in intake pos :) 
     m_rampSensor.coralSeenAfterRamp().whileTrue(m_collarCommandFactory.runCollarInSecondary()); 
@@ -345,12 +348,15 @@ public class RobotContainer {
   public void setEnabledNeutralMode() {
     drivetrain.setBrake(true);
     m_lifter.setEnabledNeutralMode();
+    m_climber.setEnabledNeutralMode();
+
   }
 
   // set motors to appropriate neutral modes for an disabled robot
   public void setDisabledNeutralMode() {
     drivetrain.setBrake(false);
     m_lifter.setDisabledNeutralMode();
+    m_climber.setDisabledNeutralMode();
 
   }
 
