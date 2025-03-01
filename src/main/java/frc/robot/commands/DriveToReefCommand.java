@@ -101,6 +101,12 @@ public class DriveToReefCommand extends Command {
           xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()),
           yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()),
           0)));
+
+      SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
+      SmartDashboard.putNumber("drivetoreef/setpoint position y", yController.getSetpoint().position);
+      
+      SmartDashboard.putNumber("drivetoreef/setpoint velocity x", xController.getSetpoint().velocity);
+      SmartDashboard.putNumber("drivetoreef/setpoint velocity y", yController.getSetpoint().velocity);
   }
 
   // Called once the command ends or is interrupted.
