@@ -88,8 +88,10 @@ public class DriveToReefCommand extends Command {
       } else {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
       }
-      
 
+      xController.reset(m_drivetrain.getState().Pose.getX());
+      yController.reset(m_drivetrain.getState().Pose.getY());
+      
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
     }
   
