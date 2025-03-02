@@ -386,7 +386,6 @@ public class RobotContainer {
     
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
-    drivetrain.updateDrivePoseWithOdometry();
     m_drivePoseField.setRobotPose(drivetrain.getDrivePoseEstimator().getEstimatedPosition());
   }
 
