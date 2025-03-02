@@ -219,8 +219,8 @@ public class RobotContainer {
     // TODO: make this only run if lifter is in intake pos :) 
     m_rampSensor.coralSeenAfterRamp().whileTrue(m_collarCommandFactory.runCollarInSecondary()); 
 
-    m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
-    m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
+    m_elevator.setDefaultCommand(m_elevator.keepInPlacePIDCommand());
+    m_arm.setDefaultCommand(m_arm.keepInPlacePIDCommand());
 
     // LED and rumble feedback when coral is seen in ramp
     m_rampSensor.coralSeenInRamp().onTrue(
