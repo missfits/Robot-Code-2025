@@ -22,11 +22,13 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -131,6 +133,7 @@ public class RobotContainer {
 
   private final Field2d m_estPoseField = new Field2d();
   private final Field2d m_actualField = new Field2d();
+  private final Field2d m_drivePoseField = new Field2d();  
 
 
   private void configureBindings() {
@@ -149,7 +152,7 @@ public class RobotContainer {
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
     // reset fused vision pose estimator on left bumper press
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose()));
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
 
     // auto rotate to reef command
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
@@ -314,6 +317,7 @@ public class RobotContainer {
     
     SmartDashboard.putData("est pose field", m_estPoseField);
     SmartDashboard.putData("Actual Field", m_actualField);
+    SmartDashboard.putData("drivetrain odometry field", m_drivePoseField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
@@ -376,18 +380,22 @@ public class RobotContainer {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
-      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d(); // estimated robot pose of vision
-    
-      // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-      if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
-        drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
-      }
+      Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
 
-        m_estPoseField.setRobotPose(estPose2d);
+      if (estPose3d.getZ() < 0.5){ // ignore vision est if too big
+
+        // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+        if (estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
+          drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
+          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), estimatedRobotPose.timestampSeconds);
+        }
+          m_estPoseField.setRobotPose(estPose3d.toPose2d());
+      }
     }
     
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
+    m_drivePoseField.setRobotPose(drivetrain.getDrivePoseEstimator().getEstimatedPosition());
   }
 
 }
