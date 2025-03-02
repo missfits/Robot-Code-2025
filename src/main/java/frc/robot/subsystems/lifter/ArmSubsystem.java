@@ -1,5 +1,8 @@
 package frc.robot.subsystems.lifter;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -11,8 +14,9 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.RobotStateConstants;
 
 public class ArmSubsystem extends SubsystemBase {
     private final ArmIOHardware m_IO = new ArmIOHardware();
@@ -30,7 +34,7 @@ public class ArmSubsystem extends SubsystemBase {
     private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ArmConstants.kMaxV, ArmConstants.kMaxA
     );
-    private TrapezoidProfile.State m_goal;
+    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
@@ -43,7 +47,7 @@ public class ArmSubsystem extends SubsystemBase {
     // commands
     public Command keepInPlaceCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(0), 
+            () -> m_IO.setVoltage(ArmConstants.kG), 
             this
         );
     }
@@ -61,6 +65,20 @@ public class ArmSubsystem extends SubsystemBase {
         );
     }
 
+    public Command moveToCommand(DoubleSupplier targetPositionSupplier) {
+        return moveToCommand(() -> new TrapezoidProfile.State(targetPositionSupplier.getAsDouble(), 0));
+    }
+
+    public Command moveToCommand(Supplier<TrapezoidProfile.State> goal) {
+        return new FunctionalCommand(
+            () -> initalizeMoveTo(goal.get()),
+            () -> executeMoveTo(),
+            (interrupted) -> {},
+            () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.025, // equivalent to 1 degree
+            this
+        );
+    }
+
     public Command moveToCommand(double targetPosition) {
         return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
     }
@@ -70,7 +88,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> isAtPosition(goal.position),
+            () -> false,
             this
         );
     }
@@ -102,6 +120,18 @@ public class ArmSubsystem extends SubsystemBase {
 
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
+    } 
+
+    public Trigger isAtGoal() {
+        return new Trigger(() -> isAtPosition(m_goal.position));
+    } 
+
+    public Trigger okToMoveElevatorDownTrigger() {
+        return new Trigger(() -> okToMoveElevatorDown());
+    } 
+
+    private boolean okToMoveElevatorDown() {
+        return ! (m_IO.getPosition() > RobotStateConstants.C4_ARM_POS - ArmConstants.MAX_POSITION_TOLERANCE && m_IO.getPosition() < ArmConstants.MIN_POS_ELEVATOR_CLEAR);
     } 
 
     public void resetControllers() {
