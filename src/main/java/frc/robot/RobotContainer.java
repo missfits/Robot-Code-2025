@@ -177,16 +177,28 @@ public class RobotContainer {
     ); 
 
     // set move to state
-    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L4_CORAL)
     ); 
 
-    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).onTrue(
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L4_CORAL_WITH_CORAL)
+    ); 
+
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L3_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L3_CORAL_WITH_CORAL)
+    ); 
+
+    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_CORAL)
+    ); 
+
+    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L2_CORAL_WITH_CORAL)
     ); 
 
     copilotJoystick.leftBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
