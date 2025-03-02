@@ -49,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
   private double targetYaw; // in radians, relative to field
   private Pose2d currentPose; // current robot pose, updates periodically
   private EstimatedRobotPose estimatedRobotPose; 
-  private Matrix<N3, N1> curStdDevs;
+  private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
@@ -108,12 +108,16 @@ public class VisionSubsystem extends SubsystemBase {
 
       // update the estimated robot pose if the pose estimator outputs something
       Optional<EstimatedRobotPose> poseEstimatorOutput = poseEstimator.update(result);
+
+      // update standard deviation based on dist 
+      this.updateEstimationStdDevs(poseEstimatorOutput, result.getTargets());
+
       if (poseEstimatorOutput.isPresent()) {
         estimatedRobotPose = poseEstimatorOutput.get(); 
       }
 
       if (result.hasTargets()) {
-        PhotonTrackedTarget target = result.getBestTarget();
+        PhotonTrackedTarget target = null;
         double biggestTargetArea = 0;
 
         for (PhotonTrackedTarget sampleTarget : result.getTargets()){
@@ -143,6 +147,7 @@ public class VisionSubsystem extends SubsystemBase {
         }
       }
       else {
+        SmartDashboard.putString("vision/targetState", "noTarget");
         targetFound = false;
       }
     }
