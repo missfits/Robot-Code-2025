@@ -316,7 +316,7 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true); // turn off unplugged joystick errors 
 
     SignalLogger.enableAutoLogging(false);
-    // SignalLogger.start();
+    SignalLogger.start();
     
     SmartDashboard.putData("est pose field", m_estPoseField);
     SmartDashboard.putData("Actual Field", m_actualField);
