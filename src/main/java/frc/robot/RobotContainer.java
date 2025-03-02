@@ -130,7 +130,6 @@ public class RobotContainer {
 
   private final Field2d m_estPoseField = new Field2d();
   private final Field2d m_actualField = new Field2d();
-  private final Field2d m_drivePoseField = new Field2d();  
 
 
   private void configureBindings() {
@@ -145,10 +144,10 @@ public class RobotContainer {
     driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
 
-    // reset the field-centric heading on left trigger press
+    // reset the field-centric heading on y press
     driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
-    // reset fused vision pose estimator on left bumper press
+    // reset fused vision pose estimator to vision pose on center (cross button)
     driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
 
     // auto rotate to reef command
@@ -311,7 +310,6 @@ public class RobotContainer {
     
     SmartDashboard.putData("est pose field", m_estPoseField);
     SmartDashboard.putData("Actual Field", m_actualField);
-    SmartDashboard.putData("drivetrain odometry field", m_drivePoseField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
@@ -386,7 +384,6 @@ public class RobotContainer {
     
 
     m_actualField.setRobotPose(drivetrain.getState().Pose);
-    m_drivePoseField.setRobotPose(drivetrain.getDrivePoseEstimator().getEstimatedPosition());
   }
 
 }
