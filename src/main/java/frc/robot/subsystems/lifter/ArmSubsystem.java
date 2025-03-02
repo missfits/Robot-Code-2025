@@ -130,8 +130,11 @@ public class ArmSubsystem extends SubsystemBase {
         // calculate part of the power based on target position + current position
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
 
-        m_IO.setVoltage(PIDPower);
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
 
+        m_IO.setVoltage(PIDPower + feedForwardPower);
+    
         SmartDashboard.putNumber("arm/target position", m_goal.position);
         SmartDashboard.putNumber("arm/target velocity", 0);
     }

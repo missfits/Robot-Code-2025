@@ -126,7 +126,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         // calculate part of the power based on target position + current position
         double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
 
-        m_IO.setVoltage(PIDPower);
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(0);
+
+        m_IO.setVoltage(PIDPower + feedForwardPower);
 
         SmartDashboard.putNumber("elevator/target position", m_goal.position);
         SmartDashboard.putNumber("elevator/target velocity", 0);
