@@ -103,15 +103,17 @@ public class DriveToReefCommand extends Command {
   
     // Called every time the scheduler runs while the command is scheduled.
     @Override
-    public void execute() {      
+    public void execute() {
+
+      double xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity;
+      double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
+
       m_drivetrain.setControl(driveRequest
-        .withVelocityX(
-          xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity)
-        .withVelocityY(
-          yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity)
-        .withTargetDirection(
-          targetRotation)
+        .withVelocityX(xVelocity)
+        .withVelocityY(yVelocity)
+        .withTargetDirection(targetRotation)
       );
+
 
       SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
       SmartDashboard.putNumber("drivetoreef/setpoint position y", yController.getSetpoint().position);
