@@ -150,6 +150,8 @@ public final class Constants {
     public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
+
+    public static final double DEGREES_PER_ROTATION = 1;
   }
   
   public static class LEDConstants {

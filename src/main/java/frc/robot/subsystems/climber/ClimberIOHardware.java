@@ -36,19 +36,19 @@ public class ClimberIOHardware {
 
     // getters
     public double getPosition() {
-        return Math.toRadians(m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION);
+        return Math.toRadians(m_positionSignal.refresh().getValue().in(Revolutions)*ClimberConstants.DEGREES_PER_ROTATION);
     }
 
     public double getPositionDegrees() {
-        return m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION;
+        return m_positionSignal.refresh().getValue().in(Revolutions)*ClimberConstants.DEGREES_PER_ROTATION;
     }
 
     public double getVelocity() {
-        return Math.toRadians(m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION);
+        return Math.toRadians(m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ClimberConstants.DEGREES_PER_ROTATION);
     }
 
     public double getVelocityDegrees() {
-        return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
+        return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ClimberConstants.DEGREES_PER_ROTATION;
     }
 
     // setters
