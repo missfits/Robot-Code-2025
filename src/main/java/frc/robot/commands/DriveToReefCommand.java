@@ -14,12 +14,15 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 public class DriveToReefCommand extends Command {
 
@@ -33,8 +36,8 @@ public class DriveToReefCommand extends Command {
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
 
-  private final PIDController xController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
-  private final PIDController yController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P/10, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
+  private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
+  private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final SwerveRequest.ApplyFieldSpeeds driveRequest = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.Velocity);
   
   
@@ -85,19 +88,31 @@ public class DriveToReefCommand extends Command {
       } else {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
       }
-      
 
+      xController.reset(m_drivetrain.getState().Pose.getX());
+      yController.reset(m_drivetrain.getState().Pose.getY());
+      
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
     }
   
     // Called every time the scheduler runs while the command is scheduled.
     @Override
-    public void execute() {      
+    public void execute() {
+
+      double xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity;
+      double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
+
       m_drivetrain.setControl(driveRequest
         .withSpeeds(new ChassisSpeeds(
-          xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()),
-          yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()),
+          xVelocity,
+          yVelocity,
           0)));
+
+      SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
+      SmartDashboard.putNumber("drivetoreef/setpoint position y", yController.getSetpoint().position);
+      
+      SmartDashboard.putNumber("drivetoreef/setpoint velocity x", xController.getSetpoint().velocity);
+      SmartDashboard.putNumber("drivetoreef/setpoint velocity y", yController.getSetpoint().velocity);
   }
 
   // Called once the command ends or is interrupted.
