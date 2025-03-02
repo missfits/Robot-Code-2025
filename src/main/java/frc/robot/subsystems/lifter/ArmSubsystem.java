@@ -49,7 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
         return new RunCommand(
             () -> m_IO.setVoltage(ArmConstants.kG), 
             this
-        );
+        ).withName("keepInPlace");
     }
 
     public Command manualMoveCommand() {
@@ -155,6 +155,9 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("arm/position", m_IO.getPosition());
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
+
+        SmartDashboard.putData("arm/subsystem", this);
+
     }
 
     

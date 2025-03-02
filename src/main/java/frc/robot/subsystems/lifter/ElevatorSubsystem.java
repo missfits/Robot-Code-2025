@@ -45,7 +45,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new RunCommand(
             () -> m_IO.setVoltage(ElevatorConstants.kG),
             this
-        );
+        ).withName("keepInPlace");
     }
 
     public Command manualMoveCommand() {
@@ -151,6 +151,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+
+        SmartDashboard.putData("elevator/subsystem", this);
     }
 
     public void setBrake(boolean brake) {
