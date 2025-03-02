@@ -148,16 +148,6 @@ public final class Constants {
     public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(1);
     public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(12);
 
-    // needs to be tuned
-    public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
-    public static final double ROBOT_ROTATION_I = 0;
-    public static final double ROBOT_ROTATION_D = 0; // 0.10877 from rotation sys-id @PF 1/13
-
-    public static final double ROBOT_POSITION_P = 20; // too high
-    public static final double ROBOT_POSITION_I = 0;
-    public static final double ROBOT_POSITION_D = 0;
-
-
     public static final double kMaxV = 1; // to be tuned
     public static final double kMaxA = 1; // to be tuned
   }
