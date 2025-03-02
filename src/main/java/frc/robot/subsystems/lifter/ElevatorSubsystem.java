@@ -31,7 +31,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
     );
-    private TrapezoidProfile.State m_goal;
+    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
@@ -45,7 +45,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new RunCommand(
             () -> m_IO.setVoltage(ElevatorConstants.kG),
             this
-        );
+        ).withName("keepInPlace");
     }
 
     public Command manualMoveCommand() {
@@ -85,7 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> isAtPosition(goal.position),
+            () -> false,
             this
         );
     }
@@ -118,6 +118,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
     } 
 
+    public Trigger isAtGoal() {
+        return new Trigger(() -> isAtPosition(m_goal.position));
+    } 
+
     public Trigger okToMoveArmBackTrigger() {
         return new Trigger(() -> okToMoveArmBack());
     } 
@@ -147,6 +151,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+
+        SmartDashboard.putData("elevator/subsystem", this);
     }
 
     public void setBrake(boolean brake) {

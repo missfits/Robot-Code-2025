@@ -131,6 +131,12 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
+
+    public static final double BACKWARDS_MOTOR_SPEED = 0;
+
+    public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
 
   public static class RampConstants {
@@ -155,9 +161,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(2) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-11) : -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(11) : 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-12.5) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-0.5) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(13.5) : 0.1397; // in meters from the floor?
     
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
@@ -171,24 +177,29 @@ public final class Constants {
     public static final double TARGET_PITCH = 0; 
   }
 
-  public static class IntakeConstants {
-    public static final int LASER_CAN_ID = 14;
+  public static class LaserCanConstants {
+    public static final int LASER_CAN_RAMP_OUT_ID = 14;
+    public static final int LASER_CAN_RAMP_IN_ID = 15;
+
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 10; // in mm
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 300; // in mm
+
   }
 
   public static class RobotStateConstants {
     public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION;
     public static final double C1_ARM_POS = ArmConstants.INITIAL_POSITION;
-    public static final double C2_ELEVATOR_POS = 0.3752;
-    public static final double C2_ARM_POS = 0.245;
+    public static final double C2_ELEVATOR_POS = 0.36;
+    public static final double C2_ARM_POS = 0.354;
     public static final double C3_ELEVATOR_POS = 0.71;
     public static final double C3_ARM_POS = 0.406;
     public static final double C4_ELEVATOR_POS = 0.71;
-    public static final double C4_ARM_POS = -3.13;
+    public static final double C4_ARM_POS = -3.25;
     public static final double A2_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A2_ARM_POS = Math.toRadians(0.0);
     public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A3_ARM_POS = Math.toRadians(0.0);
     public static final double IN_ELEVATOR_POS = 0;
-    public static final double IN_ARM_POS = -0.4;
+    public static final double IN_ARM_POS = -0.378;
   }
 }
