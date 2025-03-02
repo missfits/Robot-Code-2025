@@ -33,7 +33,7 @@ public class LifterCommandFactory {
                     new WaitCommand(3).until(m_elevator.okToMoveArmBackTrigger()), // wait until elevator is sufficiently up
                     m_arm.moveToCommand(targetRobotState.getArmPos())),
                 m_elevator.moveToCommand(targetRobotState.getElevatorPos()))
-                .until(m_arm.isAtGoal().and(m_elevator.isAtGoal())).withName("lifterMoveToL4");
+                .until(isLifterAtGoal()).withName("lifterMoveToL4");
         } else {
             return new ParallelCommandGroup(
                 m_arm.moveToCommand(targetRobotState.getArmPos()),
