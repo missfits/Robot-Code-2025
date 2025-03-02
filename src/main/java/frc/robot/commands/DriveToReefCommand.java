@@ -37,8 +37,8 @@ public class DriveToReefCommand extends Command {
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
 
-  private final ProfiledPIDController xController = new ProfiledPIDController(AutoAlignConstants.ROBOT_POSITION_P, AutoAlignConstants.ROBOT_POSITION_I, AutoAlignConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
-  private final ProfiledPIDController yController = new ProfiledPIDController(AutoAlignConstants.ROBOT_POSITION_P, AutoAlignConstants.ROBOT_POSITION_I, AutoAlignConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
+  private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
+  private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final SwerveRequest.FieldCentricFacingAngle driveRequest = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
   
   
@@ -95,7 +95,7 @@ public class DriveToReefCommand extends Command {
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
 
-      driveRequest.HeadingController = new PhoenixPIDController(AutoAlignConstants.ROBOT_ROTATION_P, AutoAlignConstants.ROBOT_ROTATION_I, AutoAlignConstants.ROBOT_ROTATION_D);
+      driveRequest.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
       driveRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
       
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
