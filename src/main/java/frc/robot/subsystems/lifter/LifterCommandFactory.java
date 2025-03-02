@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ArmConstants;
@@ -43,21 +44,33 @@ public class LifterCommandFactory {
 
         if ((targetRobotState == RobotState.INTAKE) && armInBadPositionSupplier.getAsBoolean()) {
             return new SequentialCommandGroup(
-                // run arm to ok position (a little past INTAKE), move elevator down, then move arm back to INTAKE
-                m_arm.moveToCommand(ArmConstants.INTERMEDIATE_POS_ELEVATOR_CLEAR).until(m_arm.okToMoveElevatorDownTrigger()).asProxy(),
-                m_elevator.moveToCommand(targetRobotState.getElevatorPos()).until(m_elevator.isAtGoal()).asProxy(),
-                m_arm.moveToCommand(targetRobotState.getArmPos()).until(m_arm.isAtGoal()).asProxy());
-            // proxied everything so keep in place command will run during the sequence
+                // run arm to ok position (a little past INTAKE)
+                new ParallelDeadlineGroup(
+                    m_arm.moveToCommand(ArmConstants.INTERMEDIATE_POS_ELEVATOR_CLEAR).until(m_arm.okToMoveElevatorDownTrigger()),
+                    m_elevator.keepInPlaceCommand()),
+                // move elevator down
+                new ParallelDeadlineGroup(
+                    m_elevator.moveToCommand(targetRobotState.getElevatorPos()).until(m_elevator.isAtGoal()),
+                    m_arm.keepInPlaceCommand()),
+
+                // move arm back to INTAKE
+                new ParallelDeadlineGroup(
+                    m_arm.moveToCommand(targetRobotState.getArmPos()).until(m_arm.isAtGoal()), 
+                    m_elevator.keepInPlaceCommand()));
+            // deadline groups so keep in place command will run during the sequence 
         }
         
         if ((targetRobotState == RobotState.L1_CORAL) && armInBadPositionSupplier.getAsBoolean()) {
             return new SequentialCommandGroup(
-                // move arm to an ok position, then move arm and elevator at same time to L1
-                m_arm.moveToCommand(ArmConstants.INTERMEDIATE_POS_ELEVATOR_CLEAR).until(m_arm.okToMoveElevatorDownTrigger()).asProxy(),
+                // move arm to an ok position
+                new ParallelDeadlineGroup(
+                    m_arm.moveToCommand(ArmConstants.INTERMEDIATE_POS_ELEVATOR_CLEAR).until(m_arm.okToMoveElevatorDownTrigger()),
+                    m_elevator.keepInPlaceCommand()),
+                // then move arm and elevator at same time to L1
                 new ParallelCommandGroup(
                     m_elevator.moveToCommand(targetRobotState.getElevatorPos()).until(m_elevator.isAtGoal()).asProxy(),
                     m_arm.moveToCommand(targetRobotState.getArmPos()).until(m_arm.isAtGoal()).asProxy())); 
-            // proxied everything so keep in place command will run during the sequence
+            // deadline group so keep in place command will run during the sequence 
         } 
         
         // otherwise, parallel movement 
