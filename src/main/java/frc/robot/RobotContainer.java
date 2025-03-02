@@ -193,11 +193,11 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L1_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a()).onTrue(
+    copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
-    copilotJoystick.leftBumper().and(copilotJoystick.a()).onTrue(
+    copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
