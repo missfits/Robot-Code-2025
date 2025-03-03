@@ -136,7 +136,7 @@ public final class Constants {
     public static final double INTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
 
-    public static final double BACKWARDS_MOTOR_SPEED = 0;
+    public static final double BACKWARDS_MOTOR_SPEED = -1.0;
 
     public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
@@ -200,18 +200,18 @@ public final class Constants {
   }
 
   public static class RobotStateConstants {
-    public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION;
+    public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION; 
     public static final double C1_ARM_POS = ArmConstants.INITIAL_POSITION;
-    public static final double C2_ELEVATOR_POS = 0.36;
-    public static final double C2_ARM_POS = 0.354;
-    public static final double C3_ELEVATOR_POS = 0.71;
-    public static final double C3_ARM_POS = 0.406;
-    public static final double C4_ELEVATOR_POS = 0.71;
-    public static final double C4_ARM_POS = -3.25;
-    public static final double A2_ELEVATOR_POS = Math.toRadians(0.0);
-    public static final double A2_ARM_POS = Math.toRadians(0.0);
-    public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
-    public static final double A3_ARM_POS = Math.toRadians(0.0);
+    public static final double C2_ELEVATOR_POS = 0.3611; // from 3/1
+    public static final double C2_ARM_POS = 0.3370; // from 3/1
+    public static final double C3_ELEVATOR_POS = 0.7124; // from 3/1
+    public static final double C3_ARM_POS = 0.3370; // from 3/1
+    public static final double C4_ELEVATOR_POS = 0.7043; // from 3/1
+    public static final double C4_ARM_POS = -3.211; // from 3/1
+    public static final double A2_ELEVATOR_POS = 0; // from 3/1
+    public static final double A2_ARM_POS = 0.8532; // from 3/1
+    public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
+    public static final double A3_ARM_POS = 0.9547; // from 3/1
     public static final double IN_ELEVATOR_POS = 0;
     public static final double IN_ARM_POS = -0.378;
   }

@@ -200,11 +200,11 @@ public class RobotContainer {
     ); 
 
     copilotJoystick.rightBumper().and(copilotJoystick.a()).onTrue(
-      m_lifter.moveToCommand(RobotState.L2_ALGAE)
+      m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
     copilotJoystick.leftBumper().and(copilotJoystick.a()).onTrue(
-      m_lifter.moveToCommand(RobotState.L3_ALGAE)
+      m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
     // backup commands, need to press the POV button thing down (direction does not matter)
@@ -226,8 +226,8 @@ public class RobotContainer {
     // TODO: make this only run if lifter is in intake pos :) 
     m_rampSensor.coralSeenAfterRamp().whileTrue(m_collarCommandFactory.runCollarInSecondary()); 
 
-    m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
-    m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
+    m_elevator.setDefaultCommand(m_elevator.keepInPlacePIDCommand());
+    m_arm.setDefaultCommand(m_arm.keepInPlacePIDCommand());
 
     // LED and rumble feedback when coral is seen in ramp
     m_rampSensor.coralSeenInRamp().onTrue(
