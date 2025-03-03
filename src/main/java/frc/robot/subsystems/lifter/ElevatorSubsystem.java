@@ -48,6 +48,13 @@ public class ElevatorSubsystem extends SubsystemBase{
         ).withName("keepInPlace");
     }
 
+    public Command keepInPlacePIDCommand() {
+        return new RunCommand(
+            () -> executeKeepInPlacePID(),
+            this
+        ).withName("keepInPlacePID");
+    }
+
     public Command manualMoveCommand() {
         return new RunCommand(
             () -> m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
@@ -112,6 +119,20 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("elevator/target position", m_profiledReference.position);
         SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
+    }
+
+    private void executeKeepInPlacePID() {
+
+        // calculate part of the power based on target position + current position
+        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(0);
+
+        m_IO.setVoltage(PIDPower + feedForwardPower);
+
+        SmartDashboard.putNumber("elevator/target position", m_goal.position);
+        SmartDashboard.putNumber("elevator/target velocity", 0);
     }
 
     private boolean isAtPosition(double goal) {
