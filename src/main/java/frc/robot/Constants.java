@@ -48,7 +48,9 @@ public final class Constants {
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
 
-    public static final double WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+    public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+
   }
 
   public static class ElevatorConstants {
@@ -131,10 +133,27 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
+
+    public static final double BACKWARDS_MOTOR_SPEED = 0;
+
+    public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
 
   public static class RampConstants {
 
+  }
+
+  public static class ClimberConstants {
+
+    public static final int CLIMBER_MOTOR_ID = 16;
+
+    public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
+
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
+
+    public static final double DEGREES_PER_ROTATION = 1;
   }
   
   public static class LEDConstants {
@@ -171,24 +190,29 @@ public final class Constants {
     public static final double TARGET_PITCH = 0; 
   }
 
-  public static class IntakeConstants {
-    public static final int LASER_CAN_ID = 14;
+  public static class LaserCanConstants {
+    public static final int LASER_CAN_RAMP_OUT_ID = 14;
+    public static final int LASER_CAN_RAMP_IN_ID = 15;
+
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 10; // in mm
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 300; // in mm
+
   }
 
   public static class RobotStateConstants {
     public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION;
     public static final double C1_ARM_POS = ArmConstants.INITIAL_POSITION;
-    public static final double C2_ELEVATOR_POS = 0.3752;
-    public static final double C2_ARM_POS = 0.245;
+    public static final double C2_ELEVATOR_POS = 0.36;
+    public static final double C2_ARM_POS = 0.354;
     public static final double C3_ELEVATOR_POS = 0.71;
     public static final double C3_ARM_POS = 0.406;
     public static final double C4_ELEVATOR_POS = 0.71;
-    public static final double C4_ARM_POS = -3.13;
+    public static final double C4_ARM_POS = -3.25;
     public static final double A2_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A2_ARM_POS = Math.toRadians(0.0);
     public static final double A3_ELEVATOR_POS = Math.toRadians(0.0);
     public static final double A3_ARM_POS = Math.toRadians(0.0);
     public static final double IN_ELEVATOR_POS = 0;
-    public static final double IN_ARM_POS = -0.4;
+    public static final double IN_ARM_POS = -0.378;
   }
 }
