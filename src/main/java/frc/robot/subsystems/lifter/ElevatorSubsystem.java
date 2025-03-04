@@ -158,4 +158,12 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void setBrake(boolean brake) {
         m_IO.setBrake(brake);
      }
+
+    public Trigger isTallTrigger() {
+       return new Trigger(() -> isTall());
+    }
+
+    public boolean isTall() {
+        return m_IO.getPosition() > ElevatorConstants.MIN_HEIGHT_TO_BE_TALL;
+    }
 }

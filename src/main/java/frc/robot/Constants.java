@@ -89,6 +89,8 @@ public final class Constants {
     public static final double MAX_POSITION_TOLERANCE = 0.005;
 
     public static final double MIN_POS_ARM_CLEAR = 0.4; // needs to be measured 
+
+    public static final double MIN_HEIGHT_TO_BE_TALL = 0.6;
   }
 
   public static class ArmConstants {
