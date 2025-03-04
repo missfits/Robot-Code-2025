@@ -135,6 +135,8 @@ public final class Constants {
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
+    public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -2.0;
+
 
     public static final double BACKWARDS_MOTOR_SPEED = -1.0;
 
@@ -212,7 +214,7 @@ public final class Constants {
     public static final double A2_ARM_POS = 0.8532; // from 3/1
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
     public static final double A3_ARM_POS = 0.9547; // from 3/1
-    public static final double IN_ELEVATOR_POS = 0;
-    public static final double IN_ARM_POS = -0.378;
+    public static final double IN_ELEVATOR_POS = 0.019;
+    public static final double IN_ARM_POS = -0.40;
   }
 }
