@@ -299,7 +299,7 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true); // turn off unplugged joystick errors 
 
     SignalLogger.enableAutoLogging(false);
-    // SignalLogger.start();
+    SignalLogger.start();
       
 
     // elevator moveTo auto commands
