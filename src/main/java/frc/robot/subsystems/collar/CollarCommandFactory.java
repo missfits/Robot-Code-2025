@@ -19,7 +19,7 @@ public class CollarCommandFactory {
         return Commands.sequence(
             m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRamp()),
             m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRamp().negate()),
-            m_collar.runCollarOffInstant());
+            m_collar.runCollarOff());
     }
 
     public Command runCollarOut() {

@@ -60,7 +60,7 @@ public class ElevatorIOHardware {
 
         // if position is too low, only run the elevator up 
         if (this.getPosition() < ElevatorConstants.POSITION_LOWER_LIMIT) {
-            value = MathUtil.clamp(value, -0.05, 1000);
+            value = MathUtil.clamp(value, 0, 1000);
         }
         // if position is too high, only run the elevator down (or in placd)
         if (this.getPosition() > ElevatorConstants.POSITION_UPPER_LIMIT) {
