@@ -49,7 +49,7 @@ public final class Constants {
     public static final double ROBOT_POSITION_D = 0;
 
     public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
-    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.949; // approximated @ PF session 1/13
 
   }
 
