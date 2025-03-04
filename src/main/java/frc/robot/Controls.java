@@ -1,15 +1,30 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.RobotContainer.JoystickVals;
 
 public class Controls {
+
+    private static SlewRateLimiter xSlewRateLimiter = new SlewRateLimiter(OperatorConstants.SLEW_RATE_LIMIT);
+    private static SlewRateLimiter ySlewRateLimiter = new SlewRateLimiter(OperatorConstants.SLEW_RATE_LIMIT);
+
     
-    public static JoystickVals adjustInputs(double x, double y, boolean slowmode) {
-        return adjustSlowmode(inputShape(x, y), slowmode); 
+    public static JoystickVals adjustInputs(double x, double y, boolean slowmode, boolean limitSlewRate) {
+        return applySlewRateLimiter(adjustSlowmode(inputShape(x, y), slowmode), limitSlewRate); 
     }
 
+    public static JoystickVals applySlewRateLimiter(JoystickVals input, boolean limitSlewRate) {
+        if (limitSlewRate) {
+            return new JoystickVals(xSlewRateLimiter.calculate(input.x()), ySlewRateLimiter.calculate(input.y()));
+        } else {
+            // still update the slewRateLimiters so it doesn't get mad at a discontinuity :)
+            xSlewRateLimiter.reset(input.x());
+            ySlewRateLimiter.reset(input.y());
+            return input;
+        }
+    }
 
     // square the input while maintaining direction 
     public static JoystickVals inputShape(double x, double y) {
