@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -290,7 +291,7 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), new ParallelDeadlineGroup(m_lifter.moveToCommand(RobotState.INTAKE).asProxy(), m_collar.runCollarOff()));
   }
 
   public RobotContainer() {
