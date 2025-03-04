@@ -297,8 +297,6 @@ public class RobotContainer {
 
     SignalLogger.enableAutoLogging(false);
     SignalLogger.start();
-    // SignalLogger.start();
-      
 
     // elevator moveTo auto commands
     NamedCommands.registerCommand("intakeCoral", m_collarCommandFactory.intakeCoralSequence()); // update to use grapplehook instead
