@@ -136,7 +136,7 @@ public final class Constants {
     public static final double INTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
 
-    public static final double BACKWARDS_MOTOR_SPEED = 0;
+    public static final double BACKWARDS_MOTOR_SPEED = -1.0;
 
     public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
@@ -202,22 +202,33 @@ public final class Constants {
   public static class RobotStateConstants {
     public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION; 
     public static final double C1_ARM_POS = ArmConstants.INITIAL_POSITION;
+
     public static final double C2_ELEVATOR_POS = 0.3611; // from 3/1
-    public static final double C2_ARM_POS = 0.6870; // from 3/1
+    public static final double C2_ARM_POS = 0.3370; // from 3/1
+
     public static final double C2_ELEVATOR_POS_WITH_CORAL = 0.3172; // from 3/1
     public static final double C2_ARM_POS_WITH_CORAL = 1.0371; // from 3/1
+
     public static final double C3_ELEVATOR_POS = 0.7124; // from 3/1
-    public static final double C3_ARM_POS = 0.7930; // from 3/1
+    public static final double C3_ARM_POS = 0.3370; // from 3/1
+
     public static final double C3_ELEVATOR_POS_WITH_CORAL = 0.7124; // from 3/1
     public static final double C3_ARM_POS_WITH_CORAL = 1.0515; // from 3/1
+
     public static final double C4_ELEVATOR_POS = 0.7043; // from 3/1
-    public static final double C4_ARM_POS = -2.9187; // from 3/1
+    public static final double C4_ARM_POS = -3.211; // from 3/1
+    
     public static final double C4_ELEVATOR_POS_WITH_CORAL = 0.7026; // from 3/1
     public static final double C4_ARM_POS_WITH_CORAL = -3.2239; // from 3/1
+
+  
     public static final double A2_ELEVATOR_POS = 0; // from 3/1
-    public static final double A2_ARM_POS = 1.1532; // from 3/1
+    public static final double A2_ARM_POS = 0.8532; // from 3/1
+
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
-    public static final double A3_ARM_POS = 1.2547; // from 3/1
+    public static final double A3_ARM_POS = 0.9547; // from 3/1
+
+    
     public static final double IN_ELEVATOR_POS = 0;
     public static final double IN_ARM_POS = -0.378;
   }
