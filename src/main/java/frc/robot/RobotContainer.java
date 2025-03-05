@@ -182,28 +182,49 @@ public class RobotContainer {
     ); 
 
     // set move to state
-    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
+    // C4 -> rightTrigger; !pov (any), !start
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L4_CORAL)
     ); 
 
-    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).onTrue(
+    // C4_WITH_CORAL -> rightTrigger + start; !pov (any)
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L4_CORAL_WITH_CORAL)
+    ); 
+
+    // C3 -> leftTrigger; !pov (any), !start
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L3_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
+    // C3_WITH_CORAL -> leftTrigger + start; !pov (any)
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L3_CORAL_WITH_CORAL)
+    ); 
+
+    // C2 -> rightBumper; !a, !pov (any), !start
+    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_CORAL)
     ); 
 
+    // C2_WITH_CORAL -> rightBumper + start; !a, !pov (any)
+    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L2_CORAL_WITH_CORAL)
+    ); 
+
+    // C1 -> leftBumper; !a, !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L1_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a()).onTrue(
-      m_lifter.moveToCommand(RobotState.L3_ALGAE)
+    // A2 -> rightBumper + a; !pov (any)
+    copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
+      m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
-    copilotJoystick.leftBumper().and(copilotJoystick.a()).onTrue(
-      m_lifter.moveToCommand(RobotState.L2_ALGAE)
+    // A3 -> leftBumper + a; !pov (any)
+    copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
+      m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
     // backup commands, need to press the POV button thing down (direction does not matter)
@@ -297,6 +318,7 @@ public class RobotContainer {
 
     SignalLogger.enableAutoLogging(false);
     SignalLogger.start();
+      
 
     // elevator moveTo auto commands
     NamedCommands.registerCommand("intakeCoral", m_collarCommandFactory.intakeCoralSequence()); // update to use grapplehook instead
