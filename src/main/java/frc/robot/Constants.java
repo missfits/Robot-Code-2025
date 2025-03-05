@@ -150,10 +150,13 @@ public final class Constants {
     public static final int CLIMBER_MOTOR_ID = 16;
 
     public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
-
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
-
+    public static final double AUTO_MOVE_MOTOR_SPEED = 3.0; // filler
     public static final double DEGREES_PER_ROTATION = 1;
+
+    public static final double INITIAL_POSITION = 0.0; // down
+    public static final double DEPLOY_POSITION = Math.PI*2/3; // 120 degrees
+    public static final double FINAL_POSITION = Math.PI*4/3; // 240 degres
   }
   
   public static class LEDConstants {
