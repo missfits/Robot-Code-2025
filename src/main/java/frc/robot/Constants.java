@@ -48,7 +48,9 @@ public final class Constants {
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
 
-    public static final double WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+    public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+
   }
 
   public static class ElevatorConstants {
@@ -74,17 +76,17 @@ public final class Constants {
     public static double kA = 2;
 
     public static double kP = 100; 
-    public static double kI = 0;
+    public static double kI = 15;
     public static double kD = 0; 
 
     public static double kMaxV = 2;
-    public static double kMaxA = 1; 
+    public static double kMaxA = 2.5; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
     public static final double MAX_POSITION_TOLERANCE = 0.005;
 
-    public static final double MIN_POS_ARM_CLEAR = 0.4; // needs to be measured 
+    public static final double MIN_POS_ARM_CLEAR = 0.28; 
   }
 
   public static class ArmConstants {
@@ -102,15 +104,15 @@ public final class Constants {
 
     public static double kS = 0.15;
     public static double kG = 0;
-    public static double kV = 0.2;
-    public static double kA = 0.5;
+    public static double kV = 0.6;
+    public static double kA = 0.05;
 
     public static double kP = 50;
     public static double kI = 0;
     public static double kD = 0;
     
-    public static double kMaxV = 2;
-    public static double kMaxA = 2.5; 
+    public static double kMaxV = 6;
+    public static double kMaxA = 5; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
@@ -142,6 +144,17 @@ public final class Constants {
   public static class RampConstants {
 
   }
+
+  public static class ClimberConstants {
+
+    public static final int CLIMBER_MOTOR_ID = 16;
+
+    public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
+
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
+
+    public static final double DEGREES_PER_ROTATION = 1;
+  }
   
   public static class LEDConstants {
     public static final int KPORT = 0;
@@ -161,9 +174,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-12.5) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-0.5) : -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(13.5) : 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-11) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(2) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(11) : 0.1397; // in meters from the floor?
     
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
@@ -189,16 +202,33 @@ public final class Constants {
   public static class RobotStateConstants {
     public static final double C1_ELEVATOR_POS = ElevatorConstants.INITIAL_POSITION; 
     public static final double C1_ARM_POS = ArmConstants.INITIAL_POSITION;
+
     public static final double C2_ELEVATOR_POS = 0.3611; // from 3/1
     public static final double C2_ARM_POS = 0.3370; // from 3/1
+
+    public static final double C2_ELEVATOR_POS_WITH_CORAL = 0.3172; // from 3/1
+    public static final double C2_ARM_POS_WITH_CORAL = 1.0371; // from 3/1
+
     public static final double C3_ELEVATOR_POS = 0.7124; // from 3/1
     public static final double C3_ARM_POS = 0.3370; // from 3/1
+
+    public static final double C3_ELEVATOR_POS_WITH_CORAL = 0.7124; // from 3/1
+    public static final double C3_ARM_POS_WITH_CORAL = 1.0515; // from 3/1
+
     public static final double C4_ELEVATOR_POS = 0.7043; // from 3/1
     public static final double C4_ARM_POS = -3.211; // from 3/1
+    
+    public static final double C4_ELEVATOR_POS_WITH_CORAL = 0.7026; // from 3/1
+    public static final double C4_ARM_POS_WITH_CORAL = -3.2239; // from 3/1
+
+  
     public static final double A2_ELEVATOR_POS = 0; // from 3/1
     public static final double A2_ARM_POS = 0.8532; // from 3/1
+
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
     public static final double A3_ARM_POS = 0.9547; // from 3/1
+
+    
     public static final double IN_ELEVATOR_POS = 0;
     public static final double IN_ARM_POS = -0.378;
   }

@@ -64,6 +64,7 @@ import frc.robot.commands.DriveToReefCommand.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.collar.CollarSubsystem;
 import frc.robot.subsystems.collar.CollarCommandFactory;
 import frc.robot.subsystems.collar.RampSensorSubsystem;
@@ -109,6 +110,8 @@ public class RobotContainer {
   private final RampSubsystem m_ramp = new RampSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
+  private final ClimberSubsystem m_climber = new ClimberSubsystem();
+
 
   private final CollarCommandFactory m_collarCommandFactory = new CollarCommandFactory(m_collar, m_rampSensor);
 
@@ -143,20 +146,22 @@ public class RobotContainer {
     driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
 
     // reset the field-centric heading on left trigger press
-    driverJoystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
+    driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
     // reset fused vision pose estimator on left bumper press
     driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose()));
 
     // auto rotate to reef command
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
-    
+  
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
     
+    driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
+    driverJoystick.x().whileTrue(m_climber.manualMoveCommand());
 
     // move to intake, start collar 
     copilotJoystick.x().and(copilotJoystick.povCenter()).onTrue(
@@ -177,28 +182,49 @@ public class RobotContainer {
     ); 
 
     // set move to state
-    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).onTrue(
+    // C4 -> rightTrigger; !pov (any), !start
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L4_CORAL)
     ); 
 
-    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).onTrue(
+    // C4_WITH_CORAL -> rightTrigger + start; !pov (any)
+    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L4_CORAL_WITH_CORAL)
+    ); 
+
+    // C3 -> leftTrigger; !pov (any), !start
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L3_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
+    // C3_WITH_CORAL -> leftTrigger + start; !pov (any)
+    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L3_CORAL_WITH_CORAL)
+    ); 
+
+    // C2 -> rightBumper; !a, !pov (any), !start
+    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).and(copilotJoystick.start().negate()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_CORAL)
     ); 
 
+    // C2_WITH_CORAL -> rightBumper + start; !a, !pov (any)
+    copilotJoystick.rightBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).and(copilotJoystick.start()).onTrue(
+      m_lifter.moveToCommand(RobotState.L2_CORAL_WITH_CORAL)
+    ); 
+
+    // C1 -> leftBumper; !a, !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a().negate()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L1_CORAL)
     ); 
 
-    copilotJoystick.rightBumper().and(copilotJoystick.a()).onTrue(
-      m_lifter.moveToCommand(RobotState.L3_ALGAE)
+    // A2 -> rightBumper + a; !pov (any)
+    copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
+      m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
-    copilotJoystick.leftBumper().and(copilotJoystick.a()).onTrue(
-      m_lifter.moveToCommand(RobotState.L2_ALGAE)
+    // A3 -> leftBumper + a; !pov (any)
+    copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
+      m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
     // backup commands, need to press the POV button thing down (direction does not matter)
@@ -215,6 +241,7 @@ public class RobotContainer {
       m_arm.manualMoveBackwardCommand());
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
+    m_climber.setDefaultCommand(m_climber.runClimberOff());
 
     // TODO: make this only run if lifter is in intake pos :) 
     m_rampSensor.coralSeenAfterRamp().whileTrue(m_collarCommandFactory.runCollarInSecondary()); 
@@ -293,7 +320,7 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true); // turn off unplugged joystick errors 
 
     SignalLogger.enableAutoLogging(false);
-    // SignalLogger.start();
+    SignalLogger.start();
       
 
     // elevator moveTo auto commands
@@ -350,12 +377,15 @@ public class RobotContainer {
   public void setEnabledNeutralMode() {
     drivetrain.setBrake(true);
     m_lifter.setEnabledNeutralMode();
+    m_climber.setEnabledNeutralMode();
+
   }
 
   // set motors to appropriate neutral modes for an disabled robot
   public void setDisabledNeutralMode() {
     drivetrain.setBrake(false);
     m_lifter.setDisabledNeutralMode();
+    m_climber.setDisabledNeutralMode();
 
   }
 
