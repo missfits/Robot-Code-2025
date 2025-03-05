@@ -45,7 +45,14 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new RunCommand(
             () -> m_IO.setVoltage(ElevatorConstants.kG),
             this
-        );
+        ).withName("keepInPlace");
+    }
+
+    public Command keepInPlacePIDCommand() {
+        return new RunCommand(
+            () -> executeKeepInPlacePID(),
+            this
+        ).withName("keepInPlacePID");
     }
 
     public Command manualMoveCommand() {
@@ -114,6 +121,20 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
     }
 
+    private void executeKeepInPlacePID() {
+
+        // calculate part of the power based on target position + current position
+        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(0);
+
+        m_IO.setVoltage(PIDPower + feedForwardPower);
+
+        SmartDashboard.putNumber("elevator/target position", m_goal.position);
+        SmartDashboard.putNumber("elevator/target velocity", 0);
+    }
+
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ElevatorConstants.MAX_POSITION_TOLERANCE;
     } 
@@ -151,6 +172,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+
+        SmartDashboard.putData("elevator/subsystem", this);
     }
 
     public void setBrake(boolean brake) {

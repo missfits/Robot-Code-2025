@@ -49,7 +49,14 @@ public class ArmSubsystem extends SubsystemBase {
         return new RunCommand(
             () -> m_IO.setVoltage(ArmConstants.kG), 
             this
-        );
+        ).withName("keepInPlace");
+    }
+
+    public Command keepInPlacePIDCommand() {
+        return new RunCommand(
+            () -> executeKeepInPlacePID(),
+            this
+        ).withName("keepInPlacePID");
     }
 
     public Command manualMoveCommand() {
@@ -118,6 +125,20 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
 
+    private void executeKeepInPlacePID() {
+
+        // calculate part of the power based on target position + current position
+        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
+
+        m_IO.setVoltage(PIDPower + feedForwardPower);
+    
+        SmartDashboard.putNumber("arm/target position", m_goal.position);
+        SmartDashboard.putNumber("arm/target velocity", 0);
+    }
+
     private boolean isAtPosition(double goal) {
         return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
     } 
@@ -131,7 +152,7 @@ public class ArmSubsystem extends SubsystemBase {
     } 
 
     private boolean okToMoveElevatorDown() {
-        return ! (m_IO.getPosition() > RobotStateConstants.C4_ARM_POS - ArmConstants.MAX_POSITION_TOLERANCE && m_IO.getPosition() < ArmConstants.MIN_POS_ELEVATOR_CLEAR);
+        return  m_IO.getPosition() > ArmConstants.MIN_POS_ELEVATOR_CLEAR;
     } 
 
     public void resetControllers() {
@@ -155,6 +176,9 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("arm/position", m_IO.getPosition());
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
+
+        SmartDashboard.putData("arm/subsystem", this);
+
     }
 
     
