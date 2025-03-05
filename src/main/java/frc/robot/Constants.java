@@ -44,12 +44,12 @@ public final class Constants {
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
     public static final double ROBOT_ROTATION_D = 0; // 0.10877 from rotation sys-id @PF 1/13
-    public static final double ROBOT_POSITION_P = 5;
+    public static final double ROBOT_POSITION_P = 10;
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
 
     public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
-    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.949; // approximated @ PF session 1/13
 
   }
 
@@ -64,7 +64,7 @@ public final class Constants {
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
-    public static final double POSITION_LOWER_LIMIT = 0.01;
+    public static final double POSITION_LOWER_LIMIT = 0.005;
     public static final double POSITION_UPPER_LIMIT = 0.71;
     
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
