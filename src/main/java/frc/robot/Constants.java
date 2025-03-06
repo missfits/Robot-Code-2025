@@ -135,6 +135,8 @@ public final class Constants {
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
+    public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -2.0;
+
 
     public static final double BACKWARDS_MOTOR_SPEED = -1.0;
 
@@ -194,7 +196,7 @@ public final class Constants {
     public static final int LASER_CAN_RAMP_OUT_ID = 14;
     public static final int LASER_CAN_RAMP_IN_ID = 15;
 
-    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 10; // in mm
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 20; // in mm
     public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 300; // in mm
 
   }
@@ -229,7 +231,7 @@ public final class Constants {
     public static final double A3_ARM_POS = 0.9547; // from 3/1
 
     
-    public static final double IN_ELEVATOR_POS = 0;
-    public static final double IN_ARM_POS = -0.378;
+    public static final double IN_ELEVATOR_POS = 0.019;
+    public static final double IN_ARM_POS = -0.40;
   }
 }
