@@ -219,14 +219,14 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L1_CORAL)
     ); 
 
-    // A2 -> rightBumper + a; !pov (any)
+    // A3 -> rightBumper + a; !pov (any)
     copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
-      m_lifter.moveToCommand(RobotState.L2_ALGAE)
+      m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
-    // A3 -> leftBumper + a; !pov (any)
+    // A2 -> leftBumper + a; !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
-      m_lifter.moveToCommand(RobotState.L3_ALGAE)
+      m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
     // backup commands, need to press the POV button thing down (direction does not matter)
