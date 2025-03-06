@@ -33,13 +33,12 @@ public class DriveToReefCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final CommandSwerveDrivetrain m_drivetrain;
   private Translation2d m_targetTranslation = new Translation2d();
-  private Rotation2d targetRotation;
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
 
   private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
-  private final SwerveRequest.FieldCentricFacingAngle driveRequest = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
+  private final SwerveRequest.ApplyFieldSpeeds driveRequest = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.Velocity);
   
   
     /**
@@ -90,13 +89,8 @@ public class DriveToReefCommand extends Command {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
       }
 
-      targetRotation = Rotation2d.fromRadians(Math.PI + m_vision.getTargetYaw());
-
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
-
-      driveRequest.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
-      driveRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
       
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
     }
@@ -109,11 +103,10 @@ public class DriveToReefCommand extends Command {
       double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
 
       m_drivetrain.setControl(driveRequest
-        .withVelocityX(xVelocity)
-        .withVelocityY(yVelocity)
-        .withTargetDirection(targetRotation)
-      );
-
+        .withSpeeds(new ChassisSpeeds(
+          xVelocity,
+          yVelocity,
+          0)));
 
       SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
       SmartDashboard.putNumber("drivetoreef/setpoint position y", yController.getSetpoint().position);
