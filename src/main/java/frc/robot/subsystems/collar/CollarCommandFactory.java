@@ -20,7 +20,7 @@ public class CollarCommandFactory {
             m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRamp()),
             m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRamp().negate()),
             m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_BACK_MOTOR_SPEED).withTimeout(0.3),
-            m_collar.runCollarOff());
+            m_collar.runCollarOffInstant());
     }
 
     public Command runCollarOut() {

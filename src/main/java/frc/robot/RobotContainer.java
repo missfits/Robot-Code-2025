@@ -44,7 +44,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -220,14 +219,14 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L1_CORAL)
     ); 
 
-    // A2 -> rightBumper + a; !pov (any)
+    // A3 -> rightBumper + a; !pov (any)
     copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
-      m_lifter.moveToCommand(RobotState.L2_ALGAE)
+      m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
-    // A3 -> leftBumper + a; !pov (any)
+    // A2 -> leftBumper + a; !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
-      m_lifter.moveToCommand(RobotState.L3_ALGAE)
+      m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
     // backup commands, need to press the POV button thing down (direction does not matter)
@@ -256,14 +255,15 @@ public class RobotContainer {
         new StartEndCommand(
           () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 1); driverJoystick.setRumble(RumbleType.kBothRumble, 1);},
           () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 0); driverJoystick.setRumble(RumbleType.kBothRumble, 0);})
-          .withTimeout(2), 
+          .withTimeout(1), 
 
         // set LED color
         m_ledSubsystem.runSolidGreen()));
+      
     testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
+    // m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
     testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
     testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
@@ -311,7 +311,7 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), new ParallelDeadlineGroup(m_lifter.moveToCommand(RobotState.INTAKE).asProxy(), m_collar.runCollarOff()));
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
   }
 
   public RobotContainer() {

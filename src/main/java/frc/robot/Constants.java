@@ -50,12 +50,12 @@ public final class Constants {
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
     public static final double ROBOT_ROTATION_D = 0; // 0.10877 from rotation sys-id @PF 1/13
-    public static final double ROBOT_POSITION_P = 10;
+    public static final double ROBOT_POSITION_P = 5;
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
 
     public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
-    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.949; // approximated @ PF session 1/13
+    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
 
   }
 
@@ -70,7 +70,7 @@ public final class Constants {
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
-    public static final double POSITION_LOWER_LIMIT = 0.005;
+    public static final double POSITION_LOWER_LIMIT = 0.01;
     public static final double POSITION_UPPER_LIMIT = 0.71;
     
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
@@ -175,8 +175,8 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(1);
-    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(12);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(3);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(11);
 
     public static final double kMaxV = 1; // to be tuned
     public static final double kMaxA = 1; // to be tuned
@@ -185,9 +185,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-11) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(2) : -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(11) : 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
     // default vision standard deviation
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(6, 6, 4);
@@ -227,7 +227,7 @@ public final class Constants {
     public static final double C2_ARM_POS_WITH_CORAL = 1.0371; // from 3/1
 
     public static final double C3_ELEVATOR_POS = 0.7124; // from 3/1
-    public static final double C3_ARM_POS = 0.3370; // from 3/1
+    public static final double C3_ARM_POS = 0.5078; // from 3/1
 
     public static final double C3_ELEVATOR_POS_WITH_CORAL = 0.7124; // from 3/1
     public static final double C3_ARM_POS_WITH_CORAL = 1.0515; // from 3/1
@@ -244,7 +244,6 @@ public final class Constants {
 
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
     public static final double A3_ARM_POS = 0.9547; // from 3/1
-
     
     public static final double IN_ELEVATOR_POS = 0.019;
     public static final double IN_ARM_POS = -0.40;
