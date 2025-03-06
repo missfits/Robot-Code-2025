@@ -1,0 +1,113 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.commands;
+
+import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LEDSubsystem;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
+import edu.wpi.first.wpilibj2.command.Command;
+
+public class AutoSetupCommand extends Command {
+  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  private final LEDSubsystem m_led;
+  private final VisionSubsystem m_vision;
+  private Rotation2d m_targetRotation;
+  private Translation2d m_targetTranslation;
+  private final CommandSwerveDrivetrain m_drivetrain;
+
+  /**
+   * Creates a new AutoSetupCommand, which runs left led strips to indicate moving in the x direction,
+   * and runs right led strips to indicate moving in the y direction.
+   *
+   * @param subsystem The subsystem used by this command.
+   */
+  public AutoSetupCommand(LEDSubsystem led, VisionSubsystem vision, CommandSwerveDrivetrain drivetrain) {
+    m_led = led;
+    m_vision = vision;
+    m_drivetrain = drivetrain;
+    addRequirements(drivetrain);
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    //for two led strips combined
+    AddressableLEDBuffer m_buffer = new AddressableLEDBuffer(120);
+    //for led strip on left side of the robot
+    //NOTE: VARIABLE NAMES MIGHT NEED TO BE CHANGED DEPENDING ON WHICH LED INDEXES ARE LEFT AND WHICH ARE RIGHT
+    AddressableLEDBufferView m_left = m_buffer.createView(0, 59);
+    //for led strip on right side of the robot
+    //reversed because (assuming) of snaked led arrangements
+    AddressableLEDBufferView m_right = m_buffer.createView(60, 119).reversed();
+  }
+
+    @Override
+    public boolean runsWhenDisabled(){
+        return true;
+    }
+
+    public void disabledInit(){
+    Command AutoSetupCommand = new Command(){
+        public boolean runsWhenDisabled(){
+            return true;
+        }
+        @Override
+        public void execute() {
+            m_targetRotation = 3.141596;
+            m_targetTranslation = (7.164, 6.148); //TO-DO: SET TARGET TRANSLATION COORDINATES ACCORDINGLY
+            //0.03m has been set as the buffer allowable range
+            //X DIRECTION
+                //if x translation needed is 0, shine left leds green
+                if (-0.03 <= (m_targetTranslation.getX() - m_drivetrain.getState().Pose.getTranslation().getX()) <= 0.03){
+                    //shine left leds blue
+                    m_ledSubsystem.m_left.runSolidBlue();
+                }
+                //else if x translation needed is in the positive direction; shine left leds red
+                else if ((m_targetTranslation.getX() - m_drivetrain.getState().Pose.getTranslation().getX() > 0) <= -0.03){
+                    //shine left leds red
+                    m_ledSubsystem.m_left.runSolidRed();
+                }
+                //else if x translation needed is negative, shine left leds pink
+                else if ((m_targetTranslation.getX() - m_drivetrain.getState().Pose.getTranslation().getX() < 0) >= 0.03){
+                    //shine left leds yellow
+                    m_ledSubsystem.m_left.runSolidYellow();
+                }
+            //Y DIRECTION
+                //if y translation needed is 0, shine right leds green
+                if (-0.03 <= (m_targetTranslation.getY() - m_drivetrain.getState().Pose.getTranslation().getY() = 0) <= 0.03){
+                    //shine right leds blue 
+                    m_ledSubsystem.m_right.runSolidBlue();
+                }
+                //else if y translation needed is positive; shine right leds red
+                else if ((m_targetTranslation.getY() - m_drivetrain.getState().Pose.getTranslation().getY() > 0) <= -0.03){
+                    //shine right leds red
+                    m_ledSubsystem.m_right.runSolidRed();
+                }
+                //else if y translation needed is negative, shine right leds pink
+                else if ((m_targetTranslation.getY() - m_drivetrain.getState().Pose.getTranslation().getY() < 0) >= 0.03){
+                    //shine right leds yellow
+                    m_ledSubsystem.m_right.runSolidYellow();
+                }
+        }
+    };
+        AutoAlignCommand.schedule();
+}
+
+  // Called every time the scheduler runs while the command is scheduled.
+  
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {}
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}
