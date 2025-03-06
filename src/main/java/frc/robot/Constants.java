@@ -34,7 +34,9 @@ public final class Constants {
     public static final int kTestControllerPort = 2;
 
     public static final double JOYSTICK_DEADBAND = 0.1;
-    public static final double SLOWMODE_FACTOR = 0.1;
+    public static final double SLOWMODE_FACTOR = 0.2;
+
+    public static final double SLEW_RATE_LIMIT = 1.5; // limits how fast operator input (-1 to 1) 
   }
 
   public static class DrivetrainConstants {
@@ -87,6 +89,9 @@ public final class Constants {
     public static final double MAX_POSITION_TOLERANCE = 0.005;
 
     public static final double MIN_POS_ARM_CLEAR = 0.28; 
+
+    public static final double MIN_HEIGHT_TO_BE_TALL = 0.4; // for slew rate limiting when elevator is tall
+    
   }
 
   public static class ArmConstants {
