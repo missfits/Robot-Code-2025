@@ -45,7 +45,7 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? 0.8 : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? 0.864 : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
