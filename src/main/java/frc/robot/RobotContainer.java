@@ -255,7 +255,7 @@ public class RobotContainer {
         new StartEndCommand(
           () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 1); driverJoystick.setRumble(RumbleType.kBothRumble, 1);},
           () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 0); driverJoystick.setRumble(RumbleType.kBothRumble, 0);})
-          .withTimeout(2), 
+          .withTimeout(1), 
 
         // set LED color
         m_ledSubsystem.runSolidGreen()));
