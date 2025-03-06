@@ -90,7 +90,7 @@ public class DriveToReefCommand extends Command {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
       }
 
-      targetRotation = Rotation2d.fromRadians(Math.PI + m_vision.getTargetYaw());
+      targetRotation = Rotation2d.fromRadians(m_vision.getTargetYaw());
 
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
@@ -109,8 +109,8 @@ public class DriveToReefCommand extends Command {
       double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
 
       m_drivetrain.setControl(driveRequest
-        .withVelocityX(xVelocity)
-        .withVelocityY(yVelocity)
+        .withVelocityX(-xVelocity)
+        .withVelocityY(-yVelocity)
         .withTargetDirection(targetRotation)
       );
 
