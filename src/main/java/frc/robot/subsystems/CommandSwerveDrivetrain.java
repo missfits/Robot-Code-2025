@@ -78,13 +78,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private final Vector<N3> stateStdDevs = VecBuilder.fill(1, 1,1);
     private final Vector<N3> visionStdDevs = VecBuilder.fill(10, 10, 10);
-
-        // drivePoseEstimator stores just drivetrain pose
-    private final SwerveDrivePoseEstimator drivePoseEstimator = new SwerveDrivePoseEstimator(
-        this.getKinematics(), 
-        this.getPigeon2().getRotation2d(), 
-        this.getState().ModulePositions, 
-        this.getState().Pose); 
         
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
@@ -184,7 +177,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         AutoBuilder.configure(
             () -> getState().Pose,   // Supplier of current robot pose
-            this::resetPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
+            this::resetFusedPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
             () -> getState().Speeds, // Supplier of current robot speeds. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> setControl(
                     m_pathApplyRobotSpeeds.withSpeeds(speeds)
@@ -209,6 +202,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             },
             this // Reference to this subsystem to set requirements
         );
+
+        // this.setNewPose(new Pose2d(10,2, new Rotation2d(0)));
     }
 
     public Command getCommandFromRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -253,36 +248,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
 
-    public SwerveDrivePoseEstimator getDrivePoseEstimator(){
-        return drivePoseEstimator;
-    }
-
     public Rotation2d getRobotRotation(){
         return this.getState().Pose.getRotation();
     } 
-    
 
-    // doesn't change robot pose, just stored SwerveDrivePoseEst
-    public void updateDrivePoseWithOdometry(){
-        drivePoseEstimator.update(
-            this.getPigeon2().getRotation2d(),
-            this.getState().ModulePositions);
-    }
 
     @Override
     public void resetRotation(Rotation2d rotation){
         super.resetRotation(rotation);
-        drivePoseEstimator.resetRotation(rotation);
     }
 
-    @Override
-    public void resetPose(Pose2d newPose){
-        super.resetPose(newPose);
-        drivePoseEstimator.resetPose(newPose);
-    }
-
-    public void resetFusedPose(){
-        this.resetPose(drivePoseEstimator.getEstimatedPosition());
+    public void resetFusedPose(Pose2d newPose){
+        this.resetPose(newPose);
     }
 
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
@@ -321,8 +298,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 hasAppliedOperatorPerspective = true;
             });
         }
-
-        this.updateDrivePoseWithOdometry(); // updates drivetrain periodically
 
         publisher.set(currentStates);
 
