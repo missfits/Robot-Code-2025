@@ -280,6 +280,13 @@ public class RobotContainer {
     testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
     testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+    //run sysID routines for elevator
+    testJoystick.a().whileTrue(m_elevator.sysIdDynamic(Direction.kForward));
+    testJoystick.b().whileTrue(m_elevator.sysIdDynamic(Direction.kReverse));
+    testJoystick.x().whileTrue(m_elevator.sysIdQuasistatic(Direction.kForward));
+    testJoystick.y().whileTrue(m_elevator.sysIdQuasistatic(Direction.kReverse));
+    
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
