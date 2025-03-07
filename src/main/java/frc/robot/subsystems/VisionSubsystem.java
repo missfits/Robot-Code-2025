@@ -21,7 +21,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -102,8 +101,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     var results = m_camera.getAllUnreadResults();
 
-    ArrayList<Integer> targetIds = new ArrayList<Integer>();
-
     if (!results.isEmpty()) {
       // Camera processed a new frame since last
       // Get the last one in the list.
@@ -124,7 +121,6 @@ public class VisionSubsystem extends SubsystemBase {
         double biggestTargetArea = 0;
 
         for (PhotonTrackedTarget sampleTarget : result.getTargets()){
-          targetIds.add(sampleTarget.getFiducialId());
 
           if (sampleTarget.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY){
             continue;
@@ -156,7 +152,6 @@ public class VisionSubsystem extends SubsystemBase {
       }
     }
 
-    SmartDashboard.putString("Targets Seen", targetIds.toString());
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
     SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);
