@@ -22,7 +22,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -118,6 +117,10 @@ public class VisionSubsystem extends SubsystemBase {
         for (PhotonTrackedTarget sampleTarget : result.getTargets()){
           targetIds.add(sampleTarget.getFiducialId());
           targetPoseAmbiguity.add(sampleTarget.getPoseAmbiguity());
+
+          if (sampleTarget.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY){
+            continue;
+          }
           //loops through every sample target in results.getTargets()
           //if the sample target's area is bigger than the biggestTargetArea, then the sample target
           // is set to the target, and the biggest Target Area is set to the sample's target area
