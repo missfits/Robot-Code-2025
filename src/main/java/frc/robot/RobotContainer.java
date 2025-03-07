@@ -260,7 +260,7 @@ public class RobotContainer {
           .withTimeout(2), 
 
         // set LED color
-        m_ledSubsystem.runSolidGreen()));
+        m_ledSubsystem.runSolidGreen().withTimeout(3)));
     testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
