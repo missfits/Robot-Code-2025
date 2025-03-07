@@ -138,7 +138,7 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
       drivetrain.getCommandFromRequest(() -> {
-        JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
+        JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
         return drive.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
           .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
           .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
@@ -229,18 +229,14 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
-    // backup commands, need to press the POV button thing down (direction does not matter)
-    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_elevator.manualMoveCommand());
-    
-    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_arm.manualMoveCommand());
 
-    copilotJoystick.leftBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_elevator.manualMoveBackwardCommand());
+    // lifter backup controls -- joysticks :)
+    Trigger elevatorManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getLeftY()) != 0);
+    elevatorManualTrigger.whileTrue(m_elevator.manualMoveCommand(() -> Controls.applyDeadband(copilotJoystick.getLeftY())));
     
-    copilotJoystick.rightBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_arm.manualMoveBackwardCommand());
+    Trigger armManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getRightX()) != 0);
+    armManualTrigger.whileTrue(m_elevator.manualMoveCommand(() -> Controls.applyDeadband(copilotJoystick.getRightX())));
+    
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
     m_climber.setDefaultCommand(m_climber.runClimberOff());

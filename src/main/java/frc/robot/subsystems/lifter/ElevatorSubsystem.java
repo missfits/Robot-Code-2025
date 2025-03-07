@@ -69,6 +69,13 @@ public class ElevatorSubsystem extends SubsystemBase{
         );
     }
 
+    public Command manualMoveCommand(DoubleSupplier inputSupplier) {
+        return new RunCommand(
+            () -> m_IO.setVoltage(inputSupplier.getAsDouble()),
+            this
+        );
+    }
+
     public Command moveToCommand(DoubleSupplier targetPositionSupplier) {
         return moveToCommand(() -> new TrapezoidProfile.State(targetPositionSupplier.getAsDouble(), 0));
     }
