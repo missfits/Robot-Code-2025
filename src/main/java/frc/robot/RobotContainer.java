@@ -405,7 +405,7 @@ public class RobotContainer {
         SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
         if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), estimatedRobotPose.timestampSeconds);
+          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fgpaToCurrentTime(estimatedRobotPose.timestampSeconds));
         
           m_estPoseField.setRobotPose(estPose3d.toPose2d());
       }
