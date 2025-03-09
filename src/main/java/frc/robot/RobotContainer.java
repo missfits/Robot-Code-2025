@@ -57,6 +57,7 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
@@ -399,15 +400,21 @@ public class RobotContainer {
     if (estimatedRobotPose != null) {
       Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
 
-      if (estPose3d.getZ() < 0.5){ // ignore vision est if too big
-
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-        if (estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
+        double distance = estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+        SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
-        }
+          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fgpaToCurrentTime(estimatedRobotPose.timestampSeconds));
+        
           m_estPoseField.setRobotPose(estPose3d.toPose2d());
       }
+      SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+        estPose3d.getX(),
+        estPose3d.getY(),
+        estPose3d.getZ(),
+        estPose3d.getRotation().toRotation2d().getRadians()
+      }); // post vision 3d to smartdashboard
     }
     
 
