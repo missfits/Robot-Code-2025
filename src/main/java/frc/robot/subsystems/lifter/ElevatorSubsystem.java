@@ -91,7 +91,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            (interrupted) -> {},
+            (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
         );
@@ -119,6 +119,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("elevator/target position", m_profiledReference.position);
         SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
+        SmartDashboard.putBoolean("elevator/moveToCommandRunning", true);
     }
 
     private void executeKeepInPlacePID() {
@@ -141,6 +142,10 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public Trigger isAtGoal() {
         return new Trigger(() -> isAtPosition(m_goal.position));
+    } 
+    
+    public Trigger isAtGoal(double goal) {
+        return new Trigger(() -> isAtPosition(goal));
     } 
 
     public Trigger okToMoveArmBackTrigger() {
