@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.RobotStateConstants;
 
@@ -95,6 +97,15 @@ public class ElevatorSubsystem extends SubsystemBase{
             () -> false,
             this
         );
+    }
+
+    public Command zeroElevatorCommand() {
+        return new FunctionalCommand(
+            null, 
+            () ->  m_IO.setVoltageNoCheck(ElevatorConstants.ZERO_ELEVATOR_MOTOR_SPEED), 
+            (interrupted) -> {m_IO.setVoltage(0); m_IO.setPosition(ElevatorConstants.ZERO_ELEVATOR_POSITION);}, 
+            () -> m_IO.getCurrent() > ElevatorConstants.ZERO_ELEVATOR_MAX_CURRENT, 
+            this);
     }
 
     // helper commands

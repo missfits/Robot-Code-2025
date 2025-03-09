@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.RobotStateConstants;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -98,6 +99,15 @@ public class ArmSubsystem extends SubsystemBase {
             () -> false,
             this
         );
+    }
+
+    public Command zeroArmCommand() {
+        return new FunctionalCommand(
+            null, 
+            () ->  m_IO.setVoltage(ArmConstants.ZERO_ARM_MOTOR_SPEED), 
+            (interrupted) -> {m_IO.setVoltage(0); m_IO.setPosition(ArmConstants.ZERO_ARM_POSITION);}, 
+            () -> m_IO.getCurrent() > ArmConstants.ZERO_ARM_MAX_CURRENT, 
+            this);
     }
 
     // helper commands
