@@ -95,7 +95,11 @@ public final class Constants {
     public static final double MIN_POS_ARM_CLEAR = 0.28; 
 
     public static final double MIN_HEIGHT_TO_BE_TALL = 0.4; // for slew rate limiting when elevator is tall
-    
+
+    // all TEMP!!
+    public static final double ZERO_ELEVATOR_MAX_CURRENT = 40;
+    public static final double ZERO_ELEVATOR_MOTOR_SPEED = -0.1;
+    public static final double ZERO_ELEVATOR_POSITION = 0;
   }
 
   public static class ArmConstants {
@@ -128,6 +132,11 @@ public final class Constants {
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
 
     public static final double MIN_POS_ELEVATOR_CLEAR = -0.4; // needs to be measured
+
+    // all TEMP!!
+    public static final double ZERO_ARM_MAX_CURRENT = 40;
+    public static final double ZERO_ARM_MOTOR_SPEED = -0.1;
+    public static final double ZERO_ARM_POSITION = -0.4; // idk lol
   }
 
   public static class CollarConstants {
