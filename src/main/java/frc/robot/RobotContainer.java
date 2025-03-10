@@ -312,7 +312,7 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_collar.runCollarOffInstant(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
   }
 
   public RobotContainer() {
@@ -325,7 +325,7 @@ public class RobotContainer {
       
 
     // elevator moveTo auto commands
-    NamedCommands.registerCommand("intakeCoral", m_collarCommandFactory.intakeCoralSequence().withTimeout(2)); // update to use grapplehook instead
+    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence().withTimeout(2), m_collar.runCollarOffInstant())); // update to use grapplehook instead
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
@@ -405,7 +405,7 @@ public class RobotContainer {
         SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
         if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fgpaToCurrentTime(estimatedRobotPose.timestampSeconds));
+          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
         
           m_estPoseField.setRobotPose(estPose3d.toPose2d());
       }
