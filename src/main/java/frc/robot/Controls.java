@@ -31,7 +31,7 @@ public class Controls {
         double hypot = Math.hypot(x, y);
         double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.JOYSTICK_DEADBAND);
     
-        double scaleFactor = deadbandedValue * Math.abs(deadbandedValue) / hypot;
+        double scaleFactor= hypot == 0 ? 0 : deadbandedValue * Math.abs(deadbandedValue) / hypot; // avoid division by 0 issues
 
         JoystickVals output = new JoystickVals(x * scaleFactor, y * scaleFactor);
 
