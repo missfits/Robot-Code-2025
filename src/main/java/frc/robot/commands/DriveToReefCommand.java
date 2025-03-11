@@ -7,10 +7,12 @@ package frc.robot.commands;
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -39,7 +41,7 @@ public class DriveToReefCommand extends Command {
 
   private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
-  private final SwerveRequest.FieldCentricFacingAngle driveRequest = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
+  private final SwerveRequest.FieldCentricFacingAngle driveRequest = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
   
   
     /**
@@ -90,7 +92,8 @@ public class DriveToReefCommand extends Command {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
       }
 
-      targetRotation = Rotation2d.fromRadians(m_vision.getTargetYaw());
+
+      targetRotation = Rotation2d.fromRadians(m_vision.getTargetYaw() + Math.PI); 
 
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
@@ -99,6 +102,7 @@ public class DriveToReefCommand extends Command {
       driveRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
       
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
+
     }
   
     // Called every time the scheduler runs while the command is scheduled.
@@ -109,8 +113,8 @@ public class DriveToReefCommand extends Command {
       double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
 
       m_drivetrain.setControl(driveRequest
-        .withVelocityX(-xVelocity)
-        .withVelocityY(-yVelocity)
+        .withVelocityX(xVelocity) 
+        .withVelocityY(yVelocity) 
         .withTargetDirection(targetRotation)
       );
 
