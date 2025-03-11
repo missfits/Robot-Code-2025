@@ -35,8 +35,6 @@ public class ElevatorSubsystem extends SubsystemBase{
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
-    private boolean runKeepInPlacePID = true; // false if a manual move command was just ran
-
     // constructor
     public ElevatorSubsystem() {
         m_IO.resetPosition();
@@ -59,14 +57,14 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public Command manualMoveCommand() {
         return new RunCommand(
-            () -> {m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
+            () -> m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
             this
         );
     }
 
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
-            () -> {m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
+            () -> m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
             this
         );
     }
@@ -105,7 +103,6 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_goal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
-        runKeepInPlacePID = true;
     }
 
     private void executeMoveTo() {
@@ -127,20 +124,16 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     private void executeKeepInPlacePID() {
 
-        if (runKeepInPlacePID) {
-            // calculate part of the power based on target position + current position
-            double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+        // calculate part of the power based on target position + current position
+        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
 
-            // calculate part of the power based on target velocity 
-            double feedForwardPower = m_feedforward.calculate(0);
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(0);
 
-            m_IO.setVoltage(PIDPower + feedForwardPower);
-            SmartDashboard.putNumber("elevator/target position", m_goal.position);
-            SmartDashboard.putNumber("elevator/target velocity", 0);
-        
-        } else {
-            m_IO.setVoltage(ElevatorConstants.kG);
-        }
+        m_IO.setVoltage(PIDPower + feedForwardPower);
+
+        SmartDashboard.putNumber("elevator/target position", m_goal.position);
+        SmartDashboard.putNumber("elevator/target velocity", 0);
     }
 
     private boolean isAtPosition(double goal) {
