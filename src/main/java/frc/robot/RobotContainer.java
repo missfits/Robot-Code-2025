@@ -22,11 +22,13 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -55,6 +57,7 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
@@ -136,7 +139,7 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
       drivetrain.getCommandFromRequest(() -> {
-        JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean());
+        JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
         return drive.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
           .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
           .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
@@ -145,11 +148,11 @@ public class RobotContainer {
     driveFacingAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
     driveFacingAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
 
-    // reset the field-centric heading on left trigger press
+    // reset the field-centric heading on a button press
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
-    // reset fused vision pose estimator on left bumper press
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose()));
+    // reset fused vision pose estimator to vision pose on center (cross button)
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
 
     // auto rotate to reef command
     driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
@@ -217,14 +220,14 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L1_CORAL)
     ); 
 
-    // A2 -> rightBumper + a; !pov (any)
+    // A3 -> rightBumper + a; !pov (any)
     copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
-      m_lifter.moveToCommand(RobotState.L2_ALGAE)
+      m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
-    // A3 -> leftBumper + a; !pov (any)
+    // A2 -> leftBumper + a; !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
-      m_lifter.moveToCommand(RobotState.L3_ALGAE)
+      m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
     // backup commands, need to press the POV button thing down (direction does not matter)
@@ -243,8 +246,8 @@ public class RobotContainer {
     m_collar.setDefaultCommand(m_collar.runCollarOff());
     m_climber.setDefaultCommand(m_climber.runClimberOff());
 
-    m_elevator.setDefaultCommand(m_elevator.keepInPlaceCommand());
-    m_arm.setDefaultCommand(m_arm.keepInPlaceCommand());
+    m_elevator.setDefaultCommand(m_elevator.keepInPlacePIDCommand());
+    m_arm.setDefaultCommand(m_arm.keepInPlacePIDCommand());
 
     // LED and rumble feedback when coral is seen in ramp
     m_rampSensor.coralSeenInRamp().onTrue(
@@ -253,14 +256,15 @@ public class RobotContainer {
         new StartEndCommand(
           () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 1); driverJoystick.setRumble(RumbleType.kBothRumble, 1);},
           () -> {copilotJoystick.setRumble(RumbleType.kBothRumble, 0); driverJoystick.setRumble(RumbleType.kBothRumble, 0);})
-          .withTimeout(2), 
+          .withTimeout(1), 
 
         // set LED color
         m_ledSubsystem.runSolidGreen()));
+      
     testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
     
     // run command runSolidGreen continuously if robot isWithinTarget()
-    m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
+    // m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
     testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
     testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
@@ -308,7 +312,7 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_collar.runCollarOffInstant(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
   }
 
   public RobotContainer() {
@@ -321,7 +325,7 @@ public class RobotContainer {
       
 
     // elevator moveTo auto commands
-    NamedCommands.registerCommand("intakeCoral", m_collarCommandFactory.intakeCoralSequence()); // update to use grapplehook instead
+    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence().withTimeout(2), m_collar.runCollarOffInstant())); // update to use grapplehook instead
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
@@ -394,14 +398,23 @@ public class RobotContainer {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
-      Pose2d estPose2d = estimatedRobotPose.estimatedPose.toPose2d(); // estimated robot pose of vision
-    
-      // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-      if (estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
-        drivetrain.addVisionMeasurement(estPose2d, estimatedRobotPose.timestampSeconds);
-      }
+      Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
 
-        m_estPoseField.setRobotPose(estPose2d);
+        // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+        double distance = estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+        SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
+          drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
+          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
+        
+          m_estPoseField.setRobotPose(estPose3d.toPose2d());
+      }
+      SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+        estPose3d.getX(),
+        estPose3d.getY(),
+        estPose3d.getZ(),
+        estPose3d.getRotation().toRotation2d().getRadians()
+      }); // post vision 3d to smartdashboard
     }
     
 

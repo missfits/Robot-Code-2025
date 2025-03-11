@@ -147,6 +147,10 @@ public class ArmSubsystem extends SubsystemBase {
         return new Trigger(() -> isAtPosition(m_goal.position));
     } 
 
+    public Trigger isAtGoal(double goal) {
+        return new Trigger(() -> isAtPosition(goal));
+    } 
+    
     public Trigger okToMoveElevatorDownTrigger() {
         return new Trigger(() -> okToMoveElevatorDown());
     } 
@@ -178,6 +182,8 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
 
         SmartDashboard.putData("arm/subsystem", this);
+        SmartDashboard.putBoolean("arm/okToMoveElevatorDownTrigger", okToMoveElevatorDownTrigger().getAsBoolean());
+
 
     }
 

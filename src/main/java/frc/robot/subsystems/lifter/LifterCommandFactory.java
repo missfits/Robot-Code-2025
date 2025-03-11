@@ -33,14 +33,15 @@ public class LifterCommandFactory {
                     new WaitCommand(3).until(m_elevator.okToMoveArmBackTrigger()), // wait until elevator is sufficiently up
                     m_arm.moveToCommand(targetRobotState.getArmPos())),
                 m_elevator.moveToCommand(targetRobotState.getElevatorPos()))
-                .until(isLifterAtGoal()).withName("lifterMoveToL4");
+                .until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("lifterMoveToL4");
         } else {
             return new ParallelCommandGroup(
                 m_arm.moveToCommand(targetRobotState.getArmPos()),
                 new SequentialCommandGroup( // elevator movement
+
                     new WaitCommand(3).until(m_arm.okToMoveElevatorDownTrigger()), // wait until arm is not over the ramp
                     m_elevator.moveToCommand(targetRobotState.getElevatorPos())))
-                .until(isLifterAtGoal()).withName("lifterMoveTo");
+                .until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("lifterMoveTo");
         }
     }
     public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
@@ -51,8 +52,8 @@ public class LifterCommandFactory {
         );
     }
 
-    private Trigger isLifterAtGoal() {
-        return m_arm.isAtGoal().and(m_elevator.isAtGoal());
+    private Trigger isLifterAtGoal(double armGoal, double elevatorGoal) {
+        return m_arm.isAtGoal(armGoal).and(m_elevator.isAtGoal(elevatorGoal));
     }
 
     public void resetControllers() {

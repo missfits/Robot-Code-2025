@@ -5,10 +5,14 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import frc.robot.RobotContainer.RobotName;
 import edu.wpi.first.math.util.Units;
 
@@ -34,12 +38,14 @@ public final class Constants {
     public static final int kTestControllerPort = 2;
 
     public static final double JOYSTICK_DEADBAND = 0.1;
-    public static final double SLOWMODE_FACTOR = 0.1;
+    public static final double SLOWMODE_FACTOR = 0.2;
+
+    public static final double SLEW_RATE_LIMIT = 1.5; // limits how fast operator input (-1 to 1) 
   }
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? 0.8 : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(34.5) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -87,6 +93,9 @@ public final class Constants {
     public static final double MAX_POSITION_TOLERANCE = 0.005;
 
     public static final double MIN_POS_ARM_CLEAR = 0.28; 
+
+    public static final double MIN_HEIGHT_TO_BE_TALL = 0.4; // for slew rate limiting when elevator is tall
+    
   }
 
   public static class ArmConstants {
@@ -166,8 +175,8 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(1);
-    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(12);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(3);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(11);
 
     public static final double kMaxV = 1; // to be tuned
     public static final double kMaxA = 1; // to be tuned
@@ -176,10 +185,23 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
-    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-11) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(2) : -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(11) : 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
+    // default vision standard deviation
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(6, 6, 4);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.3);
+
+    public static final double MAX_POSE_AMBIGUITY = 0.2;
+    public static final double MAX_VISION_POSE_DISTANCE = 1;
+    public static final double MAX_VISION_POSE_Z = 0.1;
+    public static final double MAX_VISION_POSE_ROLL = 0.05; // in radians
+    public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
+
+
+
+
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
 
@@ -196,7 +218,7 @@ public final class Constants {
     public static final int LASER_CAN_RAMP_OUT_ID = 14;
     public static final int LASER_CAN_RAMP_IN_ID = 15;
 
-    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 10; // in mm
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 20; // in mm
     public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 300; // in mm
 
   }
@@ -212,7 +234,7 @@ public final class Constants {
     public static final double C2_ARM_POS_WITH_CORAL = 1.0371; // from 3/1
 
     public static final double C3_ELEVATOR_POS = 0.7124; // from 3/1
-    public static final double C3_ARM_POS = 0.3370; // from 3/1
+    public static final double C3_ARM_POS = 0.5078; // from 3/1
 
     public static final double C3_ELEVATOR_POS_WITH_CORAL = 0.7124; // from 3/1
     public static final double C3_ARM_POS_WITH_CORAL = 1.0515; // from 3/1
