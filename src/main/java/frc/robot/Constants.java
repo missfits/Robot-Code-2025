@@ -169,7 +169,7 @@ public final class Constants {
   
   public static class LEDConstants {
     public static final int KPORT = 0;
-    public static final int KLENGTH = 30;
+    public static final int KLENGTH = 60;
 
     public static final double BLINK_TIME = 1; // in seconds for after intake/outtake
   }
