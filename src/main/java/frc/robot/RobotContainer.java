@@ -57,6 +57,7 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
@@ -90,8 +91,6 @@ public class RobotContainer {
   }
 
   public static RobotName name = RobotName.DYNAMENE;
-  public static boolean competitionMode = false;
-
 
   private RobotState currentState = RobotState.INTAKE;
   private RobotState nextState = RobotState.INTAKE;
@@ -264,7 +263,7 @@ public class RobotContainer {
         m_ledSubsystem.runSolidGreen()));
       
 
-    if (!competitionMode) { // don't use testJoystick in competition mode
+    if (!RobotConstants.COMPETITION_MODE) { // don't use testJoystick in competition mode
       testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
       
       // run command runSolidGreen continuously if robot isWithinTarget()
@@ -329,7 +328,7 @@ public class RobotContainer {
     SignalLogger.enableAutoLogging(false);
     SignalLogger.start();
       
-    if (competitionMode) { // only initialize testJoystick if we're not in competition mode
+    if (RobotConstants.COMPETITION_MODE) { // only initialize testJoystick if we're not in competition mode
       testJoystick = null;
     } else {
       testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort);
