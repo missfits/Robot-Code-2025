@@ -18,6 +18,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    System.out.println("ROBOT INIT HAS RUN ASJFBAKSBFJKABSKJFBJKABKFKJSFJB");
+    
     m_robotContainer = new RobotContainer();
   }
 
