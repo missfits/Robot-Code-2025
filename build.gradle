@@ -1,7 +1,6 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.1"
-    id "com.peterabeles.gversion" version "1.10"
 }
 
 java {
@@ -104,18 +103,6 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
-
-// FROM 6328: Create version file
-project.compileJava.dependsOn(createVersionFile)
-gversion {
-    srcDir       = "src/main/java/"
-    classPackage = "frc.robot"
-    className    = "BuildConstants"
-    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/Los_Angeles"
-    indent       = "  "
-}
-
 // FROM 6238: Create commit with working changes on event branches upon deploy 
 task(eventDeploy) {
     doLast {
@@ -147,5 +134,3 @@ task(eventDeploy) {
         }
     }
 }
-
-createVersionFile.dependsOn(eventDeploy)
