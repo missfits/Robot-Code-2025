@@ -105,7 +105,8 @@ tasks.withType(JavaCompile) {
 }
 
 
-// FROM 6328: Create version file
+// FROM 6328 used under the MIT license; https://github.com/Mechanical-Advantage/RobotCode2025Public/blob/main/LICENSE
+// Create version file
 project.compileJava.dependsOn(createVersionFile)
 gversion {
     srcDir       = "src/main/java/"
@@ -116,7 +117,8 @@ gversion {
     indent       = "  "
 }
 
-// FROM 6238: Create commit with working changes on event branches upon deploy 
+// FROM 6328 used under the MIT license; https://github.com/Mechanical-Advantage/RobotCode2025Public/blob/main/LICENSE
+// Create commit with working changes on event branches upon deploy 
 task(eventDeploy) {
     doLast {
         if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
