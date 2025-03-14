@@ -14,6 +14,7 @@ import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -128,7 +129,7 @@ public class RobotContainer {
       .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
+  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -170,6 +171,24 @@ public class RobotContainer {
     
     driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
     driverJoystick.x().whileTrue(m_climber.manualMoveCommand());
+
+    // drive facing angle buttons
+    // can be pressed alone for rotation or pressed with joystick input
+    // snap to left coral station
+    driverJoystick.x().whileTrue(drivetrain.getCommandFromRequest(() -> {
+      JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(-55));
+    }));
+
+    // snap to right coral station
+    driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
+      JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(55));
+    }));
 
     // move to intake, start collar 
     copilotJoystick.x().and(copilotJoystick.povCenter()).onTrue(
