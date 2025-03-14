@@ -375,10 +375,6 @@ public class RobotContainer {
     SmartDashboard.putNumber("elevator constants/kMaxV", SmartDashboard.getNumber("elevator constants/kMaxV", ElevatorConstants.kMaxV));
     SmartDashboard.putNumber("elevator constants/kMaxA", SmartDashboard.getNumber("elevator constants/kMaxA", ElevatorConstants.kMaxA));
 
-    SmartDashboard.putString("buildVersion/commitSHA", BuildConstants.GIT_SHA);
-    SmartDashboard.putString("buildVersion/branchName", BuildConstants.GIT_BRANCH);
-    SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);
-
     CameraServer.startAutomaticCapture();
 
     configureBindings();
