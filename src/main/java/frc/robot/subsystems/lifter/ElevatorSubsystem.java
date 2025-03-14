@@ -73,7 +73,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public Command manualMoveCommand(DoubleSupplier inputSupplier) {
         return new RunCommand(
-            () -> m_IO.setVoltage(inputSupplier.getAsDouble()),
+            () -> {m_IO.setVoltage(inputSupplier.getAsDouble()); runKeepInPlacePID = false;},
             this
         );
     }

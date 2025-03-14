@@ -238,10 +238,10 @@ public class RobotContainer {
 
     // lifter backup controls -- joysticks :)
     Trigger elevatorManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getLeftY()) != 0);
-    elevatorManualTrigger.whileTrue(m_elevator.manualMoveCommand(() -> Controls.applyDeadband(copilotJoystick.getLeftY())));
+    elevatorManualTrigger.whileTrue(m_elevator.manualMoveCommand(() -> Controls.applyDeadband(-copilotJoystick.getLeftY())));
     
     Trigger armManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getRightX()) != 0);
-    armManualTrigger.whileTrue(m_elevator.manualMoveCommand(() -> Controls.applyDeadband(copilotJoystick.getRightX())));
+    armManualTrigger.whileTrue(m_arm.manualMoveCommand(() -> Controls.applyDeadband(copilotJoystick.getRightX())));
     
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
