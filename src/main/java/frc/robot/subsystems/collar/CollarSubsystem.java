@@ -44,6 +44,10 @@ public class CollarSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putData("collar/subsystem", this);
+        SmartDashboard.putNumber("collar/current", m_IO.getCurrent());
+        SmartDashboard.putNumber("collar/velocity", m_IO.getVelocity());
+
+
     }
  }
 
