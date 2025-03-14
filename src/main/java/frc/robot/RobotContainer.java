@@ -101,7 +101,7 @@ public class RobotContainer {
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController driverJoystick = new CommandXboxController(OperatorConstants.kDriverControllerPort); // driver joystick
   private final CommandXboxController copilotJoystick = new CommandXboxController(OperatorConstants.kCopilotControllerPort); // copilot joystick
-  private final CommandXboxController testJoystick; // test joystick
+  private CommandXboxController testJoystick = null; // test joystick; only init'd if we're not in comp mode
 
   
   private final CommandSwerveDrivetrain drivetrain = 
@@ -328,9 +328,7 @@ public class RobotContainer {
     SignalLogger.enableAutoLogging(false);
     SignalLogger.start();
       
-    if (RobotConstants.COMPETITION_MODE) { // only initialize testJoystick if we're not in competition mode
-      testJoystick = null;
-    } else {
+    if (!RobotConstants.COMPETITION_MODE) { // only initialize testJoystick if we're not in competition mode
       testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort);
     }
 
