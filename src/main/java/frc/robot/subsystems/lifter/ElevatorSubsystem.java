@@ -61,21 +61,21 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new RunCommand(
             () -> {m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveCommand");
     }
 
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
             () -> {m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveBackwardCommand");
     }
 
     public Command manualMoveCommand(DoubleSupplier inputSupplier) {
         return new RunCommand(
             () -> {m_IO.setVoltage(inputSupplier.getAsDouble()); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveCommand");
     }
 
     public Command moveToCommand(DoubleSupplier targetPositionSupplier) {
@@ -89,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             (interrupted) -> {},
             () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.005,
             this
-        );
+        ).withName("moveToCommand");
     }
 
     public Command moveToCommand(double targetPosition) {
@@ -103,7 +103,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
-        );
+        ).withName("moveToCommand");
     }
 
     // helper commands
