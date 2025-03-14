@@ -30,6 +30,7 @@ public final class Constants {
   public static class RobotConstants {
     public static final int DISABLED_COAST_DELAY = 10; // in secs
 
+    public static final boolean COMPETITION_MODE = false;
   }
 
   public static class OperatorConstants {
