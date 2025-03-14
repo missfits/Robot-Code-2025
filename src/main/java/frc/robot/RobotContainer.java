@@ -439,16 +439,20 @@ public class RobotContainer {
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
       Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
+        Pose2d estPose2d = estPose3d.toPose2d();
 
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-        double distance = estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+        double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+
         SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
         if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
+          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
         
-          m_estPoseField.setRobotPose(estPose3d.toPose2d());
+          m_estPoseField.setRobotPose(estPose2d);
+          SmartDashboard.putNumberArray("vision/visionPose2dFiltered", new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
       }
+
       SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
         estPose3d.getX(),
         estPose3d.getY(),
