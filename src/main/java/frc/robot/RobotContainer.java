@@ -161,11 +161,11 @@ public class RobotContainer {
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
-    driverJoystick.rightTrigger().whileTrue(m_ledSubsystem.runSolidBlue()); 
+    driverJoystick.rightTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
-    driverJoystick.leftTrigger().whileTrue(m_ledSubsystem.runSolidBlue()); 
+    driverJoystick.leftTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
 
     
     driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
