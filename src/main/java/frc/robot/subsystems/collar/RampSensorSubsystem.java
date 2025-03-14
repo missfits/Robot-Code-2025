@@ -25,12 +25,24 @@ public class RampSensorSubsystem extends SubsystemBase {
 
   }
 
-  public Trigger coralSeenAfterRamp() {
+  public Trigger coralSeenAfterRampTrigger() {
     return new Trigger(() -> measurementRampOut != null && measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurementRampOut.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_OUT);
   }
 
-  public Trigger coralSeenInRamp() {
-    return new Trigger(() -> measurementRampIn != null && measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurementRampIn.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_IN);
+  public boolean coralSeenAfterRamp() {
+    return measurementRampOut != null && 
+      measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
+      measurementRampOut.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_OUT;
+  }
+  
+  public Trigger coralSeenInRampTrigger() {
+    return new Trigger(() -> coralSeenInRamp());
+  }
+
+  public boolean coralSeenInRamp() {
+    return measurementRampIn != null && 
+      measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
+      measurementRampIn.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_IN;
   }
 
   @Override
@@ -50,5 +62,9 @@ public class RampSensorSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("LaserCAN Ramp Out Distance", 0);
       // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurementRampOMeasurement.
     }
+
+    SmartDashboard.putBoolean("rampSensors/coralSeenAfterRamp", coralSeenAfterRamp());
+    SmartDashboard.putBoolean("rampSensors/coralSeenInRamp", coralSeenInRamp());
+
   }
 }

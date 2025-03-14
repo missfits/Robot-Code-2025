@@ -253,7 +253,7 @@ public class RobotContainer {
 
 
     // LED and rumble feedback when coral is seen in ramp
-    m_rampSensor.coralSeenInRamp().onTrue(
+    m_rampSensor.coralSeenInRampTrigger().onTrue(
       new ParallelCommandGroup(
         // controller rumble
         new StartEndCommand(
