@@ -63,7 +63,9 @@ public class DriveToReefCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-      Pose2d targetPose = m_vision.getTargetPose();
+
+
+      Pose2d targetPose = m_vision.getClosestReefAprilTag(m_drivetrain.getState().Pose);
       if (targetPose != null) {
         // offset with robot size because the robot has width and is not a point!
         // see images/drive to reef with offset.png for right/left offset math

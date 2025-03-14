@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -54,6 +56,7 @@ public class VisionSubsystem extends SubsystemBase {
   private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  private List<Pose2d> reefAprilTagPoses;
   private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
 
 
@@ -66,6 +69,12 @@ public class VisionSubsystem extends SubsystemBase {
     
     distToTargetX = 1;
     distToTargetY = 1;    
+
+    // create the list of apriltag poses
+    List<Integer> reefAprilTagIDs = new ArrayList<>(Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22));
+    for (Integer id : reefAprilTagIDs) {
+      reefAprilTagPoses.add(aprilTagFieldLayout.getTagPose(id).get().toPose2d());
+    }
 
   }
 
@@ -240,4 +249,8 @@ public class VisionSubsystem extends SubsystemBase {
       }
     }
   }
+
+  public Pose2d getClosestReefAprilTag(Pose2d robotPose) {
+    return robotPose.nearest(reefAprilTagPoses);
+  } 
 }
