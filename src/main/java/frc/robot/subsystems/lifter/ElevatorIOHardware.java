@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -20,6 +21,8 @@ public class ElevatorIOHardware {
     private final TalonFX m_elevatorMotor = new TalonFX(ElevatorConstants.ELEVATOR_MOTOR_ID);
     private final StatusSignal<Angle> m_positionSignal = m_elevatorMotor.getPosition();
     private final StatusSignal<AngularVelocity> m_velocitySignal = m_elevatorMotor.getVelocity();
+    private final StatusSignal<Current> m_currentSignal = m_elevatorMotor.getStatorCurrent();
+
 
     // constructor
     public ElevatorIOHardware() {
@@ -40,6 +43,10 @@ public class ElevatorIOHardware {
 
     public double getVelocity() {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ElevatorConstants.METERS_PER_ROTATION;
+    }
+
+    public double getCurrent() {
+        return m_currentSignal.refresh().getValue().in(Amp);
     }
 
     // setters
@@ -71,6 +78,11 @@ public class ElevatorIOHardware {
         m_elevatorMotor.setControl(new VoltageOut(value));
         SmartDashboard.putNumber("elevator/voltage", value);
     }
+
+    public void setVoltageNoCheck(double value) {
+        m_elevatorMotor.setControl(new VoltageOut(value));
+        SmartDashboard.putNumber("elevator/voltage", value);
+    } 
     
     public void requestClosedLoopPosition(double value) {
         m_elevatorMotor.setControl(new PositionVoltage(value));
