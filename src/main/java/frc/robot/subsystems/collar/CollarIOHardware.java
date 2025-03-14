@@ -3,6 +3,7 @@ package frc.robot.subsystems.collar;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -18,6 +19,8 @@ public class CollarIOHardware {
     private final TalonFX m_collarMotor = new TalonFX(CollarConstants.COLLAR_MOTOR_ID);
     private final StatusSignal<Angle> m_positionSignal = m_collarMotor.getPosition();
     private final StatusSignal<AngularVelocity> m_velocitySignal = m_collarMotor.getVelocity();
+    private final StatusSignal<Current> m_currentSignal = m_collarMotor.getStatorCurrent();
+
 
     // constructor
     public CollarIOHardware() {
@@ -37,6 +40,10 @@ public class CollarIOHardware {
 
     public double getVelocity() {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*CollarConstants.METERS_PER_ROTATION;
+    }
+
+    public double getCurrent() {
+        return m_currentSignal.refresh().getValue().in(Amp);
     }
 
     // setters
