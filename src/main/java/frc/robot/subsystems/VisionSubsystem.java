@@ -56,7 +56,7 @@ public class VisionSubsystem extends SubsystemBase {
   private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  private List<Pose2d> reefAprilTagPoses;
+  private List<Pose2d> reefAprilTagPoses = new ArrayList<>();
   private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
 
 
