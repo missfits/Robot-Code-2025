@@ -3,6 +3,7 @@ package frc.robot.subsystems.collar;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -52,6 +53,7 @@ public class CollarIOHardware {
     }
 
     public void setVoltage(double value) {
+        SmartDashboard.putNumber("collar/voltage", value);
         m_collarMotor.setControl(new VoltageOut(value));
     }
     
