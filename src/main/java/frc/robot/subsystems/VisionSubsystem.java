@@ -9,6 +9,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +22,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -101,30 +103,21 @@ public class VisionSubsystem extends SubsystemBase {
 
     var results = m_camera.getAllUnreadResults();
 
+    ArrayList<Integer> targetIds = new ArrayList<Integer>();
+    ArrayList<Double> targetPoseAmbiguity = new ArrayList<Double>();
+
     if (!results.isEmpty()) {
       // Camera processed a new frame since last
       // Get the last one in the list.
       var result = results.get(results.size() - 1);
-
-      // update the estimated robot pose if the pose estimator outputs something
-      Optional<EstimatedRobotPose> poseEstimatorOutput = poseEstimator.update(result);
-
-      // update standard deviation based on dist 
-      this.updateEstimationStdDevs(poseEstimatorOutput, result.getTargets());
-
-      if (poseEstimatorOutput.isPresent()) {
-        estimatedRobotPose = poseEstimatorOutput.get(); 
-      }
 
       if (result.hasTargets()) {
         PhotonTrackedTarget target = null;
         double biggestTargetArea = 0;
 
         for (PhotonTrackedTarget sampleTarget : result.getTargets()){
-
-          if (sampleTarget.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY){
-            continue;
-          }
+          targetIds.add(sampleTarget.getFiducialId());
+          targetPoseAmbiguity.add(sampleTarget.getPoseAmbiguity());
           //loops through every sample target in results.getTargets()
           //if the sample target's area is bigger than the biggestTargetArea, then the sample target
           // is set to the target, and the biggest Target Area is set to the sample's target area
@@ -132,31 +125,51 @@ public class VisionSubsystem extends SubsystemBase {
             biggestTargetArea = sampleTarget.getArea();
             target = sampleTarget;
           }
+
         }
 
-        if (target == null){
+        if (target.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY) {
           SmartDashboard.putString("vision/targetState", "targetDiscardedAmbiguity");
           targetFound = false;
-        }
-        else{
+        } else {
           SmartDashboard.putString("vision/targetState", "targetFound");
-          targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
           targetFound = true;
-          
-          targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
         }
-      }
-      else {
+        
+        targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
+        targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
+      } else {
         SmartDashboard.putString("vision/targetState", "noTarget");
         targetFound = false;
       }
+
+      if (targetFound) {
+        // update the estimated robot pose if the pose estimator outputs something
+        Optional<EstimatedRobotPose> poseEstimatorOutput = poseEstimator.update(result);
+
+        // update standard deviation based on dist 
+        this.updateEstimationStdDevs(poseEstimatorOutput, result.getTargets());
+
+        if (poseEstimatorOutput.isPresent() && poseIsSane(poseEstimatorOutput.get().estimatedPose)) {
+          estimatedRobotPose = poseEstimatorOutput.get(); 
+        }
+      }
     }
 
+    SmartDashboard.putNumberArray("Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
+    SmartDashboard.putNumberArray("Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
     SmartDashboard.putBoolean("Target Found", targetFound);
     SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
     SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);
     SmartDashboard.putNumber("Target X Distance", targetTranslation2d.getX());
     SmartDashboard.putNumber("Target Y Distance", targetTranslation2d.getY());
+
+  }
+
+  private boolean poseIsSane(Pose3d pose) {
+    return pose.getZ() < VisionConstants.MAX_VISION_POSE_Z 
+    && pose.getRotation().getX() < VisionConstants.MAX_VISION_POSE_ROLL 
+    && pose.getRotation().getY() < VisionConstants.MAX_VISION_POSE_PITCH;
 
   }
 

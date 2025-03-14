@@ -30,6 +30,7 @@ public final class Constants {
   public static class RobotConstants {
     public static final int DISABLED_COAST_DELAY = 10; // in secs
 
+    public static final boolean COMPETITION_MODE = false;
   }
 
   public static class OperatorConstants {
@@ -79,14 +80,14 @@ public final class Constants {
     public static double kS = 0;
     public static double kG = 0.17;
     public static double kV = 3; 
-    public static double kA = 2;
+    public static double kA = 1;
 
-    public static double kP = 100; 
+    public static double kP = 125; 
     public static double kI = 15;
     public static double kD = 0; 
 
     public static double kMaxV = 2;
-    public static double kMaxA = 2.5; 
+    public static double kMaxA = 3; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
@@ -113,15 +114,15 @@ public final class Constants {
 
     public static double kS = 0.15;
     public static double kG = 0;
-    public static double kV = 0.6;
-    public static double kA = 0.05;
+    public static double kV = 0.55;
+    public static double kA = 0.0125;
 
-    public static double kP = 50;
+    public static double kP = 55;
     public static double kI = 0;
     public static double kD = 0;
     
-    public static double kMaxV = 6;
-    public static double kMaxA = 5; 
+    public static double kMaxV = 7;
+    public static double kMaxA = 13; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
@@ -169,7 +170,7 @@ public final class Constants {
   
   public static class LEDConstants {
     public static final int KPORT = 0;
-    public static final int KLENGTH = 30;
+    public static final int KLENGTH = 60;
 
     public static final double BLINK_TIME = 1; // in seconds for after intake/outtake
   }
@@ -193,7 +194,14 @@ public final class Constants {
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(6, 6, 4);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.3);
 
-    public static final double MAX_POSE_AMBIGUITY = 0.4;
+    public static final double MAX_POSE_AMBIGUITY = 0.2;
+    public static final double MAX_VISION_POSE_DISTANCE = 1;
+    public static final double MAX_VISION_POSE_Z = 0.1;
+    public static final double MAX_VISION_POSE_ROLL = 0.05; // in radians
+    public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
+
+
+
 
     public static final Translation2d ROBOT_TO_CAM = 
       new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount

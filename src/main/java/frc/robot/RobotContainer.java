@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,6 +58,8 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.RobotConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
@@ -99,7 +102,7 @@ public class RobotContainer {
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController driverJoystick = new CommandXboxController(OperatorConstants.kDriverControllerPort); // driver joystick
   private final CommandXboxController copilotJoystick = new CommandXboxController(OperatorConstants.kCopilotControllerPort); // copilot joystick
-  private final CommandXboxController testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort); // test joystick
+  private CommandXboxController testJoystick = null; // test joystick; only init'd if we're not in comp mode
 
   
   private final CommandSwerveDrivetrain drivetrain = 
@@ -158,9 +161,12 @@ public class RobotContainer {
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
+    driverJoystick.rightTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
+    driverJoystick.leftTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
+
     
     driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
     driverJoystick.x().whileTrue(m_climber.manualMoveCommand());
@@ -243,6 +249,8 @@ public class RobotContainer {
 
     m_elevator.setDefaultCommand(m_elevator.keepInPlacePIDCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlacePIDCommand());
+    m_ledSubsystem.setDefaultCommand(m_ledSubsystem.runGradientBlueYellow());
+
 
     // LED and rumble feedback when coral is seen in ramp
     m_rampSensor.coralSeenInRamp().onTrue(
@@ -254,28 +262,32 @@ public class RobotContainer {
           .withTimeout(1), 
 
         // set LED color
-        m_ledSubsystem.runSolidGreen()));
+        m_ledSubsystem.runSolidGreen().withTimeout(1)));
       
-    testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
-    
-    // run command runSolidGreen continuously if robot isWithinTarget()
-    // m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
-    testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
-    testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
-    testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
-    testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
-    testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
-    testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collarCommandFactory.runCollarOut());
-    testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collarCommandFactory.runCollarBackwards());
-    
+    if (!RobotConstants.COMPETITION_MODE) { // don't use testJoystick in competition mode
+      testJoystick.povCenter().negate().onTrue(new InstantCommand(() -> resetControllerConstantsSmartDashboard()));
+      
+      // run command runSolidGreen continuously if robot isWithinTarget()
+      // m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
-    // Run SysId routines when holding back/start and X/Y.
-    // Note that each routine should be run exactly once in a single log.
-    testJoystick.leftBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+      testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+      testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+      testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+      testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+      testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+      testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collarCommandFactory.runCollarOut());
+      testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collarCommandFactory.runCollarBackwards());
+      
+
+      // Run SysId routines when holding back/start and X/Y.
+      // Note that each routine should be run exactly once in a single log.
+      testJoystick.leftBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+      testJoystick.leftBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+      testJoystick.rightBumper().and(testJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+      testJoystick.rightBumper().and(testJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    } 
+
     if (Utils.isSimulation()) {
       drivetrain.resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
@@ -307,7 +319,7 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_collar.runCollarOffInstant(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
   }
 
   public RobotContainer() {
@@ -318,9 +330,12 @@ public class RobotContainer {
     SignalLogger.enableAutoLogging(false);
     SignalLogger.start();
       
+    if (!RobotConstants.COMPETITION_MODE) { // only initialize testJoystick if we're not in competition mode
+      testJoystick = new CommandXboxController(OperatorConstants.kTestControllerPort);
+    }
 
     // elevator moveTo auto commands
-    NamedCommands.registerCommand("intakeCoral", m_collarCommandFactory.intakeCoralSequence().withTimeout(2)); // update to use grapplehook instead
+    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence().withTimeout(2), m_collar.runCollarOffInstant())); // update to use grapplehook instead
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
@@ -364,6 +379,11 @@ public class RobotContainer {
     SmartDashboard.putNumber("elevator constants/kMaxV", SmartDashboard.getNumber("elevator constants/kMaxV", ElevatorConstants.kMaxV));
     SmartDashboard.putNumber("elevator constants/kMaxA", SmartDashboard.getNumber("elevator constants/kMaxA", ElevatorConstants.kMaxA));
 
+    SmartDashboard.putString("buildVersion/commitSHA", BuildConstants.GIT_SHA);
+    SmartDashboard.putString("buildVersion/branchName", BuildConstants.GIT_BRANCH);
+    SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);
+
+    CameraServer.startAutomaticCapture();
 
     configureBindings();
 
@@ -389,21 +409,33 @@ public class RobotContainer {
     return m_autoChooser.getSelected();
   }
 
+  public void turnOffLifterKeepInPlace() {
+    m_elevator.setRunKeepInPlace(false);
+    m_arm.setRunKeepInPlace(false);
+
+  }
+
   public void updatePoseEst() {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
     if (estimatedRobotPose != null) {
       Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
 
-      if (estPose3d.getZ() < 0.5){ // ignore vision est if too big
-
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-        if (estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation()) < 2) {
+        double distance = estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+        SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
           drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
-        }
+        
           m_estPoseField.setRobotPose(estPose3d.toPose2d());
       }
+      SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+        estPose3d.getX(),
+        estPose3d.getY(),
+        estPose3d.getZ(),
+        estPose3d.getRotation().toRotation2d().getRadians()
+      }); // post vision 3d to smartdashboard
     }
     
 

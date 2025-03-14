@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.RobotStateConstants;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -37,6 +38,9 @@ public class ArmSubsystem extends SubsystemBase {
     private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
+
+    private boolean runKeepInPlacePID = true; // false if a manual move command was just ran
+
 
     // constructor
     public ArmSubsystem() {
@@ -61,21 +65,21 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command manualMoveCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> {m_IO.setVoltage(ArmConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
         );
     }
-    
+
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(-ArmConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> {m_IO.setVoltage(-ArmConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
         );
     }
 
     public Command manualMoveCommand(DoubleSupplier inputSupplier) {
         return new RunCommand(
-            () -> m_IO.setVoltage(inputSupplier.getAsDouble()),
+            () -> {m_IO.setVoltage(inputSupplier.getAsDouble()); runKeepInPlacePID = false;},
             this
         );
     }
@@ -114,6 +118,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_goal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
+        runKeepInPlacePID = true;
     }
 
     private void executeMoveTo() {
@@ -135,16 +140,22 @@ public class ArmSubsystem extends SubsystemBase {
 
     private void executeKeepInPlacePID() {
 
-        // calculate part of the power based on target position + current position
-        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+        if (runKeepInPlacePID) {
 
-        // calculate part of the power based on target velocity 
-        double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
+            // calculate part of the power based on target position + current position
+            double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
 
-        m_IO.setVoltage(PIDPower + feedForwardPower);
-    
-        SmartDashboard.putNumber("arm/target position", m_goal.position);
-        SmartDashboard.putNumber("arm/target velocity", 0);
+            // calculate part of the power based on target velocity 
+            double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
+
+            m_IO.setVoltage(PIDPower + feedForwardPower);
+        
+            SmartDashboard.putNumber("arm/target position", m_goal.position);
+            SmartDashboard.putNumber("arm/target velocity", 0);
+            
+        } else {
+            m_IO.setVoltage(ArmConstants.kG);
+        }
     }
 
     private boolean isAtPosition(double goal) {
@@ -155,6 +166,10 @@ public class ArmSubsystem extends SubsystemBase {
         return new Trigger(() -> isAtPosition(m_goal.position));
     } 
 
+    public Trigger isAtGoal(double goal) {
+        return new Trigger(() -> isAtPosition(goal));
+    } 
+    
     public Trigger okToMoveElevatorDownTrigger() {
         return new Trigger(() -> okToMoveElevatorDown());
     } 
@@ -186,11 +201,17 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
 
         SmartDashboard.putData("arm/subsystem", this);
+        SmartDashboard.putBoolean("arm/okToMoveElevatorDownTrigger", okToMoveElevatorDownTrigger().getAsBoolean());
+
 
     }
 
     
     public void setBrake(boolean brake) {
        m_IO.setBrake(brake);
+    }
+
+    public void setRunKeepInPlace(boolean bool) {
+        runKeepInPlacePID = bool;
     }
 }

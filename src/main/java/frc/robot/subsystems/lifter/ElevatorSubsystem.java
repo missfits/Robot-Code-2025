@@ -35,6 +35,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
+    private boolean runKeepInPlacePID = true; // false if a manual move command was just ran
+
     // constructor
     public ElevatorSubsystem() {
         m_IO.resetPosition();
@@ -57,14 +59,14 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public Command manualMoveCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> {m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
         );
     }
 
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> {m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
         );
     }
@@ -98,7 +100,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            (interrupted) -> {},
+            (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
         );
@@ -110,6 +112,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_goal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
+        runKeepInPlacePID = true;
     }
 
     private void executeMoveTo() {
@@ -126,20 +129,25 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("elevator/target position", m_profiledReference.position);
         SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
+        SmartDashboard.putBoolean("elevator/moveToCommandRunning", true);
     }
 
     private void executeKeepInPlacePID() {
 
-        // calculate part of the power based on target position + current position
-        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+        if (runKeepInPlacePID) {
+            // calculate part of the power based on target position + current position
+            double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
 
-        // calculate part of the power based on target velocity 
-        double feedForwardPower = m_feedforward.calculate(0);
+            // calculate part of the power based on target velocity 
+            double feedForwardPower = m_feedforward.calculate(0);
 
-        m_IO.setVoltage(PIDPower + feedForwardPower);
-
-        SmartDashboard.putNumber("elevator/target position", m_goal.position);
-        SmartDashboard.putNumber("elevator/target velocity", 0);
+            m_IO.setVoltage(PIDPower + feedForwardPower);
+            SmartDashboard.putNumber("elevator/target position", m_goal.position);
+            SmartDashboard.putNumber("elevator/target velocity", 0);
+        
+        } else {
+            m_IO.setVoltage(ElevatorConstants.kG);
+        }
     }
 
     private boolean isAtPosition(double goal) {
@@ -148,6 +156,10 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public Trigger isAtGoal() {
         return new Trigger(() -> isAtPosition(m_goal.position));
+    } 
+    
+    public Trigger isAtGoal(double goal) {
+        return new Trigger(() -> isAtPosition(goal));
     } 
 
     public Trigger okToMoveArmBackTrigger() {
@@ -186,6 +198,10 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void setBrake(boolean brake) {
         m_IO.setBrake(brake);
      }
+
+    public void setRunKeepInPlace(boolean bool) {
+        runKeepInPlacePID = bool;
+    }
 
     public Trigger isTallTrigger() {
        return new Trigger(() -> isTall());
