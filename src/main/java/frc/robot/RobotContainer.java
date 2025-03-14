@@ -413,6 +413,12 @@ public class RobotContainer {
     return m_autoChooser.getSelected();
   }
 
+  public void turnOffLifterKeepInPlace() {
+    m_elevator.setRunKeepInPlace(false);
+    m_arm.setRunKeepInPlace(false);
+
+  }
+
   public void updatePoseEst() {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();

@@ -203,4 +203,8 @@ public class ArmSubsystem extends SubsystemBase {
     public void setBrake(boolean brake) {
        m_IO.setBrake(brake);
     }
+
+    public void setRunKeepInPlace(boolean bool) {
+        runKeepInPlacePID = bool;
+    }
 }

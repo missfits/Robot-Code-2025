@@ -192,6 +192,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_IO.setBrake(brake);
      }
 
+    public void setRunKeepInPlace(boolean bool) {
+        runKeepInPlacePID = bool;
+    }
+
     public Trigger isTallTrigger() {
        return new Trigger(() -> isTall());
     }
