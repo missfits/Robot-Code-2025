@@ -104,6 +104,8 @@ public final class Constants {
     public static final double MIN_POS_ARM_CLEAR = 0.28; 
 
     public static final double MIN_HEIGHT_TO_BE_TALL = 0.4; // for slew rate limiting when elevator is tall
+
+    public static final double MIN_HEIGHT_TO_BE_BELOW_L4 = 0.68;
     
   }
 

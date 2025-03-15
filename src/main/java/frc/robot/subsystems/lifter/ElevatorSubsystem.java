@@ -207,6 +207,14 @@ public class ElevatorSubsystem extends SubsystemBase{
         runKeepInPlacePID = bool;
     }
 
+    public Trigger isNotAtL4Trigger() {
+        return new Trigger(() -> isNotAtL4());
+    }
+
+    public boolean isNotAtL4() {
+        return m_IO.getPosition() > ElevatorConstants.MIN_HEIGHT_TO_BE_BELOW_L4;
+    }
+
     public Trigger isTallTrigger() {
        return new Trigger(() -> isTall());
     }
