@@ -112,6 +112,10 @@ public class ArmSubsystem extends SubsystemBase {
         ).withName("moveToCommand");
     }
 
+    public Command setVoltageToZeroCommand() {
+        return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
+    }
+
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();

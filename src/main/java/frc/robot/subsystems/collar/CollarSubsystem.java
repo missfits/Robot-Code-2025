@@ -41,6 +41,10 @@ public class CollarSubsystem extends SubsystemBase {
         ).withName("runCollar");
     }
 
+    public Command setVoltageToZeroCommand() {
+        return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putData("collar/subsystem", this);

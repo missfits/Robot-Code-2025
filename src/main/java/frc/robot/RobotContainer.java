@@ -43,6 +43,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -249,9 +250,17 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
+    copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
+      m_collarCommandFactory.runCollarOut()
+    ); 
+
     // A2 -> leftBumper + a; !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_ALGAE)
+    ); 
+
+    copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
+      m_collarCommandFactory.runCollarOut()
     ); 
 
 
@@ -426,6 +435,13 @@ public class RobotContainer {
 
   }
 
+  public void setVoltageUponDisable() {
+    CommandScheduler.getInstance().schedule(m_elevator.setVoltageToZeroCommand());
+    CommandScheduler.getInstance().schedule(m_arm.setVoltageToZeroCommand());
+    CommandScheduler.getInstance().schedule(m_collar.setVoltageToZeroCommand());
+    CommandScheduler.getInstance().schedule(drivetrain.getCommandFromRequest(() -> drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0)));
+  }
+
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
   }
@@ -447,7 +463,7 @@ public class RobotContainer {
         double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
         SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
-        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || ! m_vision.isEstPoseJumpy()) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
           drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
         
