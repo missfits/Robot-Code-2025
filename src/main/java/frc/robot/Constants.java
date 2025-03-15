@@ -207,6 +207,7 @@ public final class Constants {
     public static final double MAX_VISION_POSE_Z = 0.1;
     public static final double MAX_VISION_POSE_ROLL = 0.05; // in radians
     public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
+    public static final double VISION_DISTANCE_DISCARD = 10; 
 
 
 

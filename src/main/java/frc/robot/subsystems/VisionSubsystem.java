@@ -183,6 +183,7 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("vision/Target Y Distance", targetTranslation2d.getY());
 
     SmartDashboard.putBoolean("vision/isEstPoseJumpy", isEstPoseJumpy());
+    SmartDashboard.putNumberArray("vision/standardDeviations", curStdDevs.getData());
 
   }
 
@@ -225,6 +226,8 @@ public class VisionSubsystem extends SubsystemBase {
     if (estimatedPose.isEmpty()) {
         // No pose input. Default to single-tag std devs
         curStdDevs = VisionConstants.kSingleTagStdDevs;
+        SmartDashboard.putNumber("vision/standardDeviation-average-distance", Double.MAX_VALUE);
+        SmartDashboard.putString("vision/standardDeviation-state", "empty");
     } 
     else {
       // Pose present. Start running Heuristic
@@ -247,9 +250,11 @@ public class VisionSubsystem extends SubsystemBase {
       if (numTags == 0) {
           // No tags visible. Default to single-tag std devs
           curStdDevs = VisionConstants.kSingleTagStdDevs;
+          SmartDashboard.putString("vision/standardDeviation-state", "no tags visible");
       } 
-      else if (numTags == 1 && avgDist > 4){  
+      else if (numTags == 1 && avgDist > VisionConstants.VISION_DISTANCE_DISCARD){  
         curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        SmartDashboard.putString("vision/standardDeviation-state", "target too far");
       }
       else {
         var unscaledStdDevs = numTags > 1 ? VisionConstants.kMultiTagStdDevs:VisionConstants.kSingleTagStdDevs;
@@ -257,7 +262,9 @@ public class VisionSubsystem extends SubsystemBase {
         avgDist /= numTags;
         // increase std devs based on (average) distance
         curStdDevs = unscaledStdDevs.times(1 + (avgDist * avgDist / 30));
+        SmartDashboard.putString("vision/standardDeviation-state", "good :)");
       }
+      SmartDashboard.putNumber("vision/standardDeviation-average-distance", avgDist);
     }
   }
 
@@ -267,7 +274,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   public boolean isEstPoseJumpy() {
     if (lastEstPoses.size() < VisionConstants.NUM_LAST_EST_POSES) {
-      return false;
+      return true;
     }
 
     double totalDistance = 0;

@@ -453,15 +453,15 @@ public class RobotContainer {
   public void updatePoseEst() {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
-    if (estimatedRobotPose != null) {
+    if (estimatedRobotPose != null && m_vision.getTargetFound()) {
       Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
-        Pose2d estPose2d = estPose3d.toPose2d();
+      Pose2d estPose2d = estPose3d.toPose2d();
 
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
         double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
         SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
-        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || ! m_vision.isEstPoseJumpy()) {
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_vision.isEstPoseJumpy()) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
           drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
         
