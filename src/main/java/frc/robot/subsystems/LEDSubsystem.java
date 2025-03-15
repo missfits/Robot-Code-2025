@@ -1,7 +1,12 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.units.Units;
+
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
+
 import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -101,7 +106,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public Command runGradientGreenYellow(){
-    LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kGreen).blink(Time.ofBaseUnits(0.25, Units.Seconds));
+    LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kGreen).scrollAtRelativeSpeed(Percent.per(Second).of(100)));
     return runPattern(gradient);
   }  
 }
