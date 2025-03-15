@@ -5,6 +5,8 @@
 package frc.robot;
 
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,6 +33,12 @@ public final class Constants {
     public static final int DISABLED_COAST_DELAY = 10; // in secs
 
     public static final boolean COMPETITION_MODE = false;
+  }
+
+  public static class FieldConstants {
+    public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+
   }
 
   public static class OperatorConstants {
