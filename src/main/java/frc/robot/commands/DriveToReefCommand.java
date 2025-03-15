@@ -38,6 +38,7 @@ public class DriveToReefCommand extends Command {
   private Rotation2d targetRotation;
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
+  private final LEDSubsystem m_ledSubsystem;
 
   private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
@@ -50,10 +51,11 @@ public class DriveToReefCommand extends Command {
      * @param drivetrain The drivetrain subsystem used by this command.
      * @param Pose2d The target pose (but only Translation) used by this command.
      */
-    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision, ReefPosition side) {
+    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision, ReefPosition side, LEDSubsystem ledSubsystem) {
       m_drivetrain = drivetrain;
       m_vision = vision;
       m_side = side;
+      m_ledSubsystem = ledSubsystem;
     
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(drivetrain);
@@ -120,6 +122,11 @@ public class DriveToReefCommand extends Command {
         .withTargetDirection(targetRotation)
       );
 
+      // run green is at target pose
+      if (isAligned()){
+        m_ledSubsystem.runSolidGreen();
+      }
+
 
       SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
       SmartDashboard.putNumber("drivetoreef/setpoint position y", yController.getSetpoint().position);
@@ -136,5 +143,11 @@ public class DriveToReefCommand extends Command {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public boolean isAligned(){
+    Pose2d drivetrainPose = m_drivetrain.getState().Pose;
+    // change to absolute value?
+    return (drivetrainPose.getX() == m_targetTranslation.getX()) && (drivetrainPose.getY() == m_targetTranslation.getY()) && (drivetrainPose.getRotation() == targetRotation);
   }
 }
