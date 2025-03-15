@@ -148,6 +148,10 @@ public class DriveToReefCommand extends Command {
   public boolean isAligned(){
     Pose2d drivetrainPose = m_drivetrain.getState().Pose;
     // change to absolute value?
-    return ((Math.abs(drivetrainPose.getX() - m_targetTranslation.getX()) < VisionConstants.VISION_ALIGNMENT_DISCARD) && (Math.abs(drivetrainPose.getY() - m_targetTranslation.getY()) < VisionConstants.VISION_ALIGNMENT_DISCARD) && (drivetrainPose.getRotation() == targetRotation));
+    double xDist = Math.abs(drivetrainPose.getX() - m_targetTranslation.getX());
+    double yDist = Math.abs(drivetrainPose.getY() - m_targetTranslation.getY());
+    SmartDashboard.putNumber("drivetrain/auto-alignment-xdist", xDist);
+    SmartDashboard.putNumber("drivetrain/auto-alignment-ydist", yDist);
+    return ((xDist < VisionConstants.VISION_ALIGNMENT_DISCARD) && (yDist < VisionConstants.VISION_ALIGNMENT_DISCARD));
   }
 }
