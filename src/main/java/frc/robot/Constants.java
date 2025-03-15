@@ -147,7 +147,7 @@ public final class Constants {
 
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
-    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double METERS_PER_ROTATION = 1; 
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;

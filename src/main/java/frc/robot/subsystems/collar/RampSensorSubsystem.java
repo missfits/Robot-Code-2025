@@ -49,17 +49,17 @@ public class RampSensorSubsystem extends SubsystemBase {
   public void periodic() {
     measurementRampOut = LCRampOut.getMeasurement();
     if (measurementRampOut != null && measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", measurementRampOut.distance_mm);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp Out Distance", measurementRampOut.distance_mm);
     } else {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", 0);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp Out Distance", 0);
       // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurementRampOMeasurement.
     }
 
     measurementRampIn = LCRampIn.getMeasurement();
     if (measurementRampIn != null && measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", measurementRampIn.distance_mm);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp In Distance", measurementRampIn.distance_mm);
     } else {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", 0);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp In Distance", 0);
       // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurementRampOMeasurement.
     }
 
