@@ -165,13 +165,15 @@ public class VisionSubsystem extends SubsystemBase {
       }
     }
 
-    SmartDashboard.putNumberArray("Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
-    SmartDashboard.putNumberArray("Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
-    SmartDashboard.putBoolean("Target Found", targetFound);
-    SmartDashboard.putNumber("Target Distance Meters", targetDistanceMeters);
-    SmartDashboard.putNumber("Target Yaw (radians)", targetYaw);
-    SmartDashboard.putNumber("Target X Distance", targetTranslation2d.getX());
-    SmartDashboard.putNumber("Target Y Distance", targetTranslation2d.getY());
+    SmartDashboard.putNumberArray("vision/Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
+    SmartDashboard.putNumberArray("vision/Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
+    SmartDashboard.putBoolean("vision/Target Found", targetFound);
+    SmartDashboard.putNumber("vision/Target Distance Meters", targetDistanceMeters);
+    SmartDashboard.putNumber("vision/Target Yaw (radians)", targetYaw);
+    SmartDashboard.putNumber("vision/Target X Distance", targetTranslation2d.getX());
+    SmartDashboard.putNumber("vision/Target Y Distance", targetTranslation2d.getY());
+
+    SmartDashboard.putBoolean("vision/isEstPoseJumpy", isEstPoseJumpy());
 
   }
 
