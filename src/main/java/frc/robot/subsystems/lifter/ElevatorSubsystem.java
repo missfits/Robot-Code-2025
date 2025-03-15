@@ -212,7 +212,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     public boolean isNotAtL4() {
-        return m_IO.getPosition() > ElevatorConstants.MIN_HEIGHT_TO_BE_BELOW_L4;
+        return m_IO.getPosition() < ElevatorConstants.MIN_HEIGHT_TO_BE_BELOW_L4;
     }
 
     public Trigger isTallTrigger() {
