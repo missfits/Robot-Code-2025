@@ -310,5 +310,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("drivetrain/pigeon/accelX", this.getPigeon2().getAccelerationX().getValueAsDouble());
         SmartDashboard.putNumber("drivetrain/pigeon/accelY", this.getPigeon2().getAccelerationY().getValueAsDouble());
         SmartDashboard.putNumber("drivetrain/pigeon/accelZ", this.getPigeon2().getAccelerationZ().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/yaw", this.getPigeon2().getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/pitch", this.getPigeon2().getPitch().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/roll", this.getPigeon2().getRoll().getValueAsDouble());
+
     }
 }
