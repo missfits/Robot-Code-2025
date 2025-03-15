@@ -153,7 +153,7 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
-    public static final double INTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_MOTOR_SPEED = 6.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
     public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -2.0;
 
