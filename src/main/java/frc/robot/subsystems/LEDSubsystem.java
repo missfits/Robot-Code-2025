@@ -99,5 +99,9 @@ public class LEDSubsystem extends SubsystemBase {
     LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kBlue);
     return runPattern(gradient);
   }
-  
+
+  public Command runGradientGreenYellow(){
+    LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kGreen);
+    return runPattern(gradient);
+  }  
 }
