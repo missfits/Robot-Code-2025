@@ -368,6 +368,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
     NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+    NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenInRampTrigger()));
+
 
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option

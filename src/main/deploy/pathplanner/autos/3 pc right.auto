@@ -23,15 +23,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "right feed to peg c"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "waitUntilCoralIntaken"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "right feed to peg c"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
@@ -47,15 +67,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "right feed to peg d"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "waitUntilCoralIntaken"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "right feed to peg d"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
