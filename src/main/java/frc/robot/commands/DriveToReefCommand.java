@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 public class DriveToReefCommand extends Command {
@@ -113,6 +115,8 @@ public class DriveToReefCommand extends Command {
     @Override
     public void execute() {
 
+      m_drivetrain.setisAutoAlign(isAligned());
+
       double xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity;
       double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
 
@@ -121,12 +125,6 @@ public class DriveToReefCommand extends Command {
         .withVelocityY(yVelocity) 
         .withTargetDirection(targetRotation)
       );
-
-      // run green is at target pose
-      if (isAligned()){
-        m_ledSubsystem.runSolidGreen();
-      }
-
 
       SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
       SmartDashboard.putNumber("drivetoreef/setpoint position y", yController.getSetpoint().position);
@@ -137,7 +135,9 @@ public class DriveToReefCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_drivetrain.setisAutoAlign(false);
+  }
 
   // Returns true when the command should end.
   @Override
@@ -148,6 +148,6 @@ public class DriveToReefCommand extends Command {
   public boolean isAligned(){
     Pose2d drivetrainPose = m_drivetrain.getState().Pose;
     // change to absolute value?
-    return ((Math.abs(drivetrainPose.getX() - m_targetTranslation.getX()) < 11.4) && (Math.abs(drivetrainPose.getY() - m_targetTranslation.getY()) < 11.4) && (drivetrainPose.getRotation() == targetRotation));
+    return ((Math.abs(drivetrainPose.getX() - m_targetTranslation.getX()) < VisionConstants.VISION_ALIGNMENT_DISCARD) && (Math.abs(drivetrainPose.getY() - m_targetTranslation.getY()) < VisionConstants.VISION_ALIGNMENT_DISCARD) && (drivetrainPose.getRotation() == targetRotation));
   }
 }
