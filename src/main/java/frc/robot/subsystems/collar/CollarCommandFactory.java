@@ -2,6 +2,7 @@ package frc.robot.subsystems.collar;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.CollarConstants;
 
 
@@ -21,6 +22,16 @@ public class CollarCommandFactory {
             m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger().negate()),
             m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_BACK_MOTOR_SPEED).withTimeout(0.3),
             m_collar.runCollarOffInstant()).withName("intakeCoralSequence");
+    }
+
+    // wait until coral hits sensors on ramp
+    public Command intakeCoralSequence2(){
+        return Commands.sequence(
+            new WaitCommand(300).until(m_rampSensors.coralSeenAfterRampTrigger().or(m_rampSensors.coralSeenAfterRampTrigger().negate())),
+            m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger()),
+            m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger().negate()),
+            m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_BACK_MOTOR_SPEED).withTimeout(0.3),
+            m_collar.runCollarOffInstant()).withName("intakeCoralSequence2");
     }
 
     public Command runCollarOut() {
