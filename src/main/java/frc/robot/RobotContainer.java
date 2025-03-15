@@ -249,9 +249,17 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
+    copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
+      m_collarCommandFactory.runCollarOut()
+    ); 
+
     // A2 -> leftBumper + a; !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_ALGAE)
+    ); 
+
+    copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
+      m_collarCommandFactory.runCollarOut()
     ); 
 
 
