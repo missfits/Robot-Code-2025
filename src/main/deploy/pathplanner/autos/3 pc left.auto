@@ -23,15 +23,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "left feed to peg L"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "waitUntilCoralIntaken"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "left feed to peg L"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
@@ -47,15 +67,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "left feed to peg K"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "waitUntilCoralIntaken"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "left feed to peg K"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
