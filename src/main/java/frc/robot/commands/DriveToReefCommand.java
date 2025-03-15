@@ -148,6 +148,6 @@ public class DriveToReefCommand extends Command {
   public boolean isAligned(){
     Pose2d drivetrainPose = m_drivetrain.getState().Pose;
     // change to absolute value?
-    return (drivetrainPose.getX() == m_targetTranslation.getX()) && (drivetrainPose.getY() == m_targetTranslation.getY()) && (drivetrainPose.getRotation() == targetRotation);
+    return ((Math.abs(drivetrainPose.getX() - m_targetTranslation.getX()) < 11.4) && (Math.abs(drivetrainPose.getY() - m_targetTranslation.getY()) < 11.4) && (drivetrainPose.getRotation() == targetRotation));
   }
 }
