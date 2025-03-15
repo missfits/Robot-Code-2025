@@ -104,6 +104,8 @@ public final class Constants {
     public static final double MIN_POS_ARM_CLEAR = 0.28; 
 
     public static final double MIN_HEIGHT_TO_BE_TALL = 0.4; // for slew rate limiting when elevator is tall
+
+    public static final double MIN_HEIGHT_TO_BE_BELOW_L4 = 0.68;
     
   }
 
@@ -145,13 +147,13 @@ public final class Constants {
 
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
-    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double METERS_PER_ROTATION = 1; 
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
-    public static final double INTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_MOTOR_SPEED = 6.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
     public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -2.0;
 
