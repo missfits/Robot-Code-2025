@@ -19,6 +19,7 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
@@ -414,6 +415,8 @@ public class RobotContainer {
     SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);
 
     CameraServer.startAutomaticCapture();
+
+    FollowPathCommand.warmupCommand().schedule();
 
     configureBindings();
 
