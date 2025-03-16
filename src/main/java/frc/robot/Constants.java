@@ -197,7 +197,7 @@ public final class Constants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
     public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-3) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-1) : -0.0508; // in meters from center of robot 
     public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
     // default vision standard deviation
