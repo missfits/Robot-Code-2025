@@ -27,7 +27,7 @@ public class CollarCommandFactory {
     // wait until coral hits sensors on ramp
     public Command intakeCoralSequence2(){
         return Commands.sequence(
-            m_collar.runCollarBackwards(CollarConstants.INTAKE_SECONDARY_BACK_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger().or(m_rampSensors.coralSeenInRampTrigger())),
+            m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_BACK_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger().or(m_rampSensors.coralSeenInRampTrigger())),
             m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger()),
             m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger().negate()),
             m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_BACK_MOTOR_SPEED).withTimeout(0.3),
