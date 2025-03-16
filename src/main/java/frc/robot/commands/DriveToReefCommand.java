@@ -94,8 +94,7 @@ public class DriveToReefCommand extends Command {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
       }
 
-
-      targetRotation = Rotation2d.fromRadians(m_vision.getTargetYaw() + Math.PI); 
+      targetRotation = targetPose.getRotation().plus(Rotation2d.fromRadians(Math.PI));
 
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
