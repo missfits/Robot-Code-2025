@@ -61,14 +61,21 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new RunCommand(
             () -> {m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveCommand");
     }
 
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
             () -> {m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveBackwardCommand");
+    }
+
+    public Command manualMoveCommand(DoubleSupplier inputSupplier) {
+        return new RunCommand(
+            () -> {m_IO.setVoltage(inputSupplier.getAsDouble()); runKeepInPlacePID = false;},
+            this
+        ).withName("manualMoveCommand");
     }
 
     public Command moveToCommand(DoubleSupplier targetPositionSupplier) {
@@ -82,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             (interrupted) -> {},
             () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.005,
             this
-        );
+        ).withName("moveToCommand");
     }
 
     public Command moveToCommand(double targetPosition) {
@@ -96,7 +103,11 @@ public class ElevatorSubsystem extends SubsystemBase{
             (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
-        );
+        ).withName("moveToCommand");
+    }
+
+    public Command setVoltageToZeroCommand() {
+        return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
 
     // helper commands
@@ -191,6 +202,18 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void setBrake(boolean brake) {
         m_IO.setBrake(brake);
      }
+
+    public void setRunKeepInPlace(boolean bool) {
+        runKeepInPlacePID = bool;
+    }
+
+    public Trigger isNotAtL4Trigger() {
+        return new Trigger(() -> isNotAtL4());
+    }
+
+    public boolean isNotAtL4() {
+        return m_IO.getPosition() < ElevatorConstants.MIN_HEIGHT_TO_BE_BELOW_L4;
+    }
 
     public Trigger isTallTrigger() {
        return new Trigger(() -> isTall());

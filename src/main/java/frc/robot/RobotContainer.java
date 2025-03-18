@@ -14,10 +14,12 @@ import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
@@ -42,6 +44,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -128,7 +131,7 @@ public class RobotContainer {
       .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
+  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -141,7 +144,7 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
       drivetrain.getCommandFromRequest(() -> {
-        JoystickVals shapedValues = Controls.adjustInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
+        JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
         return drive.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
           .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
           .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
@@ -155,33 +158,47 @@ public class RobotContainer {
 
     // reset fused vision pose estimator to vision pose on center (cross button)
     driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
-
-    // auto rotate to reef command
-    driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
-    driverJoystick.rightTrigger().whileTrue(m_ledSubsystem.runSolidBlue()); 
+    driverJoystick.rightTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
-    driverJoystick.leftTrigger().whileTrue(m_ledSubsystem.runSolidBlue()); 
+    driverJoystick.leftTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
 
     
     driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
-    driverJoystick.x().whileTrue(m_climber.manualMoveCommand());
+
+    // drive facing angle buttons
+    // can be pressed alone for rotation or pressed with joystick input
+    // snap to left coral station
+    driverJoystick.x().whileTrue(drivetrain.getCommandFromRequest(() -> {
+      JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(-55));
+    }));
+
+    // snap to right coral station
+    driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
+      JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(55));
+    }));
 
     // move to intake, start collar 
     copilotJoystick.x().and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.INTAKE)
     );
 
-    copilotJoystick.x().and(copilotJoystick.povCenter()).whileTrue(
-      m_collarCommandFactory.intakeCoralSequence()
+    copilotJoystick.x().whileTrue(
+      m_collarCommandFactory.intakeCoralSequence2()
     );
 
     // outtake from collar
-    copilotJoystick.y().and(copilotJoystick.povCenter()).whileTrue(
+    copilotJoystick.y().whileTrue(
       m_collarCommandFactory.runCollarOut()
     );
 
@@ -230,23 +247,27 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.L3_ALGAE)
     ); 
 
+    copilotJoystick.rightBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
+      m_collarCommandFactory.runCollarOut()
+    ); 
+
     // A2 -> leftBumper + a; !pov (any)
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).onTrue(
       m_lifter.moveToCommand(RobotState.L2_ALGAE)
     ); 
 
-    // backup commands, need to press the POV button thing down (direction does not matter)
-    copilotJoystick.leftTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_elevator.manualMoveCommand());
-    
-    copilotJoystick.rightTrigger().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_arm.manualMoveCommand());
+    copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
+      m_collarCommandFactory.runCollarOut()
+    ); 
 
-    copilotJoystick.leftBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_elevator.manualMoveBackwardCommand());
+
+    // lifter backup controls -- joysticks :)
+    Trigger elevatorManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getLeftY()) != 0);
+    elevatorManualTrigger.whileTrue(m_elevator.manualMoveCommand(() -> Controls.applyDeadband(-copilotJoystick.getLeftY())));
     
-    copilotJoystick.rightBumper().and(copilotJoystick.povCenter().negate()).whileTrue(
-      m_arm.manualMoveBackwardCommand());
+    Trigger armManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getRightX()) != 0);
+    armManualTrigger.whileTrue(m_arm.manualMoveCommand(() -> Controls.applyDeadband(copilotJoystick.getRightX())));
+    
 
     m_collar.setDefaultCommand(m_collar.runCollarOff());
     m_climber.setDefaultCommand(m_climber.runClimberOff());
@@ -257,7 +278,7 @@ public class RobotContainer {
 
 
     // LED and rumble feedback when coral is seen in ramp
-    m_rampSensor.coralSeenInRamp().onTrue(
+    m_rampSensor.coralSeenInRampTrigger().onTrue(
       new ParallelCommandGroup(
         // controller rumble
         new StartEndCommand(
@@ -339,11 +360,13 @@ public class RobotContainer {
     }
 
     // elevator moveTo auto commands
-    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence().withTimeout(2), m_collar.runCollarOffInstant())); // update to use grapplehook instead
+    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence().withTimeout(3), m_collar.runCollarOffInstant())); // update to use grapplehook instead
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
     NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+    NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
+    NamedCommands.registerCommand("waitUntilArmDone", new WaitCommand(1).until(m_elevator.isNotAtL4Trigger()));
 
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
@@ -389,6 +412,8 @@ public class RobotContainer {
 
     CameraServer.startAutomaticCapture();
 
+    FollowPathCommand.warmupCommand().schedule();
+
     configureBindings();
 
   }
@@ -409,25 +434,42 @@ public class RobotContainer {
 
   }
 
+  public void setVoltageUponDisable() {
+    CommandScheduler.getInstance().schedule(m_elevator.setVoltageToZeroCommand());
+    CommandScheduler.getInstance().schedule(m_arm.setVoltageToZeroCommand());
+    CommandScheduler.getInstance().schedule(m_collar.setVoltageToZeroCommand());
+    CommandScheduler.getInstance().schedule(drivetrain.getCommandFromRequest(() -> drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0)));
+  }
+
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
+  }
+
+  public void turnOffLifterKeepInPlace() {
+    m_elevator.setRunKeepInPlace(false);
+    m_arm.setRunKeepInPlace(false);
+
   }
 
   public void updatePoseEst() {
 
     EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
-    if (estimatedRobotPose != null) {
+    if (estimatedRobotPose != null && m_vision.getTargetFound()) {
       Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
+      Pose2d estPose2d = estPose3d.toPose2d();
 
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-        double distance = estPose3d.toPose2d().getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+        double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+
         SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
-        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE) {
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_vision.isEstPoseJumpy()) {
           drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose3d.toPose2d(), Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
+          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
         
-          m_estPoseField.setRobotPose(estPose3d.toPose2d());
+          m_estPoseField.setRobotPose(estPose2d);
+          SmartDashboard.putNumberArray("vision/visionPose2dFiltered", new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
       }
+
       SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
         estPose3d.getX(),
         estPose3d.getY(),

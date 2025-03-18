@@ -5,6 +5,8 @@
 package frc.robot;
 
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,6 +33,12 @@ public final class Constants {
     public static final int DISABLED_COAST_DELAY = 10; // in secs
 
     public static final boolean COMPETITION_MODE = false;
+  }
+
+  public static class FieldConstants {
+    public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+
   }
 
   public static class OperatorConstants {
@@ -96,6 +104,8 @@ public final class Constants {
     public static final double MIN_POS_ARM_CLEAR = 0.28; 
 
     public static final double MIN_HEIGHT_TO_BE_TALL = 0.4; // for slew rate limiting when elevator is tall
+
+    public static final double MIN_HEIGHT_TO_BE_BELOW_L4 = 0.68;
     
   }
 
@@ -137,13 +147,13 @@ public final class Constants {
 
     public static final int COUNTS_PER_REV = 42; // may need to be updated
 
-    public static final double METERS_PER_ROTATION = 0.0; 
+    public static final double METERS_PER_ROTATION = 1; 
     public static final double MAX_SPEED = 0.0; 
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
-    public static final double INTAKE_MOTOR_SPEED = 8.0;
+    public static final double INTAKE_MOTOR_SPEED = 6.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
     public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -2.0;
 
@@ -161,7 +171,7 @@ public final class Constants {
 
     public static final int CLIMBER_MOTOR_ID = 16;
 
-    public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
+    public static final double MOTOR_STATOR_LIMIT = 80; // needs to be updated lol
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
@@ -187,7 +197,7 @@ public final class Constants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
 
     public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-1) : -0.0508; // in meters from center of robot 
     public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
     // default vision standard deviation
@@ -199,6 +209,7 @@ public final class Constants {
     public static final double MAX_VISION_POSE_Z = 0.1;
     public static final double MAX_VISION_POSE_ROLL = 0.05; // in radians
     public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
+    public static final double VISION_DISTANCE_DISCARD = 10; 
 
 
 
@@ -212,7 +223,10 @@ public final class Constants {
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
-    public static final double TARGET_PITCH = 0; 
+    public static final double TARGET_PITCH = 0;
+
+    public static final double MAX_AVG_DIST_BETWEEN_LAST_EST_POSES = 0.3; // in meters 
+    public static final int NUM_LAST_EST_POSES = 3;
   }
 
   public static class LaserCanConstants {

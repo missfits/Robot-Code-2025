@@ -67,14 +67,21 @@ public class ArmSubsystem extends SubsystemBase {
         return new RunCommand(
             () -> {m_IO.setVoltage(ArmConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveCommand");
     }
 
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
             () -> {m_IO.setVoltage(-ArmConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveBackwardCommand");
+    }
+
+    public Command manualMoveCommand(DoubleSupplier inputSupplier) {
+        return new RunCommand(
+            () -> {m_IO.setVoltage(inputSupplier.getAsDouble()); runKeepInPlacePID = false;},
+            this
+        ).withName("manualMoveCommand");
     }
 
     public Command moveToCommand(DoubleSupplier targetPositionSupplier) {
@@ -88,7 +95,7 @@ public class ArmSubsystem extends SubsystemBase {
             (interrupted) -> {},
             () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.025, // equivalent to 1 degree
             this
-        );
+        ).withName("moveToCommand");
     }
 
     public Command moveToCommand(double targetPosition) {
@@ -102,7 +109,11 @@ public class ArmSubsystem extends SubsystemBase {
             (interrupted) -> {},
             () -> false,
             this
-        );
+        ).withName("moveToCommand");
+    }
+
+    public Command setVoltageToZeroCommand() {
+        return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
 
     // helper commands
@@ -202,5 +213,9 @@ public class ArmSubsystem extends SubsystemBase {
     
     public void setBrake(boolean brake) {
        m_IO.setBrake(brake);
+    }
+
+    public void setRunKeepInPlace(boolean bool) {
+        runKeepInPlacePID = bool;
     }
 }

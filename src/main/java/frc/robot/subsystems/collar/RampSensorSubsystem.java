@@ -25,30 +25,46 @@ public class RampSensorSubsystem extends SubsystemBase {
 
   }
 
-  public Trigger coralSeenAfterRamp() {
+  public Trigger coralSeenAfterRampTrigger() {
     return new Trigger(() -> measurementRampOut != null && measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurementRampOut.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_OUT);
   }
 
-  public Trigger coralSeenInRamp() {
-    return new Trigger(() -> measurementRampIn != null && measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurementRampIn.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_IN);
+  public boolean coralSeenAfterRamp() {
+    return measurementRampOut != null && 
+      measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
+      measurementRampOut.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_OUT;
+  }
+  
+  public Trigger coralSeenInRampTrigger() {
+    return new Trigger(() -> coralSeenInRamp());
+  }
+
+  public boolean coralSeenInRamp() {
+    return measurementRampIn != null && 
+      measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
+      measurementRampIn.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_IN;
   }
 
   @Override
   public void periodic() {
     measurementRampOut = LCRampOut.getMeasurement();
     if (measurementRampOut != null && measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", measurementRampOut.distance_mm);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp Out Distance", measurementRampOut.distance_mm);
     } else {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", 0);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp Out Distance", 0);
       // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurementRampOMeasurement.
     }
 
     measurementRampIn = LCRampIn.getMeasurement();
     if (measurementRampIn != null && measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", measurementRampIn.distance_mm);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp In Distance", measurementRampIn.distance_mm);
     } else {
-      SmartDashboard.putNumber("LaserCAN Ramp Out Distance", 0);
+      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp In Distance", 0);
       // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurementRampOMeasurement.
     }
+
+    SmartDashboard.putBoolean("rampSensors/coralSeenAfterRamp", coralSeenAfterRamp());
+    SmartDashboard.putBoolean("rampSensors/coralSeenInRamp", coralSeenInRamp());
+
   }
 }
