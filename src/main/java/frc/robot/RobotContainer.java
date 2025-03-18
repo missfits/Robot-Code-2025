@@ -158,9 +158,6 @@ public class RobotContainer {
 
     // reset fused vision pose estimator to vision pose on center (cross button)
     driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
-
-    // auto rotate to reef command
-    driverJoystick.y().whileTrue(new RotateToFaceReefCommand(drivetrain, m_vision));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
@@ -172,7 +169,6 @@ public class RobotContainer {
 
     
     driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
-    driverJoystick.x().whileTrue(m_climber.manualMoveCommand());
 
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
