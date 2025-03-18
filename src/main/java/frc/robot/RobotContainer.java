@@ -193,12 +193,12 @@ public class RobotContainer {
       m_lifter.moveToCommand(RobotState.INTAKE)
     );
 
-    copilotJoystick.x().and(copilotJoystick.povCenter()).whileTrue(
+    copilotJoystick.x().whileTrue(
       m_collarCommandFactory.intakeCoralSequence2()
     );
 
     // outtake from collar
-    copilotJoystick.y().and(copilotJoystick.povCenter()).whileTrue(
+    copilotJoystick.y().whileTrue(
       m_collarCommandFactory.runCollarOut()
     );
 
