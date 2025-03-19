@@ -112,7 +112,8 @@ public class RobotContainer {
    name == RobotName.DYNAMENE ? TunerConstantsDynamene.createDrivetrain() : TunerConstantsCeridwen.createDrivetrain(); // My drivetrain
 
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
-  private final VisionSubsystem m_vision = new VisionSubsystem();
+  private final VisionSubsystem m_cameraOne = new VisionSubsystem(VisionConstants.CAMERA1_NAME, VisionConstants.ROBOT_TO_CAM1_3D);
+  private final VisionSubsystem m_cameraTwo = new VisionSubsystem(VisionConstants.CAMERA2_NAME, VisionConstants.ROBOT_TO_CAM2_3D);
   private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
@@ -157,14 +158,14 @@ public class RobotContainer {
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
     // reset fused vision pose estimator to vision pose on center (cross button)
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_cameraOne.getEstimatedRobotPose().estimatedPose.toPose2d())));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
+    driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_cameraOne, ReefPosition.RIGHT)); 
     driverJoystick.rightTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
+    driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_cameraOne, ReefPosition.LEFT)); 
     driverJoystick.leftTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
 
     
@@ -453,8 +454,8 @@ public class RobotContainer {
 
   public void updatePoseEst() {
 
-    EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
-    if (estimatedRobotPose != null && m_vision.getTargetFound()) {
+    EstimatedRobotPose estimatedRobotPose = m_cameraOne.getEstimatedRobotPose();
+    if (estimatedRobotPose != null && m_cameraOne.getTargetFound()) {
       Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
       Pose2d estPose2d = estPose3d.toPose2d();
 
@@ -462,8 +463,8 @@ public class RobotContainer {
         double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
         SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
-        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_vision.isEstPoseJumpy()) {
-          drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_cameraOne.isEstPoseJumpy()) {
+          drivetrain.setVisionMeasurementStdDevs(m_cameraOne.getCurrentStdDevs());
           drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
         
           m_estPoseField.setRobotPose(estPose2d);

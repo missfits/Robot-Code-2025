@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -46,7 +47,7 @@ import frc.robot.VisionUtils;
 
 
 public class VisionSubsystem extends SubsystemBase {
-  private final PhotonCamera m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+  private final PhotonCamera m_camera;
   // private final LEDSubsystem m_ledSubsystem;
   private Translation2d targetTranslation2d = new Translation2d(0,0); // distance to the target; updated every periodic() call if target is found 
   private boolean targetFound; // true if the translation2d was updated last periodic() call
@@ -56,18 +57,15 @@ public class VisionSubsystem extends SubsystemBase {
   private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
+  private PhotonPoseEstimator poseEstimator;
 
   private ArrayList<Pose2d> lastEstPoses = new ArrayList<>();
 
   /** Creates a new Vision Subsystem. */
-  public VisionSubsystem() {
+  public VisionSubsystem(String cameraName, Transform3d robotToCam) {
+    m_camera = new PhotonCamera(cameraName);
+    poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
   }
-
-  public Translation2d getRobotTranslationToTag() {
-    return targetFound ? targetTranslation2d.plus(VisionConstants.ROBOT_TO_CAM) : new Translation2d(0,0); // only return translation2d if target was found
-  }
-
 
   /** returns yaw (rotation on field) of target in radians */
   public double getTargetYaw() {
