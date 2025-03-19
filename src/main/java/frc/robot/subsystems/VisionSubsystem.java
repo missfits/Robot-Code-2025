@@ -41,6 +41,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.VisionUtils;
 
 
 
@@ -55,20 +56,12 @@ public class VisionSubsystem extends SubsystemBase {
   private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  private List<Pose2d> reefAprilTagPoses = new ArrayList<>();
   private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
 
   private ArrayList<Pose2d> lastEstPoses = new ArrayList<>();
 
   /** Creates a new Vision Subsystem. */
   public VisionSubsystem() {
-
-    // create the list of apriltag poses
-    List<Integer> reefAprilTagIDs = new ArrayList<>(Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22));
-    for (Integer id : reefAprilTagIDs) {
-      reefAprilTagPoses.add(aprilTagFieldLayout.getTagPose(id).get().toPose2d());
-    }
-
   }
 
   public Translation2d getRobotTranslationToTag() {
@@ -152,7 +145,7 @@ public class VisionSubsystem extends SubsystemBase {
         // update standard deviation based on dist 
         this.updateEstimationStdDevs(poseEstimatorOutput, result.getTargets());
 
-        if (poseEstimatorOutput.isPresent() && poseIsSane(poseEstimatorOutput.get().estimatedPose)) {
+        if (poseEstimatorOutput.isPresent() && VisionUtils.poseIsSane(poseEstimatorOutput.get().estimatedPose)) {
           estimatedRobotPose = poseEstimatorOutput.get(); 
 
           // update our last n poses
@@ -175,13 +168,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("vision/isEstPoseJumpy", isEstPoseJumpy());
     SmartDashboard.putNumberArray("vision/standardDeviations", curStdDevs.getData());
-
-  }
-
-  private boolean poseIsSane(Pose3d pose) {
-    return pose.getZ() < VisionConstants.MAX_VISION_POSE_Z 
-    && pose.getRotation().getX() < VisionConstants.MAX_VISION_POSE_ROLL 
-    && pose.getRotation().getY() < VisionConstants.MAX_VISION_POSE_PITCH;
 
   }
 
@@ -258,10 +244,6 @@ public class VisionSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("vision/standardDeviation-average-distance", avgDist);
     }
   }
-
-  public Pose2d getClosestReefAprilTag(Pose2d robotPose) {
-    return robotPose.nearest(reefAprilTagPoses);
-  } 
 
   public boolean isEstPoseJumpy() {
     if (lastEstPoses.size() < VisionConstants.NUM_LAST_EST_POSES) {

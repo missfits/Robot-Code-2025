@@ -6,6 +6,8 @@ package frc.robot.commands;
 
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.VisionUtils;
+import frc.robot.VisionUtils;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -65,7 +67,7 @@ public class DriveToReefCommand extends Command {
     public void initialize() {
 
 
-      Pose2d targetPose = m_vision.getClosestReefAprilTag(m_drivetrain.getState().Pose);
+      Pose2d targetPose = VisionUtils.getClosestReefAprilTag(m_drivetrain.getState().Pose);
       if (targetPose != null) {
         // offset with robot size because the robot has width and is not a point!
         // see images/drive to reef with offset.png for right/left offset math
