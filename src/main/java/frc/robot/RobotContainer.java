@@ -81,7 +81,6 @@ import frc.robot.subsystems.lifter.ElevatorIOHardware;
 import frc.robot.subsystems.lifter.ElevatorSubsystem;
 import frc.robot.subsystems.lifter.LifterCommandFactory;
 import frc.robot.subsystems.ramp.RampSubsystem;
-import frc.robot.commands.AutoAlignCommand;
 
 
 
