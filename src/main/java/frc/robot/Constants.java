@@ -202,9 +202,9 @@ public final class Constants {
     public static final double ROBOT_TO_CAM1_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
 
-    public static final double ROBOT_TO_CAM2_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(0) : 0 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM2_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(0) : 0; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM2_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(0) : 0; // in meters from the floor?
+    public static final double ROBOT_TO_CAM2_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(7.5) : 0 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM2_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(10.5) : 0; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM2_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(7.5) : 0; // in meters from the floor?
     
 
     // default vision standard deviation
@@ -229,7 +229,7 @@ public final class Constants {
       new Transform3d(new Translation3d(ROBOT_TO_CAM1_X, ROBOT_TO_CAM1_Y, ROBOT_TO_CAM1_Z), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
     
     public static final Transform3d ROBOT_TO_CAM2_3D = 
-      new Transform3d(new Translation3d(ROBOT_TO_CAM2_X, ROBOT_TO_CAM2_Y, ROBOT_TO_CAM2_Z), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
+      new Transform3d(new Translation3d(ROBOT_TO_CAM2_X, ROBOT_TO_CAM2_Y, ROBOT_TO_CAM2_Z), new Rotation3d(0,0,-Math.PI/9)); // in meters from center of robot to 2x4 camera mount
   
 
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
