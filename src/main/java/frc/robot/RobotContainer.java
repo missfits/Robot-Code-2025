@@ -112,7 +112,7 @@ public class RobotContainer {
    name == RobotName.DYNAMENE ? TunerConstantsDynamene.createDrivetrain() : TunerConstantsCeridwen.createDrivetrain(); // My drivetrain
 
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
-  private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
+  private final VisionSubsystem m_vision = new VisionSubsystem();
   private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();

@@ -46,13 +46,11 @@ import frc.robot.Constants.VisionConstants;
 
 public class VisionSubsystem extends SubsystemBase {
   private final PhotonCamera m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
-  private final Pigeon2 m_gyro;
   // private final LEDSubsystem m_ledSubsystem;
   private Translation2d targetTranslation2d = new Translation2d(0,0); // distance to the target; updated every periodic() call if target is found 
   private boolean targetFound; // true if the translation2d was updated last periodic() call
   private Pose2d targetPose;
   private double targetYaw; // in radians, relative to field
-  private Pose2d currentPose; // current robot pose, updates periodically
   private EstimatedRobotPose estimatedRobotPose; 
   private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
@@ -62,15 +60,8 @@ public class VisionSubsystem extends SubsystemBase {
 
   private ArrayList<Pose2d> lastEstPoses = new ArrayList<>();
 
-  private double distToTargetX;
-  private double distToTargetY;
-
   /** Creates a new Vision Subsystem. */
-  public VisionSubsystem(Pigeon2 pigeon) {
-    m_gyro = pigeon;
-    
-    distToTargetX = 1;
-    distToTargetY = 1;    
+  public VisionSubsystem() {
 
     // create the list of apriltag poses
     List<Integer> reefAprilTagIDs = new ArrayList<>(Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22));
