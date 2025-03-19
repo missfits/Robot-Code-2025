@@ -48,6 +48,7 @@ import frc.robot.VisionUtils;
 
 public class VisionSubsystem extends SubsystemBase {
   private final PhotonCamera m_camera;
+  private final String m_cameraName;
   // private final LEDSubsystem m_ledSubsystem;
   private Translation2d targetTranslation2d = new Translation2d(0,0); // distance to the target; updated every periodic() call if target is found 
   private boolean targetFound; // true if the translation2d was updated last periodic() call
@@ -63,6 +64,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   /** Creates a new Vision Subsystem. */
   public VisionSubsystem(String cameraName, Transform3d robotToCam) {
+    m_cameraName = cameraName;
     m_camera = new PhotonCamera(cameraName);
     poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
   }
@@ -122,17 +124,17 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         if (target.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY) {
-          SmartDashboard.putString("vision/targetState", "targetDiscardedAmbiguity");
+          SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetDiscardedAmbiguity");
           targetFound = false;
         } else {
-          SmartDashboard.putString("vision/targetState", "targetFound");
+          SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetFound");
           targetFound = true;
         }
         
         targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
         targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
       } else {
-        SmartDashboard.putString("vision/targetState", "noTarget");
+        SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "noTarget");
         targetFound = false;
       }
 
@@ -156,16 +158,16 @@ public class VisionSubsystem extends SubsystemBase {
 
     }
 
-    SmartDashboard.putNumberArray("vision/Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
-    SmartDashboard.putNumberArray("vision/Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
-    SmartDashboard.putBoolean("vision/Target Found", targetFound);
-    SmartDashboard.putNumber("vision/Target Distance Meters", targetDistanceMeters);
-    SmartDashboard.putNumber("vision/Target Yaw (radians)", targetYaw);
-    SmartDashboard.putNumber("vision/Target X Distance", targetTranslation2d.getX());
-    SmartDashboard.putNumber("vision/Target Y Distance", targetTranslation2d.getY());
+    SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
+    SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/Target Found", targetFound);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target Distance Meters", targetDistanceMeters);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target Yaw (radians)", targetYaw);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target X Distance", targetTranslation2d.getX());
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target Y Distance", targetTranslation2d.getY());
 
-    SmartDashboard.putBoolean("vision/isEstPoseJumpy", isEstPoseJumpy());
-    SmartDashboard.putNumberArray("vision/standardDeviations", curStdDevs.getData());
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/isEstPoseJumpy", isEstPoseJumpy());
+    SmartDashboard.putNumberArray("vision/" + m_cameraName + "/standardDeviations", curStdDevs.getData());
 
   }
 
@@ -176,7 +178,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   // returns bool if camera within tolerance to AprilTag
   public boolean isWithinTarget(Pose2d currentPose){
-    SmartDashboard.putBoolean("inTarget", isWithinTarget(currentPose,1, 1));
+    SmartDashboard.putBoolean("vision/" +  m_cameraName + "/inTarget", isWithinTarget(currentPose,1, 1));
     return isWithinTarget(currentPose,1, 1);
   }
 
@@ -201,8 +203,8 @@ public class VisionSubsystem extends SubsystemBase {
     if (estimatedPose.isEmpty()) {
         // No pose input. Default to single-tag std devs
         curStdDevs = VisionConstants.kSingleTagStdDevs;
-        SmartDashboard.putNumber("vision/standardDeviation-average-distance", Double.MAX_VALUE);
-        SmartDashboard.putString("vision/standardDeviation-state", "empty");
+        SmartDashboard.putNumber("vision/" + m_cameraName + "/standardDeviation-average-distance", Double.MAX_VALUE);
+        SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "empty");
     } 
     else {
       // Pose present. Start running Heuristic
@@ -225,11 +227,11 @@ public class VisionSubsystem extends SubsystemBase {
       if (numTags == 0) {
           // No tags visible. Default to single-tag std devs
           curStdDevs = VisionConstants.kSingleTagStdDevs;
-          SmartDashboard.putString("vision/standardDeviation-state", "no tags visible");
+          SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "no tags visible");
       } 
       else if (numTags == 1 && avgDist > VisionConstants.VISION_DISTANCE_DISCARD){  
         curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        SmartDashboard.putString("vision/standardDeviation-state", "target too far");
+        SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "target too far");
       }
       else {
         var unscaledStdDevs = numTags > 1 ? VisionConstants.kMultiTagStdDevs:VisionConstants.kSingleTagStdDevs;
@@ -237,9 +239,9 @@ public class VisionSubsystem extends SubsystemBase {
         avgDist /= numTags;
         // increase std devs based on (average) distance
         curStdDevs = unscaledStdDevs.times(1 + (avgDist * avgDist / 30));
-        SmartDashboard.putString("vision/standardDeviation-state", "good :)");
+        SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "good :)");
       }
-      SmartDashboard.putNumber("vision/standardDeviation-average-distance", avgDist);
+      SmartDashboard.putNumber("vision/" + m_cameraName + "/standardDeviation-average-distance", avgDist);
     }
   }
 
@@ -256,7 +258,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
     
     double avgDist = totalDistance/lastEstPoses.size();
-    SmartDashboard.putNumber("vision/avgDistBetweenLastEstPoses", avgDist);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/avgDistBetweenLastEstPoses", avgDist);
 
     return avgDist > VisionConstants.MAX_AVG_DIST_BETWEEN_LAST_EST_POSES;
   }
