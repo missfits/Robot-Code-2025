@@ -138,7 +138,8 @@ public class RobotContainer {
 
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
 
-  private final Field2d m_estPoseField = new Field2d();
+  private final Field2d m_estPoseFieldBeam = new Field2d();
+  private final Field2d m_estPoseFieldSwerve = new Field2d();
   private final Field2d m_actualField = new Field2d();
 
 
@@ -372,7 +373,8 @@ public class RobotContainer {
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
     
-    SmartDashboard.putData("est pose field", m_estPoseField);
+    SmartDashboard.putData("est pose field beam", m_estPoseFieldBeam);
+    SmartDashboard.putData("est pose field swerve", m_estPoseFieldSwerve);
     SmartDashboard.putData("Actual Field", m_actualField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
@@ -457,8 +459,8 @@ public class RobotContainer {
     EstimatedRobotPose estimatedRobotPoseOne = m_cameraOne.getEstimatedRobotPose();
     EstimatedRobotPose estimatedRobotPoseTwo = m_cameraTwo.getEstimatedRobotPose();
 
-    updatePoseEst(estimatedRobotPoseOne, m_cameraOne);
-    updatePoseEst(estimatedRobotPoseTwo, m_cameraTwo);
+    updatePoseEst(estimatedRobotPoseOne, m_cameraOne, m_estPoseFieldBeam);
+    updatePoseEst(estimatedRobotPoseTwo, m_cameraTwo, m_estPoseFieldSwerve);
     // if (estimatedRobotPoseOne != null && m_cameraOne.getTargetFound()) {
     //   Pose3d estPose3d = estimatedRobotPoseOne.estimatedPose; // estimated robot pose of vision
     //   Pose2d estPose2d = estPose3d.toPose2d();
@@ -486,7 +488,7 @@ public class RobotContainer {
     m_actualField.setRobotPose(drivetrain.getState().Pose);
   }
 
-  public void updatePoseEst(EstimatedRobotPose robotPose, VisionSubsystem camera){
+  public void updatePoseEst(EstimatedRobotPose robotPose, VisionSubsystem camera, Field2d field){
     if (robotPose != null && camera.getTargetFound()) {
       Pose3d estPose3d = robotPose.estimatedPose; // estimated robot pose of vision
       Pose2d estPose2d = estPose3d.toPose2d();
@@ -499,7 +501,7 @@ public class RobotContainer {
           drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
           drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
         
-          m_estPoseField.setRobotPose(estPose2d);
+          field.setRobotPose(estPose2d);
           SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
       }
 

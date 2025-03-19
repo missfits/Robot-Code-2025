@@ -219,8 +219,6 @@ public final class Constants {
     public static final double VISION_DISTANCE_DISCARD = 10; 
 
 
-
-
     public static final Translation2d ROBOT_TO_CAM1 = 
       new Translation2d(ROBOT_TO_CAM1_X, ROBOT_TO_CAM1_Y); // in meters from center of robot to 2x4 camera mount
 
