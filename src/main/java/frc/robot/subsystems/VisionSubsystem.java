@@ -69,6 +69,11 @@ public class VisionSubsystem extends SubsystemBase {
     poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
   }
 
+  
+  public String getCameraName() {
+    return m_cameraName;
+  }
+  
   /** returns yaw (rotation on field) of target in radians */
   public double getTargetYaw() {
     return targetYaw;

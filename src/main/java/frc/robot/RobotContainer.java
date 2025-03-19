@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -453,33 +454,62 @@ public class RobotContainer {
 
   public void updatePoseEst() {
 
-    EstimatedRobotPose estimatedRobotPose = m_cameraOne.getEstimatedRobotPose();
-    if (estimatedRobotPose != null && m_cameraOne.getTargetFound()) {
-      Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
+    EstimatedRobotPose estimatedRobotPoseOne = m_cameraOne.getEstimatedRobotPose();
+    EstimatedRobotPose estimatedRobotPoseTwo = m_cameraTwo.getEstimatedRobotPose();
+
+    updatePoseEst(estimatedRobotPoseOne, m_cameraOne);
+    updatePoseEst(estimatedRobotPoseTwo, m_cameraTwo);
+    // if (estimatedRobotPoseOne != null && m_cameraOne.getTargetFound()) {
+    //   Pose3d estPose3d = estimatedRobotPoseOne.estimatedPose; // estimated robot pose of vision
+    //   Pose2d estPose2d = estPose3d.toPose2d();
+
+    //     // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+    //     double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+
+    //     SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
+    //     if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_cameraOne.isEstPoseJumpy()) {
+    //       drivetrain.setVisionMeasurementStdDevs(m_cameraOne.getCurrentStdDevs());
+    //       drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPoseOne.timestampSeconds));
+        
+    //       m_estPoseField.setRobotPose(estPose2d);
+    //       SmartDashboard.putNumberArray("vision/visionPose2dFiltered", new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
+    //   }
+
+    //   SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+    //     estPose3d.getX(),
+    //     estPose3d.getY(),
+    //     estPose3d.getZ(),
+    //     estPose3d.getRotation().toRotation2d().getRadians()
+    //   }); // post vision 3d to smartdashboard
+    // }
+    
+    m_actualField.setRobotPose(drivetrain.getState().Pose);
+  }
+
+  public void updatePoseEst(EstimatedRobotPose robotPose, VisionSubsystem camera){
+    if (robotPose != null && camera.getTargetFound()) {
+      Pose3d estPose3d = robotPose.estimatedPose; // estimated robot pose of vision
       Pose2d estPose2d = estPose3d.toPose2d();
 
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
         double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
-        SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
-        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_cameraOne.isEstPoseJumpy()) {
-          drivetrain.setVisionMeasurementStdDevs(m_cameraOne.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
+        SmartDashboard.putNumber("vision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
+          drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
+          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
         
           m_estPoseField.setRobotPose(estPose2d);
-          SmartDashboard.putNumberArray("vision/visionPose2dFiltered", new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
+          SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
       }
 
-      SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+      SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose3D", new double[] {
         estPose3d.getX(),
         estPose3d.getY(),
         estPose3d.getZ(),
         estPose3d.getRotation().toRotation2d().getRadians()
       }); // post vision 3d to smartdashboard
     }
-    
-
-    m_actualField.setRobotPose(drivetrain.getState().Pose);
   }
 
 }
