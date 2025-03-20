@@ -43,6 +43,7 @@ public class DriveToReefCommand extends Command {
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
   private final LEDSubsystem m_ledSubsystem;
+  private boolean reachedIntermediateTranslation = false; 
 
   private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
@@ -123,10 +124,19 @@ public class DriveToReefCommand extends Command {
     @Override
     public void execute() {
 
-      m_drivetrain.setisAutoAlign(isAligned());
+      m_drivetrain.setisAutoAlign(isAligned(m_targetTranslation));
 
-      double xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity;
-      double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
+      double xVelocity;
+      double yVelocity;
+
+      if (! reachedIntermediateTranslation) {
+        xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetIntermediateTranslation.getX()) + xController.getSetpoint().velocity;
+        yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetIntermediateTranslation.getY()) + yController.getSetpoint().velocity;
+        reachedIntermediateTranslation = isAligned(m_targetIntermediateTranslation);
+      } else {
+        xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity;
+        yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
+      }
 
       m_drivetrain.setControl(driveRequest
         .withVelocityX(xVelocity) 
@@ -139,6 +149,9 @@ public class DriveToReefCommand extends Command {
       
       SmartDashboard.putNumber("drivetoreef/setpoint velocity x", xController.getSetpoint().velocity);
       SmartDashboard.putNumber("drivetoreef/setpoint velocity y", yController.getSetpoint().velocity);
+
+      SmartDashboard.putBoolean("drivetoreef/reachedIntermediateTranslation", reachedIntermediateTranslation);
+
   }
 
   // Called once the command ends or is interrupted.
@@ -153,11 +166,12 @@ public class DriveToReefCommand extends Command {
     return false;
   }
 
-  public boolean isAligned(){
+
+  public boolean isAligned(Translation2d translation) {
     Pose2d drivetrainPose = m_drivetrain.getState().Pose;
     // change to absolute value?
-    double xDist = Math.abs(drivetrainPose.getX() - m_targetTranslation.getX());
-    double yDist = Math.abs(drivetrainPose.getY() - m_targetTranslation.getY());
+    double xDist = Math.abs(drivetrainPose.getX() - translation.getX());
+    double yDist = Math.abs(drivetrainPose.getY() - translation.getY());
     SmartDashboard.putNumber("drivetrain/auto-alignment-xdist", xDist);
     SmartDashboard.putNumber("drivetrain/auto-alignment-ydist", yDist);
     return ((xDist < VisionConstants.VISION_ALIGNMENT_DISCARD) && (yDist < VisionConstants.VISION_ALIGNMENT_DISCARD));
