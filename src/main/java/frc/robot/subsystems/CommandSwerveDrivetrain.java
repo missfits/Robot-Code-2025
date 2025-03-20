@@ -43,6 +43,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DrivetrainConstants;
 
@@ -85,6 +86,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private DoublePublisher rotationPublisher = NetworkTableInstance.getDefault().getDoubleTopic("drivetrain/rotation").publish();
     
     private StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getStructTopic("drivetrain/pose", Pose2d.struct).publish();
+
+    private boolean m_isAutoAlign = false;
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     // units are rotor rotations, which should be correct with voltage based control. 
@@ -279,6 +282,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return statusCode;
     }
 
+    public Trigger isAutoAligned(){
+        return new Trigger(()-> m_isAutoAlign);
+    }
+
+    public void setisAutoAlign(boolean isAligned){
+        m_isAutoAlign = isAligned;
+    }
+
     @Override
     public void periodic() {
         SwerveModuleState[] currentStates = {this.getModule(0).getCurrentState(), this.getModule(1).getCurrentState(), this.getModule(2).getCurrentState(), this.getModule(3).getCurrentState()};
@@ -313,6 +324,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("drivetrain/pigeon/yaw", this.getPigeon2().getYaw().getValueAsDouble());
         SmartDashboard.putNumber("drivetrain/pigeon/pitch", this.getPigeon2().getPitch().getValueAsDouble());
         SmartDashboard.putNumber("drivetrain/pigeon/roll", this.getPigeon2().getRoll().getValueAsDouble());
+        SmartDashboard.putBoolean("drivetrain/is-aligned", m_isAutoAlign);
 
     }
 }
