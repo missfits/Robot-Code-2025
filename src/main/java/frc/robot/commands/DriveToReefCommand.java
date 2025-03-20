@@ -19,6 +19,7 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -36,7 +37,8 @@ public class DriveToReefCommand extends Command {
 
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final CommandSwerveDrivetrain m_drivetrain;
-  private Translation2d m_targetTranslation = new Translation2d();
+  private Translation2d m_targetTranslation;
+  private Translation2d m_targetIntermediateTranslation;
   private Rotation2d targetRotation;
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
@@ -68,7 +70,6 @@ public class DriveToReefCommand extends Command {
     @Override
     public void initialize() {
 
-
       Pose2d targetPose = m_vision.getClosestReefAprilTag(m_drivetrain.getState().Pose);
       if (targetPose != null) {
         // offset with robot size because the robot has width and is not a point!
@@ -92,10 +93,18 @@ public class DriveToReefCommand extends Command {
             + DrivetrainConstants.ROBOT_SIZE_X/2 * Math.sin(targetPose.getRotation().getRadians())
             - AutoAlignConstants.REEF_OFFSET_LEFT * Math.sin(Math.PI/2 + targetPose.getRotation().getRadians()));
         }
+
+        m_targetIntermediateTranslation = m_targetTranslation.plus(new Translation2d(
+            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.sin(Math.PI/2 + targetPose.getRotation().getRadians()),
+            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.cos(Math.PI/2 + targetPose.getRotation().getRadians())
+          )
+        );
         
     
       } else {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
+        m_targetIntermediateTranslation = m_drivetrain.getState().Pose.getTranslation();
+
       }
 
       targetRotation = targetPose.getRotation().plus(Rotation2d.fromRadians(Math.PI));

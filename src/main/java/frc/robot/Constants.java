@@ -191,6 +191,7 @@ public final class Constants {
 
     public static final double kMaxV = 1; // to be tuned
     public static final double kMaxA = 1; // to be tuned
+    public static final double INTERMEDIATE_POS_DIST = Units.inchesToMeters(2);
   }
 
   public static class VisionConstants {
