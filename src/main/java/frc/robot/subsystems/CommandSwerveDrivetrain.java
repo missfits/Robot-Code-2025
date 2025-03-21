@@ -259,7 +259,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void resetFusedPose(Pose2d newPose){
-        this.resetPose(newPose);
+        if (newPose != null) {
+            this.resetPose(newPose);
+        }
     }
 
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
