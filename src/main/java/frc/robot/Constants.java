@@ -186,15 +186,15 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(3);
-    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(11);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(1);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(9);
 
     public static final double kMaxV = 1; // to be tuned
     public static final double kMaxA = 1; // to be tuned
   }
 
   public static class VisionConstants {
-    public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
+    public static final String CAMERA_NAME = "beam_camera";  
 
     public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
     public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-1) : -0.0508; // in meters from center of robot 
