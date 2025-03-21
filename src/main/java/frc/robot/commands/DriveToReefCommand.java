@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 public class DriveToReefCommand extends Command {
@@ -38,6 +40,7 @@ public class DriveToReefCommand extends Command {
   private Rotation2d targetRotation;
   private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
+  private final LEDSubsystem m_ledSubsystem;
 
   private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
@@ -50,10 +53,11 @@ public class DriveToReefCommand extends Command {
      * @param drivetrain The drivetrain subsystem used by this command.
      * @param Pose2d The target pose (but only Translation) used by this command.
      */
-    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision, ReefPosition side) {
+    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision, ReefPosition side, LEDSubsystem ledSubsystem) {
       m_drivetrain = drivetrain;
       m_vision = vision;
       m_side = side;
+      m_ledSubsystem = ledSubsystem;
     
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(drivetrain);
@@ -110,6 +114,8 @@ public class DriveToReefCommand extends Command {
     @Override
     public void execute() {
 
+      m_drivetrain.setisAutoAlign(isAligned());
+
       double xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity;
       double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
 
@@ -118,7 +124,6 @@ public class DriveToReefCommand extends Command {
         .withVelocityY(yVelocity) 
         .withTargetDirection(targetRotation)
       );
-
 
       SmartDashboard.putNumber("drivetoreef/setpoint position x", xController.getSetpoint().position);
       SmartDashboard.putNumber("drivetoreef/setpoint position y", yController.getSetpoint().position);
@@ -129,11 +134,23 @@ public class DriveToReefCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_drivetrain.setisAutoAlign(false);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public boolean isAligned(){
+    Pose2d drivetrainPose = m_drivetrain.getState().Pose;
+    // change to absolute value?
+    double xDist = Math.abs(drivetrainPose.getX() - m_targetTranslation.getX());
+    double yDist = Math.abs(drivetrainPose.getY() - m_targetTranslation.getY());
+    SmartDashboard.putNumber("drivetrain/auto-alignment-xdist", xDist);
+    SmartDashboard.putNumber("drivetrain/auto-alignment-ydist", yDist);
+    return ((xDist < VisionConstants.VISION_ALIGNMENT_DISCARD) && (yDist < VisionConstants.VISION_ALIGNMENT_DISCARD));
   }
 }

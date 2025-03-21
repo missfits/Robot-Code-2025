@@ -160,13 +160,13 @@ public class RobotContainer {
     driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT)); 
-    driverJoystick.rightTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
+    driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT, m_ledSubsystem)); 
+    driverJoystick.rightTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
+    drivetrain.isAutoAligned().whileTrue(m_ledSubsystem.runGradientGreenYellow());
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT)); 
-    driverJoystick.leftTrigger().whileTrue(m_ledSubsystem.runSolidRed()); 
-
+    driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT, m_ledSubsystem)); 
+    driverJoystick.leftTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
     
     driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
 
