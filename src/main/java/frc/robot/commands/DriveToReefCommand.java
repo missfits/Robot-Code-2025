@@ -6,6 +6,8 @@ package frc.robot.commands;
 
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.VisionUtils;
+import frc.robot.VisionUtils;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -36,7 +38,6 @@ public class DriveToReefCommand extends Command {
   private final CommandSwerveDrivetrain m_drivetrain;
   private Translation2d m_targetTranslation = new Translation2d();
   private Rotation2d targetRotation;
-  private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
 
   private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
@@ -50,9 +51,8 @@ public class DriveToReefCommand extends Command {
      * @param drivetrain The drivetrain subsystem used by this command.
      * @param Pose2d The target pose (but only Translation) used by this command.
      */
-    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision, ReefPosition side) {
+    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, ReefPosition side) {
       m_drivetrain = drivetrain;
-      m_vision = vision;
       m_side = side;
     
       // Use addRequirements() here to declare subsystem dependencies.
@@ -65,7 +65,7 @@ public class DriveToReefCommand extends Command {
     public void initialize() {
 
 
-      Pose2d targetPose = m_vision.getClosestReefAprilTag(m_drivetrain.getState().Pose);
+      Pose2d targetPose = VisionUtils.getClosestReefAprilTag(m_drivetrain.getState().Pose);
       if (targetPose != null) {
         // offset with robot size because the robot has width and is not a point!
         // see images/drive to reef with offset.png for right/left offset math

@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -41,50 +42,38 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.VisionUtils;
 
 
 
 public class VisionSubsystem extends SubsystemBase {
-  private final PhotonCamera m_camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
-  private final Pigeon2 m_gyro;
+  private final PhotonCamera m_camera;
+  private final String m_cameraName;
   // private final LEDSubsystem m_ledSubsystem;
   private Translation2d targetTranslation2d = new Translation2d(0,0); // distance to the target; updated every periodic() call if target is found 
   private boolean targetFound; // true if the translation2d was updated last periodic() call
   private Pose2d targetPose;
   private double targetYaw; // in radians, relative to field
-  private Pose2d currentPose; // current robot pose, updates periodically
   private EstimatedRobotPose estimatedRobotPose; 
   private Matrix<N3,N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  private List<Pose2d> reefAprilTagPoses = new ArrayList<>();
-  private PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.ROBOT_TO_CAM_3D);
+  private PhotonPoseEstimator poseEstimator;
 
   private ArrayList<Pose2d> lastEstPoses = new ArrayList<>();
 
-  private double distToTargetX;
-  private double distToTargetY;
-
   /** Creates a new Vision Subsystem. */
-  public VisionSubsystem(Pigeon2 pigeon) {
-    m_gyro = pigeon;
-    
-    distToTargetX = 1;
-    distToTargetY = 1;    
-
-    // create the list of apriltag poses
-    List<Integer> reefAprilTagIDs = new ArrayList<>(Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22));
-    for (Integer id : reefAprilTagIDs) {
-      reefAprilTagPoses.add(aprilTagFieldLayout.getTagPose(id).get().toPose2d());
-    }
-
+  public VisionSubsystem(String cameraName, Transform3d robotToCam) {
+    m_cameraName = cameraName;
+    m_camera = new PhotonCamera(cameraName);
+    poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
   }
 
-  public Translation2d getRobotTranslationToTag() {
-    return targetFound ? targetTranslation2d.plus(VisionConstants.ROBOT_TO_CAM) : new Translation2d(0,0); // only return translation2d if target was found
+  
+  public String getCameraName() {
+    return m_cameraName;
   }
-
-
+  
   /** returns yaw (rotation on field) of target in radians */
   public double getTargetYaw() {
     return targetYaw;
@@ -140,17 +129,17 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         if (target.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY) {
-          SmartDashboard.putString("vision/targetState", "targetDiscardedAmbiguity");
+          SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetDiscardedAmbiguity");
           targetFound = false;
         } else {
-          SmartDashboard.putString("vision/targetState", "targetFound");
+          SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetFound");
           targetFound = true;
         }
         
         targetYaw = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().getRotation().getZ();
         targetPose = aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
       } else {
-        SmartDashboard.putString("vision/targetState", "noTarget");
+        SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "noTarget");
         targetFound = false;
       }
 
@@ -161,7 +150,7 @@ public class VisionSubsystem extends SubsystemBase {
         // update standard deviation based on dist 
         this.updateEstimationStdDevs(poseEstimatorOutput, result.getTargets());
 
-        if (poseEstimatorOutput.isPresent() && poseIsSane(poseEstimatorOutput.get().estimatedPose)) {
+        if (poseEstimatorOutput.isPresent() && VisionUtils.poseIsSane(poseEstimatorOutput.get().estimatedPose)) {
           estimatedRobotPose = poseEstimatorOutput.get(); 
 
           // update our last n poses
@@ -174,23 +163,16 @@ public class VisionSubsystem extends SubsystemBase {
 
     }
 
-    SmartDashboard.putNumberArray("vision/Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
-    SmartDashboard.putNumberArray("vision/Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
-    SmartDashboard.putBoolean("vision/Target Found", targetFound);
-    SmartDashboard.putNumber("vision/Target Distance Meters", targetDistanceMeters);
-    SmartDashboard.putNumber("vision/Target Yaw (radians)", targetYaw);
-    SmartDashboard.putNumber("vision/Target X Distance", targetTranslation2d.getX());
-    SmartDashboard.putNumber("vision/Target Y Distance", targetTranslation2d.getY());
+    SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
+    SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/Target Found", targetFound);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target Distance Meters", targetDistanceMeters);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target Yaw (radians)", targetYaw);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target X Distance", targetTranslation2d.getX());
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/Target Y Distance", targetTranslation2d.getY());
 
-    SmartDashboard.putBoolean("vision/isEstPoseJumpy", isEstPoseJumpy());
-    SmartDashboard.putNumberArray("vision/standardDeviations", curStdDevs.getData());
-
-  }
-
-  private boolean poseIsSane(Pose3d pose) {
-    return pose.getZ() < VisionConstants.MAX_VISION_POSE_Z 
-    && pose.getRotation().getX() < VisionConstants.MAX_VISION_POSE_ROLL 
-    && pose.getRotation().getY() < VisionConstants.MAX_VISION_POSE_PITCH;
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/isEstPoseJumpy", isEstPoseJumpy());
+    SmartDashboard.putNumberArray("vision/" + m_cameraName + "/standardDeviations", curStdDevs.getData());
 
   }
 
@@ -201,7 +183,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   // returns bool if camera within tolerance to AprilTag
   public boolean isWithinTarget(Pose2d currentPose){
-    SmartDashboard.putBoolean("inTarget", isWithinTarget(currentPose,1, 1));
+    SmartDashboard.putBoolean("vision/" +  m_cameraName + "/inTarget", isWithinTarget(currentPose,1, 1));
     return isWithinTarget(currentPose,1, 1);
   }
 
@@ -226,8 +208,8 @@ public class VisionSubsystem extends SubsystemBase {
     if (estimatedPose.isEmpty()) {
         // No pose input. Default to single-tag std devs
         curStdDevs = VisionConstants.kSingleTagStdDevs;
-        SmartDashboard.putNumber("vision/standardDeviation-average-distance", Double.MAX_VALUE);
-        SmartDashboard.putString("vision/standardDeviation-state", "empty");
+        SmartDashboard.putNumber("vision/" + m_cameraName + "/standardDeviation-average-distance", Double.MAX_VALUE);
+        SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "empty");
     } 
     else {
       // Pose present. Start running Heuristic
@@ -250,11 +232,11 @@ public class VisionSubsystem extends SubsystemBase {
       if (numTags == 0) {
           // No tags visible. Default to single-tag std devs
           curStdDevs = VisionConstants.kSingleTagStdDevs;
-          SmartDashboard.putString("vision/standardDeviation-state", "no tags visible");
+          SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "no tags visible");
       } 
       else if (numTags == 1 && avgDist > VisionConstants.VISION_DISTANCE_DISCARD){  
         curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        SmartDashboard.putString("vision/standardDeviation-state", "target too far");
+        SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "target too far");
       }
       else {
         var unscaledStdDevs = numTags > 1 ? VisionConstants.kMultiTagStdDevs:VisionConstants.kSingleTagStdDevs;
@@ -262,15 +244,11 @@ public class VisionSubsystem extends SubsystemBase {
         avgDist /= numTags;
         // increase std devs based on (average) distance
         curStdDevs = unscaledStdDevs.times(1 + (avgDist * avgDist / 30));
-        SmartDashboard.putString("vision/standardDeviation-state", "good :)");
+        SmartDashboard.putString("vision/" + m_cameraName + "/standardDeviation-state", "good :)");
       }
-      SmartDashboard.putNumber("vision/standardDeviation-average-distance", avgDist);
+      SmartDashboard.putNumber("vision/" + m_cameraName + "/standardDeviation-average-distance", avgDist);
     }
   }
-
-  public Pose2d getClosestReefAprilTag(Pose2d robotPose) {
-    return robotPose.nearest(reefAprilTagPoses);
-  } 
 
   public boolean isEstPoseJumpy() {
     if (lastEstPoses.size() < VisionConstants.NUM_LAST_EST_POSES) {
@@ -285,7 +263,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
     
     double avgDist = totalDistance/lastEstPoses.size();
-    SmartDashboard.putNumber("vision/avgDistBetweenLastEstPoses", avgDist);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/avgDistBetweenLastEstPoses", avgDist);
 
     return avgDist > VisionConstants.MAX_AVG_DIST_BETWEEN_LAST_EST_POSES;
   }
