@@ -35,6 +35,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
+    private boolean runKeepInPlacePID = true; // false if a manual move command was just ran
+
     // constructor
     public ElevatorSubsystem() {
         m_IO.resetPosition();
@@ -57,16 +59,23 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public Command manualMoveCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> {m_IO.setVoltage(ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveCommand");
     }
 
     public Command manualMoveBackwardCommand() {
         return new RunCommand(
-            () -> m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED),
+            () -> {m_IO.setVoltage(-ElevatorConstants.MANUAL_MOVE_MOTOR_SPEED); runKeepInPlacePID = false;},
             this
-        );
+        ).withName("manualMoveBackwardCommand");
+    }
+
+    public Command manualMoveCommand(DoubleSupplier inputSupplier) {
+        return new RunCommand(
+            () -> {m_IO.setVoltage(inputSupplier.getAsDouble()); runKeepInPlacePID = false;},
+            this
+        ).withName("manualMoveCommand");
     }
 
     public Command moveToCommand(DoubleSupplier targetPositionSupplier) {
@@ -80,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             (interrupted) -> {},
             () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.005,
             this
-        );
+        ).withName("moveToCommand");
     }
 
     public Command moveToCommand(double targetPosition) {
@@ -94,7 +103,11 @@ public class ElevatorSubsystem extends SubsystemBase{
             (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
-        );
+        ).withName("moveToCommand");
+    }
+
+    public Command setVoltageToZeroCommand() {
+        return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
 
     // helper commands
@@ -103,6 +116,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_goal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
+        runKeepInPlacePID = true;
     }
 
     private void executeMoveTo() {
@@ -124,16 +138,20 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     private void executeKeepInPlacePID() {
 
-        // calculate part of the power based on target position + current position
-        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+        if (runKeepInPlacePID) {
+            // calculate part of the power based on target position + current position
+            double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
 
-        // calculate part of the power based on target velocity 
-        double feedForwardPower = m_feedforward.calculate(0);
+            // calculate part of the power based on target velocity 
+            double feedForwardPower = m_feedforward.calculate(0);
 
-        m_IO.setVoltage(PIDPower + feedForwardPower);
-
-        SmartDashboard.putNumber("elevator/target position", m_goal.position);
-        SmartDashboard.putNumber("elevator/target velocity", 0);
+            m_IO.setVoltage(PIDPower + feedForwardPower);
+            SmartDashboard.putNumber("elevator/target position", m_goal.position);
+            SmartDashboard.putNumber("elevator/target velocity", 0);
+        
+        } else {
+            m_IO.setVoltage(ElevatorConstants.kG);
+        }
     }
 
     private boolean isAtPosition(double goal) {
@@ -184,6 +202,18 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void setBrake(boolean brake) {
         m_IO.setBrake(brake);
      }
+
+    public void setRunKeepInPlace(boolean bool) {
+        runKeepInPlacePID = bool;
+    }
+
+    public Trigger isNotAtL4Trigger() {
+        return new Trigger(() -> isNotAtL4());
+    }
+
+    public boolean isNotAtL4() {
+        return m_IO.getPosition() < ElevatorConstants.MIN_HEIGHT_TO_BE_BELOW_L4;
+    }
 
     public Trigger isTallTrigger() {
        return new Trigger(() -> isTall());

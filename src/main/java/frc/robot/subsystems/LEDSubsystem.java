@@ -33,7 +33,6 @@ public class LEDSubsystem extends SubsystemBase {
     // Set the data
     m_led.setData(m_ledBuffer);
 
-    m_led.setLength(kLength);
     m_led.start();
 
     // Set the default command to turn the strip off, otherwise the last colors written by

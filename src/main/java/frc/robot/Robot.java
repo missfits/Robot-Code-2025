@@ -31,6 +31,9 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     m_neutralModeTimer.start();
+    CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.turnOffLifterKeepInPlace();
+    m_robotContainer.setVoltageUponDisable();
   }
 
   @Override

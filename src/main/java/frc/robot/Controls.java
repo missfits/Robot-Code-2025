@@ -11,7 +11,7 @@ public class Controls {
     private static SlewRateLimiter ySlewRateLimiter = new SlewRateLimiter(OperatorConstants.SLEW_RATE_LIMIT);
 
     
-    public static JoystickVals adjustInputs(double x, double y, boolean slowmode, boolean limitSlewRate) {
+    public static JoystickVals adjustDrivetrainInputs(double x, double y, boolean slowmode, boolean limitSlewRate) {
         return applySlewRateLimiter(adjustSlowmode(inputShape(x, y), slowmode), limitSlewRate); 
     }
 
@@ -31,7 +31,7 @@ public class Controls {
         double hypot = Math.hypot(x, y);
         double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.JOYSTICK_DEADBAND);
     
-        double scaleFactor = deadbandedValue * Math.abs(deadbandedValue) / hypot;
+        double scaleFactor= hypot == 0 ? 0 : deadbandedValue * Math.abs(deadbandedValue) / hypot; // avoid division by 0 issues
 
         JoystickVals output = new JoystickVals(x * scaleFactor, y * scaleFactor);
 
@@ -45,6 +45,10 @@ public class Controls {
         } else {
             return new JoystickVals(input.x(), input.y());
         }
+    }
+
+    public static double applyDeadband(double input) {
+        return MathUtil.applyDeadband(input, OperatorConstants.JOYSTICK_DEADBAND);
     }
 
 }

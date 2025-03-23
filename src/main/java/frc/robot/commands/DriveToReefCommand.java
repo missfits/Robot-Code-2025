@@ -6,11 +6,15 @@ package frc.robot.commands;
 
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.VisionUtils;
+import frc.robot.VisionUtils;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -34,12 +38,11 @@ public class DriveToReefCommand extends Command {
   private final CommandSwerveDrivetrain m_drivetrain;
   private Translation2d m_targetTranslation = new Translation2d();
   private Rotation2d targetRotation;
-  private final VisionSubsystem m_vision;
   private final ReefPosition m_side;
 
   private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
-  private final SwerveRequest.FieldCentricFacingAngle driveRequest = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
+  private final SwerveRequest.FieldCentricFacingAngle driveRequest = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
   
   
     /**
@@ -48,9 +51,8 @@ public class DriveToReefCommand extends Command {
      * @param drivetrain The drivetrain subsystem used by this command.
      * @param Pose2d The target pose (but only Translation) used by this command.
      */
-    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision, ReefPosition side) {
+    public DriveToReefCommand(CommandSwerveDrivetrain drivetrain, ReefPosition side) {
       m_drivetrain = drivetrain;
-      m_vision = vision;
       m_side = side;
     
       // Use addRequirements() here to declare subsystem dependencies.
@@ -61,7 +63,9 @@ public class DriveToReefCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-      Pose2d targetPose = m_vision.getTargetPose();
+
+
+      Pose2d targetPose = VisionUtils.getClosestReefAprilTag(m_drivetrain.getState().Pose);
       if (targetPose != null) {
         // offset with robot size because the robot has width and is not a point!
         // see images/drive to reef with offset.png for right/left offset math
@@ -90,7 +94,7 @@ public class DriveToReefCommand extends Command {
         m_targetTranslation = m_drivetrain.getState().Pose.getTranslation();
       }
 
-      targetRotation = Rotation2d.fromRadians(m_vision.getTargetYaw());
+      targetRotation = targetPose.getRotation().plus(Rotation2d.fromRadians(Math.PI));
 
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
@@ -99,6 +103,7 @@ public class DriveToReefCommand extends Command {
       driveRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
       
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
+
     }
   
     // Called every time the scheduler runs while the command is scheduled.
@@ -109,8 +114,8 @@ public class DriveToReefCommand extends Command {
       double yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
 
       m_drivetrain.setControl(driveRequest
-        .withVelocityX(-xVelocity)
-        .withVelocityY(-yVelocity)
+        .withVelocityX(xVelocity) 
+        .withVelocityY(yVelocity) 
         .withTargetDirection(targetRotation)
       );
 
