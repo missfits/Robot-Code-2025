@@ -203,6 +203,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("arm/position", m_IO.getPosition());
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("arm/voltage", m_IO.getVoltage());
 
         SmartDashboard.putData("arm/subsystem", this);
         SmartDashboard.putBoolean("arm/okToMoveElevatorDownTrigger", okToMoveElevatorDownTrigger().getAsBoolean());

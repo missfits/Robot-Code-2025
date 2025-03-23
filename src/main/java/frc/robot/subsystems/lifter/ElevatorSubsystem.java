@@ -195,6 +195,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("elevator/voltage", m_IO.getVoltage());
 
         SmartDashboard.putData("elevator/subsystem", this);
     }

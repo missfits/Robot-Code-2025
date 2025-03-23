@@ -4,12 +4,14 @@ import edu.wpi.first.math.MathUtil;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
@@ -19,6 +21,8 @@ public class ArmIOHardware {
     private final TalonFX m_armMotor = new TalonFX(ArmConstants.ARM_MOTOR_ID);
     private final StatusSignal<Angle> m_positionSignal = m_armMotor.getPosition();
     private final StatusSignal<AngularVelocity> m_velocitySignal = m_armMotor.getVelocity();
+    private final StatusSignal<Voltage> m_voltageSignal = m_armMotor.getMotorVoltage();
+
 
     // constructor
     public ArmIOHardware() {
@@ -48,6 +52,10 @@ public class ArmIOHardware {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
+    public double getVoltage() {
+        return m_voltageSignal.refresh().getValue().in(Volts);
+    }
+
     // setters
     public void motorOff() {
         m_armMotor.stopMotor();
@@ -64,7 +72,6 @@ public class ArmIOHardware {
     public void setVoltage(double value) {
         // value = MathUtil.clamp(value, -, 8);
         m_armMotor.setControl(new VoltageOut(value));
-        SmartDashboard.putNumber("arm/voltage", value);
     }
     
     public void requestClosedLoopPosition(double value) {
