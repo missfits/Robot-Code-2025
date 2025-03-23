@@ -88,7 +88,7 @@ public final class Constants {
     public static double kS = 0;
     public static double kG = 0.17;
     public static double kV = 3; 
-    public static double kA = 1;
+    public static double kA = 0.6;
 
     public static double kP = 125; 
     public static double kI = 15;
