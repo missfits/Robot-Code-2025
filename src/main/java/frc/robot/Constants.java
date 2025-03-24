@@ -88,7 +88,7 @@ public final class Constants {
     public static double kS = 0;
     public static double kG = 0.17;
     public static double kV = 3; 
-    public static double kA = 1;
+    public static double kA = 0.6;
 
     public static double kP = 125; 
     public static double kI = 15;
@@ -124,15 +124,15 @@ public final class Constants {
 
     public static double kS = 0.15;
     public static double kG = 0;
-    public static double kV = 0.55;
+    public static double kV = 0.6;
     public static double kA = 0.0125;
 
     public static double kP = 55;
     public static double kI = 0;
     public static double kD = 0;
     
-    public static double kMaxV = 7;
-    public static double kMaxA = 13; 
+    public static double kMaxV = 9;
+    public static double kMaxA = 15; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
@@ -194,7 +194,7 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
+    public static final String CAMERA_NAME = "beam_camera";  
 
     public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
     public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-1) : -0.0508; // in meters from center of robot 
