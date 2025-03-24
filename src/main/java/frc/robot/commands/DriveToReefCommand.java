@@ -70,6 +70,8 @@ public class DriveToReefCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+      
+      reachedIntermediateTranslation = false
 
       Pose2d targetPose = m_vision.getClosestReefAprilTag(m_drivetrain.getState().Pose);
       if (targetPose != null) {
