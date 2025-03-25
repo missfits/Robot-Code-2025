@@ -3,6 +3,8 @@ package frc.robot.subsystems.lifter;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -44,7 +46,10 @@ public class ArmSubsystem extends SubsystemBase {
 
     // constructor
     public ArmSubsystem() {
-        m_IO.resetPosition();
+        m_IO.resetPosition(); 
+        
+        resetControllers();
+
         m_controller.enableContinuousInput(0, Math.PI*2);
     }
 
@@ -112,6 +117,20 @@ public class ArmSubsystem extends SubsystemBase {
         ).withName("moveToCommand");
     }
 
+    public Command moveToOnMotorCommand(double targetPosition) {
+        return moveToOnMotorCommand(new TrapezoidProfile.State(targetPosition, 0));
+    }
+
+    public Command moveToOnMotorCommand(TrapezoidProfile.State goal) {
+        return new FunctionalCommand(
+            () -> initalizeMoveTo(goal),
+            () -> executeMoveToOnMotor(),
+            (interrupted) -> {},
+            () -> false,
+            this
+        ).withName("moveToOnMotorCommand");
+    }
+
     public Command setVoltageToZeroCommand() {
         return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
@@ -142,6 +161,20 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
 
+    private void executeMoveToOnMotor() {
+        // recalculate the profiled reference point (the vel + pos that we want)
+        m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_goal);
+        
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(m_profiledReference.position - ArmConstants.POSITION_OFFSET, m_profiledReference.velocity);
+    
+        m_IO.setControl(new PositionVoltage(m_goal.position).withFeedForward(feedForwardPower).withSlot(0));
+
+        SmartDashboard.putNumber("arm/target position", m_IO.getTargetPosition());
+        SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
+
+    }
+
     private void executeKeepInPlacePID() {
 
         if (runKeepInPlacePID) {
@@ -157,6 +190,23 @@ public class ArmSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("arm/target position", m_goal.position);
             SmartDashboard.putNumber("arm/target velocity", 0);
             
+        } else {
+            m_IO.setVoltage(ArmConstants.kG);
+        }
+    }
+
+    private void executeKeepInPlacePIDOnMotor() {
+
+        if (runKeepInPlacePID) {
+
+            // calculate part of the power based on target velocity 
+            double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
+
+            m_IO.setControl(new PositionVoltage(m_goal.position).withFeedForward(feedForwardPower).withSlot(0));
+    
+            SmartDashboard.putNumber("arm/target position", m_goal.position);
+            SmartDashboard.putNumber("arm/target velocity", 0);
+        
         } else {
             m_IO.setVoltage(ArmConstants.kG);
         }
@@ -197,6 +247,25 @@ public class ArmSubsystem extends SubsystemBase {
             m_constraints = new TrapezoidProfile.Constraints(
             ArmConstants.kMaxV, ArmConstants.kMaxA
         );
+
+        var talonFXConfigs = new TalonFXConfiguration();
+
+        // set slot 0 gains
+        var slot0Configs = talonFXConfigs.Slot0;
+        slot0Configs.kS = ArmConstants.kS*ArmConstants.DEGREES_PER_ROTATION; 
+        slot0Configs.kV = ArmConstants.kV*ArmConstants.DEGREES_PER_ROTATION; 
+        slot0Configs.kA = ArmConstants.kA*ArmConstants.DEGREES_PER_ROTATION; 
+        slot0Configs.kP = ArmConstants.kP*ArmConstants.DEGREES_PER_ROTATION;
+        slot0Configs.kI = ArmConstants.kI*ArmConstants.DEGREES_PER_ROTATION;
+        slot0Configs.kD = ArmConstants.kD*ArmConstants.DEGREES_PER_ROTATION;
+
+        // set Motion Magic settings
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = ArmConstants.kMaxV*ArmConstants.DEGREES_PER_ROTATION; 
+        motionMagicConfigs.MotionMagicAcceleration = ArmConstants.kMaxA*ArmConstants.DEGREES_PER_ROTATION; 
+        motionMagicConfigs.MotionMagicJerk = 0; // no jerk limit
+
+        m_IO.config(talonFXConfigs);
     } 
     
     @Override
