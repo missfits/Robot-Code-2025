@@ -11,7 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -23,8 +22,6 @@ public class ArmIOHardware {
     private final StatusSignal<Angle> m_positionSignal = m_armMotor.getPosition();
     private final StatusSignal<AngularVelocity> m_velocitySignal = m_armMotor.getVelocity();
     private final StatusSignal<Voltage> m_voltageSignal = m_armMotor.getMotorVoltage();
-    private final StatusSignal<Double> m_targetPositionSignal = m_armMotor.getClosedLoopReference();
-    private final StatusSignal<Double> m_targetVelocitySignal = m_armMotor.getClosedLoopReferenceSlope();
 
 
     // constructor
@@ -47,28 +44,12 @@ public class ArmIOHardware {
         return m_positionSignal.refresh().getValue().in(Revolutions)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
-    public double getTargetPosition() {
-        return Math.toRadians(m_targetPositionSignal.refresh().getValue()*ArmConstants.DEGREES_PER_ROTATION);
-    }
-
-    public double getTargetPositionDegrees() {
-        return m_targetPositionSignal.refresh().getValue()*ArmConstants.DEGREES_PER_ROTATION;
-    }
-
     public double getVelocity() {
         return Math.toRadians(m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION);
     }
 
     public double getVelocityDegrees() {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
-    }
-
-    public double getTargetVelocity() {
-        return Math.toRadians(m_targetVelocitySignal.refresh().getValue()*ArmConstants.DEGREES_PER_ROTATION);
-    }
-
-    public double getTargetVelocityDegrees() {
-        return m_targetVelocitySignal.refresh().getValue()*ArmConstants.DEGREES_PER_ROTATION;
     }
 
     public double getVoltage() {
@@ -100,13 +81,4 @@ public class ArmIOHardware {
     public void setBrake(boolean brake) {
         m_armMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
-
-    public void config(TalonFXConfiguration configs) {
-        m_armMotor.getConfigurator().apply(configs);
-    }
-
-    public void setControl(ControlRequest request) {
-        m_armMotor.setControl(request);
-    }
 }
-

@@ -12,8 +12,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
@@ -23,9 +21,7 @@ public class ElevatorIOHardware {
     private final TalonFX m_elevatorMotor = new TalonFX(ElevatorConstants.ELEVATOR_MOTOR_ID);
     private final StatusSignal<Angle> m_positionSignal = m_elevatorMotor.getPosition();
     private final StatusSignal<AngularVelocity> m_velocitySignal = m_elevatorMotor.getVelocity();
-    private final StatusSignal<Voltage> m_voltageSignal = m_elevatorMotor.getMotorVoltage();
-    private final StatusSignal<Double> m_targetPositionSignal = m_elevatorMotor.getClosedLoopReference();
-    private final StatusSignal<Double> m_targetVelocitySignal = m_elevatorMotor.getClosedLoopReferenceSlope();
+        private final StatusSignal<Voltage> m_voltageSignal = m_elevatorMotor.getMotorVoltage();
 
 
     // constructor
@@ -44,17 +40,9 @@ public class ElevatorIOHardware {
     public double getPosition() {
         return m_positionSignal.refresh().getValue().in(Revolutions)*ElevatorConstants.METERS_PER_ROTATION;
     }
-    
-    public double getTargetPosition() {
-        return m_targetPositionSignal.refresh().getValue()*ElevatorConstants.METERS_PER_ROTATION;
-    }
 
     public double getVelocity() {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ElevatorConstants.METERS_PER_ROTATION;
-    }
-
-    public double getTargetVelocity() {
-        return m_targetVelocitySignal.refresh().getValue()*ElevatorConstants.METERS_PER_ROTATION;
     }
 
     public double getVoltage() {
@@ -96,13 +84,5 @@ public class ElevatorIOHardware {
 
     public void setBrake(boolean brake) {
         m_elevatorMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
-    }
-
-    public void config(TalonFXConfiguration configs) {
-        m_elevatorMotor.getConfigurator().apply(configs);
-    }
-
-    public void setControl(ControlRequest request) {
-        m_elevatorMotor.setControl(request);
     }
 }

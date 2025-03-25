@@ -12,26 +12,34 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.RobotStateConstants;
 
 public class ElevatorSubsystem extends SubsystemBase{
     private final ElevatorIOHardware m_IO = new ElevatorIOHardware();
-    
+    private ElevatorFeedforward m_feedforward = new ElevatorFeedforward(
+        ElevatorConstants.kS,
+        ElevatorConstants.kG,
+        ElevatorConstants.kV,
+        ElevatorConstants.kA
+    );
+    private PIDController m_controller = new PIDController(
+        ElevatorConstants.kP,
+        ElevatorConstants.kI,
+        ElevatorConstants.kD
+    );
+    private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
+        ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
+    );
     private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
- 
+    private TrapezoidProfile.State m_profiledReference;
+    private TrapezoidProfile m_profile;
+
     private boolean runKeepInPlacePID = true; // false if a manual move command was just ran
 
     // constructor
     public ElevatorSubsystem() {
         m_IO.resetPosition();
-
-        resetControllers();
     }
 
     // commands
@@ -104,19 +112,43 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
+        m_controller.reset();
         m_goal = goal;
+        m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
+        m_profile = new TrapezoidProfile(m_constraints);
         runKeepInPlacePID = true;
     }
 
     private void executeMoveTo() {
-        m_IO.setControl(new MotionMagicVoltage(m_goal.position).withFeedForward(ElevatorConstants.kG).withSlot(0));
+        // recalculate the profiled reference point (the vel + pos that we want)
+        m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_goal);
+        
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(m_profiledReference.velocity);
+
+        // calculate part of the power based on target position + current position
+        double PIDPower = m_controller.calculate(m_IO.getPosition(), m_profiledReference.position);
+
+        m_IO.setVoltage(feedForwardPower + PIDPower);
+
+        SmartDashboard.putNumber("elevator/target position", m_profiledReference.position);
+        SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
         SmartDashboard.putBoolean("elevator/moveToCommandRunning", true);
     }
 
     private void executeKeepInPlacePID() {
 
         if (runKeepInPlacePID) {
-            m_IO.setControl(new MotionMagicVoltage(m_goal.position/ElevatorConstants.METERS_PER_ROTATION).withFeedForward(ElevatorConstants.kG).withSlot(0));
+            // calculate part of the power based on target position + current position
+            double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+
+            // calculate part of the power based on target velocity 
+            double feedForwardPower = m_feedforward.calculate(0);
+
+            m_IO.setVoltage(PIDPower + feedForwardPower);
+            SmartDashboard.putNumber("elevator/target position", m_goal.position);
+            SmartDashboard.putNumber("elevator/target velocity", 0);
+        
         } else {
             m_IO.setVoltage(ElevatorConstants.kG);
         }
@@ -143,35 +175,27 @@ public class ElevatorSubsystem extends SubsystemBase{
     } 
     
     public void resetControllers() {
-        var talonFXConfigs = new TalonFXConfiguration();
-
-        // set slot 0 gains
-        var slot0Configs = talonFXConfigs.Slot0;
-        slot0Configs.kS = ElevatorConstants.kS/ElevatorConstants.METERS_PER_ROTATION; 
-        slot0Configs.kV = ElevatorConstants.kV/ElevatorConstants.METERS_PER_ROTATION; 
-        slot0Configs.kA = ElevatorConstants.kA/ElevatorConstants.METERS_PER_ROTATION; 
-        slot0Configs.kP = ElevatorConstants.kP/ElevatorConstants.METERS_PER_ROTATION;
-        slot0Configs.kI = ElevatorConstants.kI/ElevatorConstants.METERS_PER_ROTATION;
-        slot0Configs.kD = ElevatorConstants.kD/ElevatorConstants.METERS_PER_ROTATION;
-
-        // set Motion Magic settings
-        var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.kMaxV/ElevatorConstants.METERS_PER_ROTATION; 
-        motionMagicConfigs.MotionMagicAcceleration = ElevatorConstants.kMaxA/ElevatorConstants.METERS_PER_ROTATION; 
-        motionMagicConfigs.MotionMagicJerk = 0; // no jerk limit
-
-        m_IO.config(talonFXConfigs);
-    } 
+        m_feedforward = new ElevatorFeedforward(
+            ElevatorConstants.kS,
+            ElevatorConstants.kG,
+            ElevatorConstants.kV,
+            ElevatorConstants.kA
+        );
+        m_controller = new PIDController(
+            ElevatorConstants.kP,
+            ElevatorConstants.kI,
+            ElevatorConstants.kD
+        );
+        m_constraints = new TrapezoidProfile.Constraints(
+            ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
+        );
+    }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
         SmartDashboard.putNumber("elevator/voltage", m_IO.getVoltage());
-
-        SmartDashboard.putNumber("elevator/target position", m_IO.getTargetPosition());
-        SmartDashboard.putNumber("elevator/target velocity", m_IO.getTargetVelocity());
-
 
         SmartDashboard.putData("elevator/subsystem", this);
     }
