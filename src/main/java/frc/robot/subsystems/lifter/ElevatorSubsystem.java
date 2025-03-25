@@ -17,6 +17,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.RobotStateConstants;
 
@@ -163,7 +164,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         // calculate part of the power based on target velocity 
         double feedForwardPower = m_feedforward.calculate(m_profiledReference.velocity);
 
-        m_IO.setControl(new PositionVoltage(m_goal.position).withFeedForward(feedForwardPower).withSlot(0));
+        m_IO.setControl(new PositionVoltage(m_profiledReference.position/ElevatorConstants.METERS_PER_ROTATION).withFeedForward(feedForwardPower).withSlot(0));
 
         SmartDashboard.putNumber("elevator/target position", m_IO.getTargetPosition());
         SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
@@ -195,7 +196,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             // calculate part of the power based on target velocity 
             double feedForwardPower = m_feedforward.calculate(0);
 
-            m_IO.setControl(new PositionVoltage(m_goal.position).withFeedForward(feedForwardPower).withSlot(0));
+            m_IO.setControl(new PositionVoltage(m_goal.position*ElevatorConstants.METERS_PER_ROTATION).withFeedForward(feedForwardPower).withSlot(0));
     
             SmartDashboard.putNumber("elevator/target position", m_goal.position);
             SmartDashboard.putNumber("elevator/target velocity", 0);
