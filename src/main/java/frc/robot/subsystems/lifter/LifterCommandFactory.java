@@ -44,6 +44,26 @@ public class LifterCommandFactory {
                 .until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("lifterMoveTo");
         }
     }
+
+    public Command moveToOnMotorCommand(RobotState targetRobotState) {
+        if (targetRobotState == RobotState.L4_CORAL) {
+            return new ParallelCommandGroup(
+                new SequentialCommandGroup( // arm movement 
+                    new WaitCommand(3).until(m_elevator.okToMoveArmBackTrigger()), // wait until elevator is sufficiently up
+                    m_arm.moveToOnMotorCommand(targetRobotState.getArmPos())),
+                m_elevator.moveToOnMotorCommand(targetRobotState.getElevatorPos()))
+                .until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("lifterMoveToL4OnMotor");
+        } else {
+            return new ParallelCommandGroup(
+                m_arm.moveToOnMotorCommand(targetRobotState.getArmPos()),
+                new SequentialCommandGroup( // elevator movement
+
+                    new WaitCommand(3).until(m_arm.okToMoveElevatorDownTrigger()), // wait until arm is not over the ramp
+                    m_elevator.moveToOnMotorCommand(targetRobotState.getElevatorPos())))
+                .until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("lifterMoveToOnMotor");
+        }
+    }
+
     public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
         return new SequentialCommandGroup(
             m_arm.moveToCommand(ArmConstants.INITIAL_POSITION),
