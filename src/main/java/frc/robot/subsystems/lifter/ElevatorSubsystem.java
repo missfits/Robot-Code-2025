@@ -87,7 +87,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             () -> initalizeMoveTo(goal.get()),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.005,
+            () -> false,
             this
         ).withName("moveToCommand");
     }

@@ -93,7 +93,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -> initalizeMoveTo(goal.get()),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.025, // equivalent to 1 degree
+            () -> false, 
             this
         ).withName("moveToCommand");
     }
@@ -162,16 +162,16 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    private boolean isAtPosition(double goal) {
-        return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
-    } 
-
     public Trigger isAtGoal() {
         return new Trigger(() -> isAtPosition(m_goal.position));
     } 
 
     public Trigger isAtGoal(double goal) {
         return new Trigger(() -> isAtPosition(goal));
+    } 
+
+    private boolean isAtPosition(double goal) {
+        return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
     } 
     
     public Trigger okToMoveElevatorDownTrigger() {
@@ -181,6 +181,17 @@ public class ArmSubsystem extends SubsystemBase {
     private boolean okToMoveElevatorDown() {
         return  m_IO.getPosition() > ArmConstants.MIN_POS_ELEVATOR_CLEAR;
     } 
+
+    public Trigger isArmInsideRobotTrigger() {
+        return new Trigger(() -> isArmInsideRobot());
+    }
+
+    private boolean isArmInsideRobot() {
+        return m_IO.getPosition() < ArmConstants.LOWER_INSIDE_ROBOT_BOUND 
+            + ArmConstants.MAX_POSITION_TOLERANCE 
+            && m_IO.getPosition() > ArmConstants.UPPER_INSIDE_ROBOT_BOUND
+            - ArmConstants.MAX_POSITION_TOLERANCE;
+    }
 
     public void resetControllers() {
         m_feedforward = new ArmFeedforward(
