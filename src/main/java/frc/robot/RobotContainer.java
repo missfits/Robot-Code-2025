@@ -296,11 +296,11 @@ public class RobotContainer {
       // run command runSolidGreen continuously if robot isWithinTarget()
       // m_vision.isWithinTargetTrigger(() -> drivetrain.getState().Pose).whileTrue(m_ledSubsystem.runSolidGreen());
 
-      testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToOnMotorCommand(RobotState.L1_CORAL));
-      testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToOnMotorCommand(RobotState.L2_CORAL));
-      testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToOnMotorCommand(RobotState.L3_CORAL));
-      testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToOnMotorCommand(RobotState.L4_CORAL));
-      testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToOnMotorCommand(RobotState.INTAKE));
+      testJoystick.leftTrigger().and(testJoystick.a()).onTrue(m_lifter.moveToCommand(RobotState.L1_CORAL));
+      testJoystick.leftTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.L2_CORAL));
+      testJoystick.leftTrigger().and(testJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.L3_CORAL));
+      testJoystick.leftTrigger().and(testJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+      testJoystick.rightTrigger().and(testJoystick.x()).onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
       testJoystick.rightTrigger().and(testJoystick.a()).whileTrue(m_collarCommandFactory.runCollarOut());
       testJoystick.rightTrigger().and(testJoystick.y()).whileTrue(m_collarCommandFactory.runCollarBackwards());
       

@@ -92,7 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public Command moveToCommand(Supplier<TrapezoidProfile.State> goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal.get()),
-            () -> executeMoveTo(),
+            () -> executeMoveToOnMotor(),
             (interrupted) -> {},
             () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.005,
             this
@@ -106,25 +106,11 @@ public class ElevatorSubsystem extends SubsystemBase{
     public Command moveToCommand(TrapezoidProfile.State goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
-            () -> executeMoveTo(),
+            () -> executeMoveToOnMotor(),
             (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
         ).withName("moveToCommand");
-    }
-
-    public Command moveToOnMotorCommand(double targetPosition) {
-        return moveToOnMotorCommand(new TrapezoidProfile.State(targetPosition, 0));
-    }
-
-    public Command moveToOnMotorCommand(TrapezoidProfile.State goal) {
-        return new FunctionalCommand(
-            () -> initalizeMoveTo(goal),
-            () -> executeMoveToOnMotor(),
-            (interrupted) -> {},
-            () -> false,
-            this
-        ).withName("moveToOnMotorCommand");
     }
 
     public Command setVoltageToZeroCommand() {

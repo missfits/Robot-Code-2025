@@ -96,7 +96,7 @@ public class ArmSubsystem extends SubsystemBase {
     public Command moveToCommand(Supplier<TrapezoidProfile.State> goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal.get()),
-            () -> executeMoveTo(),
+            () -> executeMoveToOnMotor(),
             (interrupted) -> {},
             () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.025, // equivalent to 1 degree
             this
@@ -110,25 +110,11 @@ public class ArmSubsystem extends SubsystemBase {
     public Command moveToCommand(TrapezoidProfile.State goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
-            () -> executeMoveTo(),
-            (interrupted) -> {},
-            () -> false,
-            this
-        ).withName("moveToCommand");
-    }
-
-    public Command moveToOnMotorCommand(double targetPosition) {
-        return moveToOnMotorCommand(new TrapezoidProfile.State(targetPosition, 0));
-    }
-
-    public Command moveToOnMotorCommand(TrapezoidProfile.State goal) {
-        return new FunctionalCommand(
-            () -> initalizeMoveTo(goal),
             () -> executeMoveToOnMotor(),
             (interrupted) -> {},
             () -> false,
             this
-        ).withName("moveToOnMotorCommand");
+        ).withName("moveToCommand");
     }
 
     public Command setVoltageToZeroCommand() {
