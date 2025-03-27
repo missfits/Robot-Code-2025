@@ -30,6 +30,9 @@ public class ElevatorIOHardware {
 
     // constructor
     public ElevatorIOHardware() {
+        StatusSignal.setUpdateFrequencyForAll(100, m_positionSignal, m_velocitySignal, m_voltageSignal, m_targetPositionSignal, m_targetVelocitySignal);
+
+
         var talonFXConfigurator = m_elevatorMotor.getConfigurator();
         var limitConfigs = new CurrentLimitsConfigs();
 
