@@ -150,7 +150,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         // calculate part of the power based on target velocity 
         double feedForwardPower = m_feedforward.calculate(m_profiledReference.velocity);
 
-        m_IO.setControl(new PositionVoltage(m_profiledReference.position/ElevatorConstants.METERS_PER_ROTATION).withFeedForward(feedForwardPower).withSlot(0));
+        m_IO.setClosedLoopPositionVoltage(m_profiledReference.position, feedForwardPower);
 
         SmartDashboard.putNumber("elevator/target position", m_IO.getTargetPosition());
         SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
@@ -182,7 +182,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             // calculate part of the power based on target velocity 
             double feedForwardPower = m_feedforward.calculate(0);
 
-            m_IO.setControl(new PositionVoltage(m_goal.position*ElevatorConstants.METERS_PER_ROTATION).withFeedForward(feedForwardPower).withSlot(0));
+            m_IO.setClosedLoopPositionVoltage(m_goal.position, feedForwardPower);
     
             SmartDashboard.putNumber("elevator/target position", m_goal.position);
             SmartDashboard.putNumber("elevator/target velocity", 0);
@@ -228,24 +228,7 @@ public class ElevatorSubsystem extends SubsystemBase{
             ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
         );
 
-        var talonFXConfigs = new TalonFXConfiguration();
-
-        // set slot 0 gains
-        var slot0Configs = talonFXConfigs.Slot0;
-        slot0Configs.kS = ElevatorConstants.kS*ElevatorConstants.METERS_PER_ROTATION; 
-        slot0Configs.kV = ElevatorConstants.kV*ElevatorConstants.METERS_PER_ROTATION; 
-        slot0Configs.kA = ElevatorConstants.kA*ElevatorConstants.METERS_PER_ROTATION; 
-        slot0Configs.kP = ElevatorConstants.kP*ElevatorConstants.METERS_PER_ROTATION;
-        slot0Configs.kI = ElevatorConstants.kI*ElevatorConstants.METERS_PER_ROTATION;
-        slot0Configs.kD = ElevatorConstants.kD*ElevatorConstants.METERS_PER_ROTATION;
-
-        // set Motion Magic settings
-        var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.kMaxV*ElevatorConstants.METERS_PER_ROTATION; 
-        motionMagicConfigs.MotionMagicAcceleration = ElevatorConstants.kMaxA*ElevatorConstants.METERS_PER_ROTATION; 
-        motionMagicConfigs.MotionMagicJerk = 0; // no jerk limit
-
-        m_IO.config(talonFXConfigs);
+        m_IO.resetSlot0Gains();
     }
 
     @Override

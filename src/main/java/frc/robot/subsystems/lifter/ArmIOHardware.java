@@ -38,6 +38,8 @@ public class ArmIOHardware {
         limitConfigs.StatorCurrentLimitEnable = true;
 
         talonFXConfigurator.apply(limitConfigs);
+
+        resetSlot0Gains();
     }
 
     // getters
@@ -103,12 +105,29 @@ public class ArmIOHardware {
     public void setBrake(boolean brake) {
         m_armMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
-    
-     public void config(TalonFXConfiguration configs) {
-        m_armMotor.getConfigurator().apply(configs);
+
+    public void setClosedLoopPositionVoltage(double position, double feedfowardVoltage) {
+        m_armMotor.setControl(new PositionVoltage(position/Math.toRadians(ArmConstants.DEGREES_PER_ROTATION)).withFeedForward(feedfowardVoltage).withSlot(0));
     }
 
-    public void setControl(ControlRequest request) {
-        m_armMotor.setControl(request);
+    public void resetSlot0Gains() {
+        var talonFXConfigs = new TalonFXConfiguration();
+
+        // set slot 0 gains
+        var slot0Configs = talonFXConfigs.Slot0;
+        slot0Configs.kS = ArmConstants.kS*ArmConstants.DEGREES_PER_ROTATION; 
+        slot0Configs.kV = ArmConstants.kV*ArmConstants.DEGREES_PER_ROTATION; 
+        slot0Configs.kA = ArmConstants.kA*ArmConstants.DEGREES_PER_ROTATION; 
+        slot0Configs.kP = ArmConstants.kP*ArmConstants.DEGREES_PER_ROTATION;
+        slot0Configs.kI = ArmConstants.kI*ArmConstants.DEGREES_PER_ROTATION;
+        slot0Configs.kD = ArmConstants.kD*ArmConstants.DEGREES_PER_ROTATION;
+
+        // set Motion Magic settings
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = ArmConstants.kMaxV*ArmConstants.DEGREES_PER_ROTATION; 
+        motionMagicConfigs.MotionMagicAcceleration = ArmConstants.kMaxA*ArmConstants.DEGREES_PER_ROTATION; 
+        motionMagicConfigs.MotionMagicJerk = 0; // no jerk limit
+
+        m_armMotor.getConfigurator().apply(talonFXConfigs);
     }
 }

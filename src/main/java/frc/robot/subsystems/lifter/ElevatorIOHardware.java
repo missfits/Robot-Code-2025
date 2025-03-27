@@ -17,6 +17,7 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOHardware {
@@ -40,6 +41,8 @@ public class ElevatorIOHardware {
         limitConfigs.StatorCurrentLimitEnable = true;
 
         talonFXConfigurator.apply(limitConfigs);
+
+        resetSlot0Gains();
     }
 
     // ----- MOTOR METHODS -----
@@ -101,11 +104,29 @@ public class ElevatorIOHardware {
         m_elevatorMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
 
-    public void config(TalonFXConfiguration configs) {
-        m_elevatorMotor.getConfigurator().apply(configs);
+    public void setClosedLoopPositionVoltage(double position, double feedfowardVoltage) {
+        m_elevatorMotor.setControl(new PositionVoltage(position/ElevatorConstants.METERS_PER_ROTATION).withFeedForward(feedfowardVoltage).withSlot(0));
     }
 
-    public void setControl(ControlRequest request) {
-        m_elevatorMotor.setControl(request);
+    public void resetSlot0Gains() {
+        var talonFXConfigs = new TalonFXConfiguration();
+
+        // set slot 0 gains
+        var slot0Configs = talonFXConfigs.Slot0;
+        slot0Configs.kS = ElevatorConstants.kS*ElevatorConstants.METERS_PER_ROTATION; 
+        slot0Configs.kV = ElevatorConstants.kV*ElevatorConstants.METERS_PER_ROTATION; 
+        slot0Configs.kA = ElevatorConstants.kA*ElevatorConstants.METERS_PER_ROTATION; 
+        slot0Configs.kP = ElevatorConstants.kP*ElevatorConstants.METERS_PER_ROTATION;
+        slot0Configs.kI = ElevatorConstants.kI*ElevatorConstants.METERS_PER_ROTATION;
+        slot0Configs.kD = ElevatorConstants.kD*ElevatorConstants.METERS_PER_ROTATION;
+
+        // set Motion Magic settings
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.kMaxV*ElevatorConstants.METERS_PER_ROTATION; 
+        motionMagicConfigs.MotionMagicAcceleration = ElevatorConstants.kMaxA*ElevatorConstants.METERS_PER_ROTATION; 
+        motionMagicConfigs.MotionMagicJerk = 0; // no jerk limit
+
+        m_elevatorMotor.getConfigurator().apply(talonFXConfigs);
     }
+
 }

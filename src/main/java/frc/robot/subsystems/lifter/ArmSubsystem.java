@@ -154,7 +154,7 @@ public class ArmSubsystem extends SubsystemBase {
         // calculate part of the power based on target velocity 
         double feedForwardPower = m_feedforward.calculate(m_profiledReference.position - ArmConstants.POSITION_OFFSET, m_profiledReference.velocity);
     
-        m_IO.setControl(new PositionVoltage(m_profiledReference.position/Math.toRadians(ArmConstants.DEGREES_PER_ROTATION)).withFeedForward(feedForwardPower).withSlot(0));
+        m_IO.setClosedLoopPositionVoltage(m_profiledReference.position/Math.toRadians(ArmConstants.DEGREES_PER_ROTATION), feedForwardPower);;
 
         SmartDashboard.putNumber("arm/target position", m_IO.getTargetPosition());
         SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
@@ -188,8 +188,8 @@ public class ArmSubsystem extends SubsystemBase {
             // calculate part of the power based on target velocity 
             double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
 
-            m_IO.setControl(new PositionVoltage(m_goal.position*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION)).withFeedForward(feedForwardPower).withSlot(0));
-    
+            m_IO.setClosedLoopPositionVoltage(m_goal.position*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION), feedForwardPower);
+
             SmartDashboard.putNumber("arm/target position", m_goal.position);
             SmartDashboard.putNumber("arm/target velocity", 0);
         
@@ -234,24 +234,7 @@ public class ArmSubsystem extends SubsystemBase {
             ArmConstants.kMaxV, ArmConstants.kMaxA
         );
 
-        var talonFXConfigs = new TalonFXConfiguration();
-
-        // set slot 0 gains
-        var slot0Configs = talonFXConfigs.Slot0;
-        slot0Configs.kS = ArmConstants.kS*ArmConstants.DEGREES_PER_ROTATION; 
-        slot0Configs.kV = ArmConstants.kV*ArmConstants.DEGREES_PER_ROTATION; 
-        slot0Configs.kA = ArmConstants.kA*ArmConstants.DEGREES_PER_ROTATION; 
-        slot0Configs.kP = ArmConstants.kP*ArmConstants.DEGREES_PER_ROTATION;
-        slot0Configs.kI = ArmConstants.kI*ArmConstants.DEGREES_PER_ROTATION;
-        slot0Configs.kD = ArmConstants.kD*ArmConstants.DEGREES_PER_ROTATION;
-
-        // set Motion Magic settings
-        var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = ArmConstants.kMaxV*ArmConstants.DEGREES_PER_ROTATION; 
-        motionMagicConfigs.MotionMagicAcceleration = ArmConstants.kMaxA*ArmConstants.DEGREES_PER_ROTATION; 
-        motionMagicConfigs.MotionMagicJerk = 0; // no jerk limit
-
-        m_IO.config(talonFXConfigs);
+        m_IO.resetSlot0Gains();
     } 
     
     @Override
@@ -262,7 +245,6 @@ public class ArmSubsystem extends SubsystemBase {
 
         SmartDashboard.putData("arm/subsystem", this);
         SmartDashboard.putBoolean("arm/okToMoveElevatorDownTrigger", okToMoveElevatorDownTrigger().getAsBoolean());
-
 
     }
 
