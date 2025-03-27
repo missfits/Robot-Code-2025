@@ -115,17 +115,17 @@ public class ArmIOHardware {
 
         // set slot 0 gains
         var slot0Configs = talonFXConfigs.Slot0;
-        slot0Configs.kS = ArmConstants.kS*ArmConstants.DEGREES_PER_ROTATION; 
-        slot0Configs.kV = ArmConstants.kV*ArmConstants.DEGREES_PER_ROTATION; 
-        slot0Configs.kA = ArmConstants.kA*ArmConstants.DEGREES_PER_ROTATION; 
-        slot0Configs.kP = ArmConstants.kP*ArmConstants.DEGREES_PER_ROTATION;
-        slot0Configs.kI = ArmConstants.kI*ArmConstants.DEGREES_PER_ROTATION;
-        slot0Configs.kD = ArmConstants.kD*ArmConstants.DEGREES_PER_ROTATION;
+        slot0Configs.kS = ArmConstants.kS*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION); 
+        slot0Configs.kV = ArmConstants.kV*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION); 
+        slot0Configs.kA = ArmConstants.kA*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION); 
+        slot0Configs.kP = ArmConstants.kP*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION);
+        slot0Configs.kI = ArmConstants.kI*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION);
+        slot0Configs.kD = ArmConstants.kD*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION);
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = ArmConstants.kMaxV*ArmConstants.DEGREES_PER_ROTATION; 
-        motionMagicConfigs.MotionMagicAcceleration = ArmConstants.kMaxA*ArmConstants.DEGREES_PER_ROTATION; 
+        motionMagicConfigs.MotionMagicCruiseVelocity = ArmConstants.kMaxV*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION);
+        motionMagicConfigs.MotionMagicAcceleration = ArmConstants.kMaxA*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION); 
         motionMagicConfigs.MotionMagicJerk = 0; // no jerk limit
 
         m_armMotor.getConfigurator().apply(talonFXConfigs);
