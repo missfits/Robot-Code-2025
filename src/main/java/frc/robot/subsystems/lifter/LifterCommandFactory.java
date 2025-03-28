@@ -34,15 +34,15 @@ public class LifterCommandFactory {
         if (targetRobotState == RobotState.L4_CORAL) {
             return Commands.parallel(
                 Commands.sequence(
-                    m_arm.moveToCommand(ArmConstants.MIN_POS_ELEVATOR_CLEAR)
+                    m_arm.moveToCommand(ArmConstants.MIN_POS_ELEVATOR_CLEAR, false)
                         .until(m_elevator.okToMoveArmBackTrigger()),
-                    m_arm.moveToCommand(ArmConstants.UPPER_INSIDE_ROBOT_BOUND)
+                    m_arm.moveToCommand(ArmConstants.UPPER_INSIDE_ROBOT_BOUND, false)
                         .until(m_elevator.isAtGoal(targetRobotState.getElevatorPos())),
-                    m_arm.moveToCommand(targetRobotState.getArmPos())
+                    m_arm.moveToCommand(targetRobotState.getArmPos(), true)
                 ),
                 Commands.sequence(
                     Commands.waitSeconds(3).until(m_arm.isArmInsideRobotTrigger()),
-                    m_elevator.moveToCommand(targetRobotState.getElevatorPos())
+                    m_elevator.moveToCommand(targetRobotState.getElevatorPos(), true)
                 )
             ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("moveToL4Command");
         } else {
@@ -54,16 +54,16 @@ public class LifterCommandFactory {
                 ElevatorConstants.MIN_POS_ARM_CLEAR);
             return Commands.parallel(
                 Commands.sequence(
-                    m_arm.moveToCommand(armIntermediatePosition)
+                    m_arm.moveToCommand(armIntermediatePosition, false)
                     .until(m_arm.isArmInsideRobotTrigger()
                         .and(m_elevator.isAtGoal(targetRobotState.getElevatorPos()))),
-                    m_arm.moveToCommand(targetRobotState.getArmPos())
+                    m_arm.moveToCommand(targetRobotState.getArmPos(), true)
                 ), 
                 Commands.sequence(
                     Commands.waitSeconds(3).until(m_arm.isArmInsideRobotTrigger()),
-                    m_elevator.moveToCommand(elevatorIntermediatePosition)
+                    m_elevator.moveToCommand(elevatorIntermediatePosition, false)
                         .until(m_arm.okToMoveElevatorDownTrigger()),
-                    m_elevator.moveToCommand(targetRobotState.getElevatorPos())
+                    m_elevator.moveToCommand(targetRobotState.getElevatorPos(), true)
                 )
             ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("moveToCommand");
         }
@@ -71,7 +71,7 @@ public class LifterCommandFactory {
 
     public Command moveToCommand(Supplier<RobotState> targetRobotStateSupplier) {
         return new SequentialCommandGroup(
-            m_arm.moveToCommand(ArmConstants.INITIAL_POSITION),
+            m_arm.moveToCommand(ArmConstants.INITIAL_POSITION, false),
             m_elevator.moveToCommand(() -> targetRobotStateSupplier.get().getElevatorPos()),
             m_arm.moveToCommand(() -> targetRobotStateSupplier.get().getArmPos())
         );
