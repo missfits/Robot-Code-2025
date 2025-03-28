@@ -54,7 +54,7 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(34.5) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(35.5) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -79,7 +79,7 @@ public final class Constants {
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
-    public static final double POSITION_LOWER_LIMIT = 0.01;
+    public static final double POSITION_LOWER_LIMIT = 0.005;
     public static final double POSITION_UPPER_LIMIT = 0.71;
     
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
@@ -88,7 +88,7 @@ public final class Constants {
     public static double kS = 0;
     public static double kG = 0.17;
     public static double kV = 3; 
-    public static double kA = 1;
+    public static double kA = 0.6;
 
     public static double kP = 125; 
     public static double kI = 15;
@@ -124,21 +124,24 @@ public final class Constants {
 
     public static double kS = 0.15;
     public static double kG = 0;
-    public static double kV = 0.55;
+    public static double kV = 0.6;
     public static double kA = 0.0125;
 
     public static double kP = 55;
     public static double kI = 0;
     public static double kD = 0;
     
-    public static double kMaxV = 7;
-    public static double kMaxA = 13; 
+    public static double kMaxV = 9;
+    public static double kMaxA = 15; 
+
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
 
-    public static final double MIN_POS_ELEVATOR_CLEAR = -0.4; // needs to be measured
+    public static final double MIN_POS_ELEVATOR_CLEAR = -0.3; // accounts for when coral inside collar
+    public static final double LOWER_INSIDE_ROBOT_BOUND = 0;
+    public static final double UPPER_INSIDE_ROBOT_BOUND = -Math.PI;
   }
 
   public static class CollarConstants {
@@ -154,8 +157,8 @@ public final class Constants {
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_MOTOR_SPEED = 6.0;
-    public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
-    public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -2.0;
+    public static final double INTAKE_SECONDARY_MOTOR_SPEED = 3.0;
+    public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -4.5;
 
 
     public static final double BACKWARDS_MOTOR_SPEED = -1.0;
@@ -186,20 +189,28 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(3);
-    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(11);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(1);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(9);
 
     public static final double kMaxV = 1; // to be tuned
     public static final double kMaxA = 1; // to be tuned
+    public static final double INTERMEDIATE_POS_DIST = Units.inchesToMeters(2);
   }
 
   public static class VisionConstants {
-    public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";  
+    public static final String CAMERA1_NAME = "beam_camera";  
+    public static final String CAMERA2_NAME = "swerve_camera";  
 
-    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-1) : -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM1_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM1_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-1) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM1_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
+
+    public static final double ROBOT_TO_CAM2_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(13-4.75) : 0 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM2_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(13-3.125) : 0; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM2_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(7.5) : 0; // in meters from the floor?
+    
+
     // default vision standard deviation
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(6, 6, 4);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.3);
@@ -211,15 +222,22 @@ public final class Constants {
     public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
     public static final double VISION_DISTANCE_DISCARD = 10; 
 
+    public static final double VISION_ALIGNMENT_DISCARD = 0.114; // in meters
 
 
+    public static final Translation2d ROBOT_TO_CAM1 = 
+      new Translation2d(ROBOT_TO_CAM1_X, ROBOT_TO_CAM1_Y); // in meters from center of robot to 2x4 camera mount
 
-    public static final Translation2d ROBOT_TO_CAM = 
-      new Translation2d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y); // in meters from center of robot to 2x4 camera mount
+    public static final Translation2d ROBOT_TO_CAM2 = 
+      new Translation2d(ROBOT_TO_CAM2_X, ROBOT_TO_CAM2_Y); // in meters from center of robot to 2x4 camera mount
 
-    public static final Transform3d ROBOT_TO_CAM_3D = 
-      new Transform3d(new Translation3d(ROBOT_TO_CAM_X, ROBOT_TO_CAM_Y, ROBOT_TO_CAM_Z), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
+    public static final Transform3d ROBOT_TO_CAM1_3D = 
+      new Transform3d(new Translation3d(ROBOT_TO_CAM1_X, ROBOT_TO_CAM1_Y, ROBOT_TO_CAM1_Z), new Rotation3d(0,0,0)); // in meters from center of robot to 2x4 camera mount
     
+    public static final Transform3d ROBOT_TO_CAM2_3D = 
+      new Transform3d(new Translation3d(ROBOT_TO_CAM2_X, ROBOT_TO_CAM2_Y, ROBOT_TO_CAM2_Z), new Rotation3d(0,0,-Math.PI/9)); // in meters from center of robot to 2x4 camera mount
+  
+
     public static final double CAMERA_HEIGHT = 0.0951738; // in meters from floor to camera center
     public static final double CAMERA_PITCH = 0; // in radians, bogus
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
@@ -248,7 +266,7 @@ public final class Constants {
     public static final double C2_ELEVATOR_POS_WITH_CORAL = 0.3172; // from 3/1
     public static final double C2_ARM_POS_WITH_CORAL = 1.0371; // from 3/1
 
-    public static final double C3_ELEVATOR_POS = 0.7124; // from 3/1
+    public static final double C3_ELEVATOR_POS = 0.670; // from 3/1
     public static final double C3_ARM_POS = 0.5078; // from 3/1
 
     public static final double C3_ELEVATOR_POS_WITH_CORAL = 0.7124; // from 3/1
@@ -261,7 +279,7 @@ public final class Constants {
     public static final double C4_ARM_POS_WITH_CORAL = -3.2239; // from 3/1
 
   
-    public static final double A2_ELEVATOR_POS = 0; // from 3/1
+    public static final double A2_ELEVATOR_POS = 0.01; // from 3/25
     public static final double A2_ARM_POS = 0.8532; // from 3/1
 
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
