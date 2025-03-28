@@ -94,8 +94,8 @@ public final class Constants {
     public static double kI = 15;
     public static double kD = 0; 
 
-    public static double kMaxV = 2;
-    public static double kMaxA = 3; 
+    public static double kMaxV = 3;
+    public static double kMaxA = 6; 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
@@ -127,7 +127,7 @@ public final class Constants {
     public static double kV = 0.6;
     public static double kA = 0.0125;
 
-    public static double kP = 55;
+    public static double kP = 45;
     public static double kI = 0;
     public static double kD = 0;
     
