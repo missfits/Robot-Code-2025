@@ -32,6 +32,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
     );
     private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
+    private TrapezoidProfile.State m_oldGoal = new TrapezoidProfile.State(0,0);
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
@@ -92,15 +93,15 @@ public class ElevatorSubsystem extends SubsystemBase{
         ).withName("moveToCommand");
     }
 
-    public Command moveToCommand(double targetPosition) {
-        return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
+    public Command moveToCommand(double targetPosition, boolean keepGoal) {
+        return moveToCommand(new TrapezoidProfile.State(targetPosition, 0), keepGoal);
     }
 
-    public Command moveToCommand(TrapezoidProfile.State goal) {
+    public Command moveToCommand(TrapezoidProfile.State goal, boolean keepGoal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
+            (interrupted) -> {if (keepGoal) {m_oldGoal = goal;} else {m_goal = m_oldGoal;}; SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
         ).withName("moveToCommand");
@@ -195,6 +196,9 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("elevator/goal position", m_goal.position);
+        SmartDashboard.putNumber("elevator/old goal position", m_oldGoal.position);
+
 
         SmartDashboard.putData("elevator/subsystem", this);
     }
