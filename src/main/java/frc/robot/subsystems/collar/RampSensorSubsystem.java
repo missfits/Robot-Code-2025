@@ -32,7 +32,8 @@ public class RampSensorSubsystem extends SubsystemBase {
   public boolean coralSeenAfterRamp() {
     return measurementRampOut != null && 
       measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
-      measurementRampOut.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_OUT;
+      measurementRampOut.distance_mm < LaserCanConstants.MIN_CORAL_SEEN_DISTANCE_RAMP_OUT &&
+      measurementRampOut.distance_mm > 0.1; // bypass lasercan skill issue (periodically outputs 0 mm)
   }
   
   public Trigger coralSeenInRampTrigger() {
