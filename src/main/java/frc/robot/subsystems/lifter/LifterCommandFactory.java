@@ -44,7 +44,7 @@ public class LifterCommandFactory {
                     Commands.waitSeconds(3).until(m_arm.isArmInsideRobotTrigger()),
                     m_elevator.moveToCommand(targetRobotState.getElevatorPos())
                 )
-            ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos()));
+            ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("moveToL4Command");
         } else {
             // move arm to intermediate pos inside the robot before moving elevator
             double armIntermediatePosition = MathUtil.clamp(targetRobotState.getArmPos(), 
@@ -65,7 +65,7 @@ public class LifterCommandFactory {
                         .until(m_arm.okToMoveElevatorDownTrigger()),
                     m_elevator.moveToCommand(targetRobotState.getElevatorPos())
                 )
-            ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos()));
+            ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("moveToCommand");
         }
     }
 
