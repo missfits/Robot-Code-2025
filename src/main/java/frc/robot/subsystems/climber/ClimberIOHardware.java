@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -70,5 +71,9 @@ public class ClimberIOHardware {
 
     public void setBrake(boolean brake) {
         m_climberMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    }
+
+    public void setCoast() {
+        m_climberMotor.setControl(new CoastOut());
     }
 }

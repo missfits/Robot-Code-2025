@@ -266,4 +266,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public boolean isTall() {
         return m_IO.getPosition() > ElevatorConstants.MIN_HEIGHT_TO_BE_TALL;
     }
+
+    public Command setCoastCommand() {
+        return run(() -> m_IO.setCoast()).ignoringDisable(true);
+    }
 }

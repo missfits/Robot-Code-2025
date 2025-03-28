@@ -444,6 +444,13 @@ public class RobotContainer {
     CommandScheduler.getInstance().schedule(drivetrain.getCommandFromRequest(() -> drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0)));
   }
 
+  public void startCoastMode() {
+    CommandScheduler.getInstance().schedule(m_elevator.setCoastCommand());
+    CommandScheduler.getInstance().schedule(m_arm.setCoastCommand());
+    CommandScheduler.getInstance().schedule(m_climber.setCoastCommand());
+    CommandScheduler.getInstance().schedule(drivetrain.setCoastCommand());
+  }
+
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
   }

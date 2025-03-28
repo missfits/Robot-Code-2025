@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
@@ -66,5 +67,9 @@ public class CollarIOHardware {
     
     public void requestClosedLoopPosition(double value) {
         m_collarMotor.setControl(new PositionVoltage(value));
+    }
+
+    public void setCoast() {
+        m_collarMotor.setControl(new CoastOut());
     }
 }

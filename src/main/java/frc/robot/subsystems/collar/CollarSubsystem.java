@@ -50,8 +50,10 @@ public class CollarSubsystem extends SubsystemBase {
         SmartDashboard.putData("collar/subsystem", this);
         SmartDashboard.putNumber("collar/current", m_IO.getCurrent());
         SmartDashboard.putNumber("collar/velocity", m_IO.getVelocity());
+    }
 
-
+    public Command setCoastCommand() {
+        return run(() -> m_IO.setCoast()).ignoringDisable(true);
     }
  }
 
