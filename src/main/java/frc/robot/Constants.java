@@ -54,7 +54,7 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(34.5) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(35.5) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -79,7 +79,7 @@ public final class Constants {
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
-    public static final double POSITION_LOWER_LIMIT = 0.01;
+    public static final double POSITION_LOWER_LIMIT = 0.005;
     public static final double POSITION_UPPER_LIMIT = 0.71;
     
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
@@ -88,7 +88,7 @@ public final class Constants {
     public static double kS = 0;
     public static double kG = 0.17;
     public static double kV = 3; 
-    public static double kA = 1;
+    public static double kA = 0.6;
 
     public static double kP = 125; 
     public static double kI = 15;
@@ -124,21 +124,24 @@ public final class Constants {
 
     public static double kS = 0.15;
     public static double kG = 0;
-    public static double kV = 0.55;
+    public static double kV = 0.6;
     public static double kA = 0.0125;
 
     public static double kP = 55;
     public static double kI = 0;
     public static double kD = 0;
     
-    public static double kMaxV = 7;
-    public static double kMaxA = 13; 
+    public static double kMaxV = 9;
+    public static double kMaxA = 15; 
+
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
 
     public static final double MIN_POS_ELEVATOR_CLEAR = -0.4; // needs to be measured
+    public static final double LOWER_INSIDE_ROBOT_BOUND = 0;
+    public static final double UPPER_INSIDE_ROBOT_BOUND = -Math.PI;
   }
 
   public static class CollarConstants {
@@ -276,7 +279,7 @@ public final class Constants {
     public static final double C4_ARM_POS_WITH_CORAL = -3.2239; // from 3/1
 
   
-    public static final double A2_ELEVATOR_POS = 0; // from 3/1
+    public static final double A2_ELEVATOR_POS = 0.01; // from 3/25
     public static final double A2_ARM_POS = 0.8532; // from 3/1
 
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
