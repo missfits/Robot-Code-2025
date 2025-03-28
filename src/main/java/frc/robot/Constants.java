@@ -253,7 +253,7 @@ public final class Constants {
     public static final double C2_ELEVATOR_POS_WITH_CORAL = 0.3172; // from 3/1
     public static final double C2_ARM_POS_WITH_CORAL = 1.0371; // from 3/1
 
-    public static final double C3_ELEVATOR_POS = 0.7124; // from 3/1
+    public static final double C3_ELEVATOR_POS = 0.670; // from 3/1
     public static final double C3_ARM_POS = 0.5078; // from 3/1
 
     public static final double C3_ELEVATOR_POS_WITH_CORAL = 0.7124; // from 3/1
