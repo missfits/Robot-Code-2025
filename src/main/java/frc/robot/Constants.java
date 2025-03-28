@@ -203,8 +203,8 @@ public final class Constants {
     public static final double ROBOT_TO_CAM1_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
 
-    public static final double ROBOT_TO_CAM2_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(7.5) : 0 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM2_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(10.5) : 0; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM2_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(13-4.75) : 0 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM2_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(13-3.125) : 0; // in meters from center of robot 
     public static final double ROBOT_TO_CAM2_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(7.5) : 0; // in meters from the floor?
     
 
