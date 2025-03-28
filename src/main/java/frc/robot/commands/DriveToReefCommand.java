@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.VisionUtils;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
@@ -69,7 +70,7 @@ public class DriveToReefCommand extends Command {
     @Override
     public void initialize() {
       
-      reachedIntermediateTranslation = false
+      reachedIntermediateTranslation = false;
 
       Pose2d targetPose = VisionUtils.getClosestReefAprilTag(m_drivetrain.getState().Pose);
       if (targetPose != null) {
