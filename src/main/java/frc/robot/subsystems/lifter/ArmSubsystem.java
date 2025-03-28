@@ -154,7 +154,7 @@ public class ArmSubsystem extends SubsystemBase {
         // calculate part of the power based on target velocity 
         double feedForwardPower = m_feedforward.calculate(m_profiledReference.position - ArmConstants.POSITION_OFFSET, m_profiledReference.velocity);
     
-        m_IO.setClosedLoopPositionVoltage(m_profiledReference.position/Math.toRadians(ArmConstants.DEGREES_PER_ROTATION), feedForwardPower);;
+        m_IO.setClosedLoopPositionVoltage(m_profiledReference.position, feedForwardPower);;
 
         SmartDashboard.putNumber("arm/target position", m_IO.getTargetPosition());
         SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
@@ -188,7 +188,7 @@ public class ArmSubsystem extends SubsystemBase {
             // calculate part of the power based on target velocity 
             double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
 
-            m_IO.setClosedLoopPositionVoltage(m_goal.position*Math.toRadians(ArmConstants.DEGREES_PER_ROTATION), feedForwardPower);
+            m_IO.setClosedLoopPositionVoltage(m_goal.position, feedForwardPower);
 
             SmartDashboard.putNumber("arm/target position", m_goal.position);
             SmartDashboard.putNumber("arm/target velocity", 0);
