@@ -31,7 +31,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
         ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
     );
-    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
+    private TrapezoidProfile.State m_currentGoal = new TrapezoidProfile.State(0,0);
+    private TrapezoidProfile.State m_keepInPlacePIDGoal = new TrapezoidProfile.State(0,0);
     private TrapezoidProfile.State m_profiledReference;
     private TrapezoidProfile m_profile;
 
@@ -87,20 +88,20 @@ public class ElevatorSubsystem extends SubsystemBase{
             () -> initalizeMoveTo(goal.get()),
             () -> executeMoveTo(),
             (interrupted) -> {},
-            () -> Math.abs(m_IO.getPosition()-goal.get().position) < 0.005,
+            () -> false,
             this
         ).withName("moveToCommand");
     }
 
-    public Command moveToCommand(double targetPosition) {
-        return moveToCommand(new TrapezoidProfile.State(targetPosition, 0));
+    public Command moveToCommand(double targetPosition, boolean keepGoal) {
+        return moveToCommand(new TrapezoidProfile.State(targetPosition, 0), keepGoal);
     }
 
-    public Command moveToCommand(TrapezoidProfile.State goal) {
+    public Command moveToCommand(TrapezoidProfile.State goal, boolean keepGoal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
             () -> executeMoveTo(),
-            (interrupted) -> {SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
+            (interrupted) -> {if (keepGoal) {m_keepInPlacePIDGoal = goal;}; SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
         ).withName("moveToCommand");
@@ -113,7 +114,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();
-        m_goal = goal;
+        m_currentGoal = goal;
         m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         m_profile = new TrapezoidProfile(m_constraints);
         runKeepInPlacePID = true;
@@ -121,7 +122,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     private void executeMoveTo() {
         // recalculate the profiled reference point (the vel + pos that we want)
-        m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_goal);
+        m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_currentGoal);
         
         // calculate part of the power based on target velocity 
         double feedForwardPower = m_feedforward.calculate(m_profiledReference.velocity);
@@ -140,13 +141,13 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         if (runKeepInPlacePID) {
             // calculate part of the power based on target position + current position
-            double PIDPower = m_controller.calculate(m_IO.getPosition(), m_goal.position);
+            double PIDPower = m_controller.calculate(m_IO.getPosition(), m_keepInPlacePIDGoal.position);
 
             // calculate part of the power based on target velocity 
             double feedForwardPower = m_feedforward.calculate(0);
 
             m_IO.setVoltage(PIDPower + feedForwardPower);
-            SmartDashboard.putNumber("elevator/target position", m_goal.position);
+            SmartDashboard.putNumber("elevator/target position", m_keepInPlacePIDGoal.position);
             SmartDashboard.putNumber("elevator/target velocity", 0);
         
         } else {
@@ -159,7 +160,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     } 
 
     public Trigger isAtGoal() {
-        return new Trigger(() -> isAtPosition(m_goal.position));
+        return new Trigger(() -> isAtPosition(m_currentGoal.position));
     } 
     
     public Trigger isAtGoal(double goal) {
@@ -195,6 +196,9 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("elevator/currentGoal position", m_currentGoal.position);
+        SmartDashboard.putNumber("elevator/keepInPlacePIDGoal position", m_keepInPlacePIDGoal.position);
+
 
         SmartDashboard.putData("elevator/subsystem", this);
     }

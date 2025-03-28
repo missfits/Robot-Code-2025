@@ -79,7 +79,7 @@ public final class Constants {
     public static final double SPEED_LOWER_LIMIT = 0.0;
     public static final double SPEED_UPPER_LIMIT = 0.0;
     
-    public static final double POSITION_LOWER_LIMIT = 0.01;
+    public static final double POSITION_LOWER_LIMIT = 0.005;
     public static final double POSITION_UPPER_LIMIT = 0.71;
     
     public static final int MOTOR_STATOR_LIMIT = 60; // needs to be tuned
@@ -134,11 +134,14 @@ public final class Constants {
     public static double kMaxV = 9;
     public static double kMaxA = 15; 
 
+
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
 
     public static final double MIN_POS_ELEVATOR_CLEAR = -0.4; // needs to be measured
+    public static final double LOWER_INSIDE_ROBOT_BOUND = 0;
+    public static final double UPPER_INSIDE_ROBOT_BOUND = -Math.PI;
   }
 
   public static class CollarConstants {
@@ -196,9 +199,9 @@ public final class Constants {
   public static class VisionConstants {
     public static final String CAMERA_NAME = "beam_camera";  
 
-    public static final double ROBOT_TO_CAM1_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2.5) : 0.31115 ; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM1_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : -0.0508; // in meters from center of robot 
-    public static final double ROBOT_TO_CAM1_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
+    public static final double ROBOT_TO_CAM_X = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2.5) : 0.31115 ; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Y = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(-2) : -0.0508; // in meters from center of robot 
+    public static final double ROBOT_TO_CAM_Z = RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(17) : 0.1397; // in meters from the floor?
     
     // default vision standard deviation
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(6, 6, 4);
@@ -263,7 +266,7 @@ public final class Constants {
     public static final double C4_ARM_POS_WITH_CORAL = -3.2239; // from 3/1
 
   
-    public static final double A2_ELEVATOR_POS = 0; // from 3/1
+    public static final double A2_ELEVATOR_POS = 0.01; // from 3/25
     public static final double A2_ARM_POS = 0.8532; // from 3/1
 
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
