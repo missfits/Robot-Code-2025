@@ -48,21 +48,17 @@ public class RampSensorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     measurementRampOut = LCRampOut.getMeasurement();
-    if (measurementRampOut != null && measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+    if (measurementRampOut != null) {
       SmartDashboard.putNumber("rampSensors/LaserCAN Ramp Out Distance", measurementRampOut.distance_mm);
-    } else {
-      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp Out Distance", 0);
-      // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurementRampOMeasurement.
+      SmartDashboard.putBoolean("rampSensors/LaserCAN Ramp Out isValid", measurementRampOut.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT);
     }
 
     measurementRampIn = LCRampIn.getMeasurement();
-    if (measurementRampIn != null && measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+    if (measurementRampIn != null) {
       SmartDashboard.putNumber("rampSensors/LaserCAN Ramp In Distance", measurementRampIn.distance_mm);
-    } else {
-      SmartDashboard.putNumber("rampSensors/LaserCAN Ramp In Distance", 0);
-      // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurementRampOMeasurement.
+      SmartDashboard.putBoolean("rampSensors/LaserCAN Ramp In isValid", measurementRampIn.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT);
     }
-
+    
     SmartDashboard.putBoolean("rampSensors/coralSeenAfterRamp", coralSeenAfterRamp());
     SmartDashboard.putBoolean("rampSensors/coralSeenInRamp", coralSeenInRamp());
 
