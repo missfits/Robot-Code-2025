@@ -270,4 +270,8 @@ public class ArmSubsystem extends SubsystemBase {
     public void setRunKeepInPlace(boolean bool) {
         runKeepInPlacePID = bool;
     }
+
+    public Command setCoastCommand() {
+        return run(() -> m_IO.setCoast()).ignoringDisable(true);
+    }
 }
