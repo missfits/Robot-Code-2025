@@ -139,7 +139,7 @@ public final class Constants {
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
 
-    public static final double MIN_POS_ELEVATOR_CLEAR = -0.4; // needs to be measured
+    public static final double MIN_POS_ELEVATOR_CLEAR = -0.3; // accounts for when coral inside collar
     public static final double LOWER_INSIDE_ROBOT_BOUND = 0;
     public static final double UPPER_INSIDE_ROBOT_BOUND = -Math.PI;
   }
@@ -157,8 +157,8 @@ public final class Constants {
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
     public static final double INTAKE_MOTOR_SPEED = 6.0;
-    public static final double INTAKE_SECONDARY_MOTOR_SPEED = 1.0;
-    public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -2.0;
+    public static final double INTAKE_SECONDARY_MOTOR_SPEED = 3.0;
+    public static final double INTAKE_SECONDARY_BACK_MOTOR_SPEED = -4.5;
 
 
     public static final double BACKWARDS_MOTOR_SPEED = -1.0;
