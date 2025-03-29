@@ -52,11 +52,17 @@ public class CollarSubsystem extends SubsystemBase {
         return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
 
+    public Command resetEncoders() {
+        return new InstantCommand(() -> m_IO.setPosition(0), this);
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putData("collar/subsystem", this);
         SmartDashboard.putNumber("collar/current", m_IO.getCurrent());
         SmartDashboard.putNumber("collar/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("collar/position", m_IO.getPosition());
+
     }
 
     public Command setCoastCommand() {
