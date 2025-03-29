@@ -362,7 +362,7 @@ public class RobotContainer {
     }
 
     // elevator moveTo auto commands
-    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence().withTimeout(3), m_collar.runCollarOffInstant())); // update to use grapplehook instead
+    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence2().withTimeout(3), m_collar.runCollarOffInstant())); // update to use grapplehook instead
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
