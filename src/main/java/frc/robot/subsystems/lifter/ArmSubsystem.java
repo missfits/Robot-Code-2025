@@ -259,6 +259,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         SmartDashboard.putData("arm/subsystem", this);
         SmartDashboard.putBoolean("arm/okToMoveElevatorDownTrigger", okToMoveElevatorDownTrigger().getAsBoolean());
+        SmartDashboard.putBoolean("arm/isArmInsideRobotTrigger", isArmInsideRobotTrigger().getAsBoolean());
 
     }
 
