@@ -21,8 +21,11 @@ public class CollarSubsystem extends SubsystemBase {
     }
 
     public Command runCollarOff() {
-        return new RunCommand(
+        return new FunctionalCommand(
             () -> {m_IO.setVoltage(0);  SmartDashboard.putString("collar/currentlyRunningCommand", "runCollarOff");},
+            () -> {m_IO.setVoltage(0);  SmartDashboard.putString("collar/currentlyRunningCommand", "runCollarOff");},
+            (interrupted) -> {},
+            () -> false,
             this
         ).withName("collarOff");
     }
@@ -35,8 +38,12 @@ public class CollarSubsystem extends SubsystemBase {
     }
 
     public Command runCollar(double speed) {
-        return new RunCommand(
+        return new FunctionalCommand(
+            // set voltage in init also
             () -> {m_IO.setVoltage(speed); SmartDashboard.putString("collar/currentlyRunningCommand", "runCollar");},
+            () -> {m_IO.setVoltage(speed); SmartDashboard.putString("collar/currentlyRunningCommand", "runCollar");},
+            (interrupted) -> {},
+            () -> false,
             this
         ).withName("runCollar");
     }
