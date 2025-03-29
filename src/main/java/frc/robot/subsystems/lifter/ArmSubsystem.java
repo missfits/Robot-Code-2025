@@ -216,7 +216,7 @@ public class ArmSubsystem extends SubsystemBase {
     } 
 
     private boolean okToMoveElevatorDown() {
-        return  m_IO.getPosition() > ArmConstants.MIN_POS_ELEVATOR_CLEAR;
+        return  m_IO.getPosition() > ArmConstants.MIN_POS_ELEVATOR_CLEAR - ArmConstants.MAX_POSITION_TOLERANCE;
     } 
 
     public Trigger isArmInsideRobotTrigger() {
