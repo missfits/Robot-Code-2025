@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.events.EventTrigger;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
@@ -367,8 +368,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
     NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+    NamedCommands.registerCommand("shootCoral", Commands.sequence(m_collarCommandFactory.runCollarOut().withTimeout(0.35), m_collar.runCollarOffInstant()));
     NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
     NamedCommands.registerCommand("waitUntilArmDone", new WaitCommand(1).until(m_elevator.isNotAtL4Trigger()));
+    NamedCommands.registerCommand("descoreAlgaeL2", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_ALGAE)));
 
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
@@ -413,6 +416,9 @@ public class RobotContainer {
     SmartDashboard.putString("buildVersion/branchName", BuildConstants.GIT_BRANCH);
     SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);
 
+    //add event markers
+    new EventTrigger("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+    new EventTrigger("lifterToL4").onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
     CameraServer.startAutomaticCapture();
 
     FollowPathCommand.warmupCommand().schedule();
