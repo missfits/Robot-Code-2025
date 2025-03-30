@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5685297309027773,
-        "y": 3.0472254774305547
+        "x": 3.649667385727612,
+        "y": 3.005530404617537
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1777275464463512,
-        "y": 2.6383755879083557
+        "x": 3.258865201271186,
+        "y": 2.596680515095338
       },
       "isLocked": false,
       "linkedName": "peg c"
     },
     {
       "anchor": {
-        "x": 1.4363628472222212,
-        "y": 0.6968630642361109
+        "x": 1.4660982684235073,
+        "y": 0.7757636135727602
       },
       "prevControl": {
-        "x": 1.601682166854858,
-        "y": 0.9385530225648345
+        "x": 1.6314175880561441,
+        "y": 1.017453571901484
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,10 +31,17 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "lifterToIntake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
