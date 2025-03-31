@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.649667385727612,
-        "y": 3.005530404617537
+        "x": 3.709437889676857,
+        "y": 3.0080147998753604
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.258865201271186,
-        "y": 2.596680515095338
+        "x": 3.318635705220431,
+        "y": 2.5991649103531613
       },
       "isLocked": false,
       "linkedName": "peg c"
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.49826523680124224,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 4.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
@@ -55,7 +69,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": 60.11558572476731
   },
   "useDefaultConstraints": true
 }
