@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -81,7 +82,6 @@ import frc.robot.subsystems.lifter.ElevatorIOHardware;
 import frc.robot.subsystems.lifter.ElevatorSubsystem;
 import frc.robot.subsystems.lifter.LifterCommandFactory;
 import frc.robot.subsystems.ramp.RampSubsystem;
-import frc.robot.commands.AutoAlignCommand;
 
 
 
@@ -100,7 +100,7 @@ public class RobotContainer {
   private RobotState nextState = RobotState.INTAKE;
 
   private double MaxSpeed = TunerConstantsDynamene.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
-  private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double MaxAngularRate = 2.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController driverJoystick = new CommandXboxController(OperatorConstants.kDriverControllerPort); // driver joystick
@@ -112,7 +112,8 @@ public class RobotContainer {
    name == RobotName.DYNAMENE ? TunerConstantsDynamene.createDrivetrain() : TunerConstantsCeridwen.createDrivetrain(); // My drivetrain
 
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem(); 
-  private final VisionSubsystem m_vision = new VisionSubsystem(drivetrain.getPigeon2());
+  private final VisionSubsystem m_cameraOne = new VisionSubsystem(VisionConstants.CAMERA1_NAME, VisionConstants.ROBOT_TO_CAM1_3D);
+  private final VisionSubsystem m_cameraTwo = new VisionSubsystem(VisionConstants.CAMERA2_NAME, VisionConstants.ROBOT_TO_CAM2_3D);
   private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
   private final RampSubsystem m_ramp = new RampSubsystem();
@@ -137,7 +138,8 @@ public class RobotContainer {
 
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
 
-  private final Field2d m_estPoseField = new Field2d();
+  private final Field2d m_estPoseFieldBeam = new Field2d();
+  private final Field2d m_estPoseFieldSwerve = new Field2d();
   private final Field2d m_actualField = new Field2d();
 
 
@@ -157,15 +159,15 @@ public class RobotContainer {
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
     // reset fused vision pose estimator to vision pose on center (cross button)
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_vision.getEstimatedRobotPose().estimatedPose.toPose2d())));
+    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_cameraOne.getEstimatedRobotPose().estimatedPose.toPose2d())));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.RIGHT, m_ledSubsystem)); 
+    driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.RIGHT, m_ledSubsystem)); 
     driverJoystick.rightTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
-    drivetrain.isAutoAligned().whileTrue(m_ledSubsystem.runGradientGreenYellow());
+    drivetrain.isAutoAligned().whileTrue(m_ledSubsystem.runSolidGreen());
 
     // moves to the LEFT side. only press after running rotatetofacereef (right trigger)
-    driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, m_vision, ReefPosition.LEFT, m_ledSubsystem)); 
+    driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.LEFT, m_ledSubsystem)); 
     driverJoystick.leftTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
     
     driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
@@ -360,7 +362,7 @@ public class RobotContainer {
     }
 
     // elevator moveTo auto commands
-    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence().withTimeout(3), m_collar.runCollarOffInstant())); // update to use grapplehook instead
+    NamedCommands.registerCommand("intakeCoral", Commands.sequence(m_collarCommandFactory.intakeCoralSequence2().withTimeout(3), m_collar.runCollarOffInstant())); // update to use grapplehook instead
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
@@ -371,7 +373,8 @@ public class RobotContainer {
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
     
-    SmartDashboard.putData("est pose field", m_estPoseField);
+    SmartDashboard.putData("est pose field beam", m_estPoseFieldBeam);
+    SmartDashboard.putData("est pose field swerve", m_estPoseFieldSwerve);
     SmartDashboard.putData("Actual Field", m_actualField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
@@ -441,6 +444,13 @@ public class RobotContainer {
     CommandScheduler.getInstance().schedule(drivetrain.getCommandFromRequest(() -> drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0)));
   }
 
+  public void startCoastMode() {
+    CommandScheduler.getInstance().schedule(m_elevator.setCoastCommand());
+    CommandScheduler.getInstance().schedule(m_arm.setCoastCommand());
+    CommandScheduler.getInstance().schedule(m_climber.setCoastCommand());
+    CommandScheduler.getInstance().schedule(drivetrain.setCoastCommand());
+  }
+
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
   }
@@ -453,33 +463,62 @@ public class RobotContainer {
 
   public void updatePoseEst() {
 
-    EstimatedRobotPose estimatedRobotPose = m_vision.getEstimatedRobotPose();
-    if (estimatedRobotPose != null && m_vision.getTargetFound()) {
-      Pose3d estPose3d = estimatedRobotPose.estimatedPose; // estimated robot pose of vision
+    EstimatedRobotPose estimatedRobotPoseOne = m_cameraOne.getEstimatedRobotPose();
+    EstimatedRobotPose estimatedRobotPoseTwo = m_cameraTwo.getEstimatedRobotPose();
+
+    updatePoseEst(estimatedRobotPoseOne, m_cameraOne, m_estPoseFieldBeam);
+    updatePoseEst(estimatedRobotPoseTwo, m_cameraTwo, m_estPoseFieldSwerve);
+    // if (estimatedRobotPoseOne != null && m_cameraOne.getTargetFound()) {
+    //   Pose3d estPose3d = estimatedRobotPoseOne.estimatedPose; // estimated robot pose of vision
+    //   Pose2d estPose2d = estPose3d.toPose2d();
+
+    //     // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+    //     double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+
+    //     SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
+    //     if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_cameraOne.isEstPoseJumpy()) {
+    //       drivetrain.setVisionMeasurementStdDevs(m_cameraOne.getCurrentStdDevs());
+    //       drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPoseOne.timestampSeconds));
+        
+    //       m_estPoseField.setRobotPose(estPose2d);
+    //       SmartDashboard.putNumberArray("vision/visionPose2dFiltered", new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
+    //   }
+
+    //   SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+    //     estPose3d.getX(),
+    //     estPose3d.getY(),
+    //     estPose3d.getZ(),
+    //     estPose3d.getRotation().toRotation2d().getRadians()
+    //   }); // post vision 3d to smartdashboard
+    // }
+    
+    m_actualField.setRobotPose(drivetrain.getState().Pose);
+  }
+
+  public void updatePoseEst(EstimatedRobotPose robotPose, VisionSubsystem camera, Field2d field){
+    if (robotPose != null && camera.getTargetFound()) {
+      Pose3d estPose3d = robotPose.estimatedPose; // estimated robot pose of vision
       Pose2d estPose2d = estPose3d.toPose2d();
 
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
         double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
-        SmartDashboard.putNumber("vision/distanceBetweenVisionAndActualPose", distance);
-        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !m_vision.isEstPoseJumpy()) {
-          drivetrain.setVisionMeasurementStdDevs(m_vision.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(estimatedRobotPose.timestampSeconds));
+        SmartDashboard.putNumber("vision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
+          drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
+          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
         
-          m_estPoseField.setRobotPose(estPose2d);
-          SmartDashboard.putNumberArray("vision/visionPose2dFiltered", new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
+          field.setRobotPose(estPose2d);
+          SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
       }
 
-      SmartDashboard.putNumberArray("vision/visionPose3D", new double[] {
+      SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose3D", new double[] {
         estPose3d.getX(),
         estPose3d.getY(),
         estPose3d.getZ(),
         estPose3d.getRotation().toRotation2d().getRadians()
       }); // post vision 3d to smartdashboard
     }
-    
-
-    m_actualField.setRobotPose(drivetrain.getState().Pose);
   }
 
 }

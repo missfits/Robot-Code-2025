@@ -12,6 +12,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
+
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.RobotStateConstants;
 
@@ -41,6 +47,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     // constructor
     public ElevatorSubsystem() {
         m_IO.resetPosition();
+        resetControllers();
     }
 
     // commands
@@ -86,7 +93,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public Command moveToCommand(Supplier<TrapezoidProfile.State> goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal.get()),
-            () -> executeMoveTo(),
+            () -> executeMoveToOnMotor(),
             (interrupted) -> {},
             () -> false,
             this
@@ -100,7 +107,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public Command moveToCommand(TrapezoidProfile.State goal, boolean keepGoal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
-            () -> executeMoveTo(),
+            () -> executeMoveToOnMotor(),
             (interrupted) -> {if (keepGoal) {m_keepInPlacePIDGoal = goal;}; SmartDashboard.putBoolean("elevator/moveToCommandRunning", false);},
             () -> false,
             this
@@ -137,6 +144,19 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putBoolean("elevator/moveToCommandRunning", true);
     }
 
+    private void executeMoveToOnMotor() {
+        // recalculate the profiled reference point (the vel + pos that we want)
+        m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_currentGoal);
+        
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(m_profiledReference.velocity);
+
+        m_IO.setClosedLoopPositionVoltage(m_profiledReference.position, feedForwardPower);
+
+        SmartDashboard.putNumber("elevator/target position", m_IO.getTargetPosition());
+        SmartDashboard.putNumber("elevator/target velocity", m_profiledReference.velocity);
+    }
+
     private void executeKeepInPlacePID() {
 
         if (runKeepInPlacePID) {
@@ -148,6 +168,24 @@ public class ElevatorSubsystem extends SubsystemBase{
 
             m_IO.setVoltage(PIDPower + feedForwardPower);
             SmartDashboard.putNumber("elevator/target position", m_keepInPlacePIDGoal.position);
+            SmartDashboard.putNumber("elevator/target velocity", 0);
+        
+        } else {
+            m_IO.setVoltage(ElevatorConstants.kG);
+        }
+    }
+
+
+    private void executeKeepInPlacePIDOnMotor() {
+
+        if (runKeepInPlacePID) {
+
+            // calculate part of the power based on target velocity 
+            double feedForwardPower = m_feedforward.calculate(0);
+
+            m_IO.setClosedLoopPositionVoltage(m_currentGoal.position, feedForwardPower);
+    
+            SmartDashboard.putNumber("elevator/target position", m_currentGoal.position);
             SmartDashboard.putNumber("elevator/target velocity", 0);
         
         } else {
@@ -190,15 +228,17 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_constraints = new TrapezoidProfile.Constraints(
             ElevatorConstants.kMaxV, ElevatorConstants.kMaxA
         );
+
+        m_IO.resetSlot0Gains();
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("elevator/voltage", m_IO.getVoltage());
         SmartDashboard.putNumber("elevator/currentGoal position", m_currentGoal.position);
         SmartDashboard.putNumber("elevator/keepInPlacePIDGoal position", m_keepInPlacePIDGoal.position);
-
 
         SmartDashboard.putData("elevator/subsystem", this);
     }
@@ -225,5 +265,9 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public boolean isTall() {
         return m_IO.getPosition() > ElevatorConstants.MIN_HEIGHT_TO_BE_TALL;
+    }
+
+    public Command setCoastCommand() {
+        return run(() -> m_IO.setCoast()).ignoringDisable(true);
     }
 }

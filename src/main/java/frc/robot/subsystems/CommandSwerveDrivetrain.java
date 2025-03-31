@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -290,6 +291,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void setisAutoAlign(boolean isAligned){
         m_isAutoAlign = isAligned;
+    }
+
+    public Command setCoastCommand() {
+        return run(() -> {
+            for (var module : getModules()) {
+                module.getSteerMotor().setControl(new CoastOut());
+                module.getDriveMotor().setControl(new CoastOut());
+            }
+        });
     }
 
     @Override

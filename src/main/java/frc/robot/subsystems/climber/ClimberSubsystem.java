@@ -38,4 +38,8 @@ public class ClimberSubsystem extends SubsystemBase {
         m_IO.setBrake(false);
     }
 
+    public Command setCoastCommand() {
+        return run(() -> m_IO.setCoast()).ignoringDisable(true);
+    }
+
 }

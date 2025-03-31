@@ -3,6 +3,8 @@ package frc.robot.subsystems.lifter;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -45,7 +47,10 @@ public class ArmSubsystem extends SubsystemBase {
 
     // constructor
     public ArmSubsystem() {
-        m_IO.resetPosition();
+        m_IO.resetPosition(); 
+        
+        resetControllers();
+
         m_controller.enableContinuousInput(0, Math.PI*2);
     }
 
@@ -92,7 +97,7 @@ public class ArmSubsystem extends SubsystemBase {
     public Command moveToCommand(Supplier<TrapezoidProfile.State> goal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal.get()),
-            () -> executeMoveTo(),
+            () -> executeMoveToOnMotor(),
             (interrupted) -> {},
             () -> false, 
             this
@@ -106,7 +111,7 @@ public class ArmSubsystem extends SubsystemBase {
     public Command moveToCommand(TrapezoidProfile.State goal, boolean keepGoal) {
         return new FunctionalCommand(
             () -> initalizeMoveTo(goal),
-            () -> executeMoveTo(),
+            () -> executeMoveToOnMotor(),
             (interrupted) -> {if (keepGoal) {m_keepInPlacePIDGoal = goal;}},
             () -> false,
             this
@@ -143,6 +148,20 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
 
+    private void executeMoveToOnMotor() {
+        // recalculate the profiled reference point (the vel + pos that we want)
+        m_profiledReference = m_profile.calculate(0.02, m_profiledReference, m_currentGoal);
+        
+        // calculate part of the power based on target velocity 
+        double feedForwardPower = m_feedforward.calculate(m_profiledReference.position - ArmConstants.POSITION_OFFSET, m_profiledReference.velocity);
+    
+        m_IO.setClosedLoopPositionVoltage(m_profiledReference.position, feedForwardPower);;
+
+        SmartDashboard.putNumber("arm/target position", m_IO.getTargetPosition());
+        SmartDashboard.putNumber("arm/target velocity", m_profiledReference.velocity);
+
+    }
+
     private void executeKeepInPlacePID() {
 
         if (runKeepInPlacePID) {
@@ -158,6 +177,23 @@ public class ArmSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("arm/target position", m_keepInPlacePIDGoal.position);
             SmartDashboard.putNumber("arm/target velocity", 0);
             
+        } else {
+            m_IO.setVoltage(ArmConstants.kG);
+        }
+    }
+
+    private void executeKeepInPlacePIDOnMotor() {
+
+        if (runKeepInPlacePID) {
+
+            // calculate part of the power based on target velocity 
+            double feedForwardPower = m_feedforward.calculate(m_IO.getPosition() - ArmConstants.POSITION_OFFSET, 0);
+
+            m_IO.setClosedLoopPositionVoltage(m_currentGoal.position, feedForwardPower);
+
+            SmartDashboard.putNumber("arm/target position", m_currentGoal.position);
+            SmartDashboard.putNumber("arm/target velocity", 0);
+        
         } else {
             m_IO.setVoltage(ArmConstants.kG);
         }
@@ -180,7 +216,7 @@ public class ArmSubsystem extends SubsystemBase {
     } 
 
     private boolean okToMoveElevatorDown() {
-        return  m_IO.getPosition() > ArmConstants.MIN_POS_ELEVATOR_CLEAR;
+        return  m_IO.getPosition() > ArmConstants.MIN_POS_ELEVATOR_CLEAR - ArmConstants.MAX_POSITION_TOLERANCE;
     } 
 
     public Trigger isArmInsideRobotTrigger() {
@@ -209,18 +245,21 @@ public class ArmSubsystem extends SubsystemBase {
             m_constraints = new TrapezoidProfile.Constraints(
             ArmConstants.kMaxV, ArmConstants.kMaxA
         );
+
+        m_IO.resetSlot0Gains();
     } 
     
     @Override
     public void periodic() {
         SmartDashboard.putNumber("arm/position", m_IO.getPosition());
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("arm/voltage", m_IO.getVoltage());
         SmartDashboard.putNumber("arm/currentGoal position", m_currentGoal.position);
         SmartDashboard.putNumber("arm/keepInPlacePIDGoal position", m_keepInPlacePIDGoal.position);
 
         SmartDashboard.putData("arm/subsystem", this);
         SmartDashboard.putBoolean("arm/okToMoveElevatorDownTrigger", okToMoveElevatorDownTrigger().getAsBoolean());
-
+        SmartDashboard.putBoolean("arm/isArmInsideRobotTrigger", isArmInsideRobotTrigger().getAsBoolean());
 
     }
 
@@ -231,5 +270,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void setRunKeepInPlace(boolean bool) {
         runKeepInPlacePID = bool;
+    }
+
+    public Command setCoastCommand() {
+        return run(() -> m_IO.setCoast()).ignoringDisable(true);
     }
 }
