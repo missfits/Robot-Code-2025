@@ -122,6 +122,15 @@ public class ArmSubsystem extends SubsystemBase {
         return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
 
+    public Command zeroArmCommand() {
+        return new FunctionalCommand(
+            null, 
+            () ->  m_IO.setVoltage(ArmConstants.ZERO_ARM_MOTOR_SPEED), 
+            (interrupted) -> {m_IO.setVoltage(0); m_IO.setPosition(ArmConstants.ZERO_ARM_POSITION);}, 
+            () -> m_IO.getCurrent() > ArmConstants.ZERO_ARM_MAX_CURRENT, 
+            this);
+    }
+
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();
@@ -253,6 +262,8 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("arm/position", m_IO.getPosition());
         SmartDashboard.putNumber("arm/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("arm/current", m_IO.getCurrent());
+
         SmartDashboard.putNumber("arm/voltage", m_IO.getVoltage());
         SmartDashboard.putNumber("arm/currentGoal position", m_currentGoal.position);
         SmartDashboard.putNumber("arm/keepInPlacePIDGoal position", m_keepInPlacePIDGoal.position);
