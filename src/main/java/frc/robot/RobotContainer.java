@@ -459,7 +459,7 @@ public class RobotContainer {
   public void updatePoseEst() {
     ArrayList<LocalizationCamera> cameras = m_vision.getLocalizationCameras();
     LocalizationCamera cam_1 = cameras.get(0);
-    LocalizationCamera cam_2 = cameras.get(0);
+    LocalizationCamera cam_2 = cameras.get(1);
 
     updatePoseEst(cam_1.getRobotPose(), cam_1, m_estPoseFieldBeam);
     updatePoseEst(cam_2.getRobotPose(), cam_2, m_estPoseFieldSwerve);
