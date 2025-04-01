@@ -168,7 +168,7 @@ public class RobotContainer {
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.LEFT, m_ledSubsystem)); 
     driverJoystick.leftTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
     
-    driverJoystick.b().and(driverJoystick.leftBumper().negate()).onTrue(m_climber.manualMoveBackwardCommand());
+    driverJoystick.b().and(driverJoystick.leftBumper().negate()).whileTrue(m_climber.manualMoveCommand());
 
     driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_climber.deployClimberCommand());
     driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
@@ -186,7 +186,7 @@ public class RobotContainer {
     }));
 
     // snap to right coral station
-    driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    driverJoystick.y().and(driverJoystick.leftBumper().negate()).whileTrue(drivetrain.getCommandFromRequest(() -> {
       JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
