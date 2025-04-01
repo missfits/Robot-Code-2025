@@ -19,37 +19,39 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    m_robotContainer.setEnabledNeutralMode();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run(); 
-    
     m_robotContainer.updatePoseEst();
   }
 
   @Override
   public void disabledInit() {
     m_neutralModeTimer.start();
+    CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.turnOffLifterKeepInPlace();
+    m_robotContainer.setVoltageUponDisable();
   }
 
   @Override
   public void disabledPeriodic() {
     // if DISABLED_COAST_DELAY seconds have passed since disabling, set the neutral mode to coast
     if (m_neutralModeTimer.get() > RobotConstants.DISABLED_COAST_DELAY) {
-      m_robotContainer.setDisabledNeutralMode();
+      m_robotContainer.startCoastMode();;
       m_neutralModeTimer.stop();
       m_neutralModeTimer.reset();
     }
   }
 
   @Override
-  public void disabledExit() {
-    m_robotContainer.setEnabledNeutralMode();
-  }
+  public void disabledExit() {}
 
   @Override
   public void autonomousInit() {
+    CommandScheduler.getInstance().cancelAll();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -65,6 +67,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().cancelAll();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

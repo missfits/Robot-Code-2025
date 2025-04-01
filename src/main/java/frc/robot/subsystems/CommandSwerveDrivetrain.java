@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -43,6 +44,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DrivetrainConstants;
 
@@ -78,13 +80,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private final Vector<N3> stateStdDevs = VecBuilder.fill(1, 1,1);
     private final Vector<N3> visionStdDevs = VecBuilder.fill(10, 10, 10);
-
-        // drivePoseEstimator stores just drivetrain pose
-    private final SwerveDrivePoseEstimator drivePoseEstimator = new SwerveDrivePoseEstimator(
-        this.getKinematics(), 
-        this.getPigeon2().getRotation2d(), 
-        this.getState().ModulePositions, 
-        this.getState().Pose); 
         
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
@@ -92,6 +87,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private DoublePublisher rotationPublisher = NetworkTableInstance.getDefault().getDoubleTopic("drivetrain/rotation").publish();
     
     private StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getStructTopic("drivetrain/pose", Pose2d.struct).publish();
+
+    private boolean m_isAutoAlign = false;
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     // units are rotor rotations, which should be correct with voltage based control. 
@@ -184,7 +181,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         AutoBuilder.configure(
             () -> getState().Pose,   // Supplier of current robot pose
-            this::resetPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
+            this::resetFusedPose,         // Consumer for seeding pose against auto (will be called if your auto has a starting pose)
             () -> getState().Speeds, // Supplier of current robot speeds. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> setControl(
                     m_pathApplyRobotSpeeds.withSpeeds(speeds)
@@ -209,6 +206,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             },
             this // Reference to this subsystem to set requirements
         );
+
+        // this.setNewPose(new Pose2d(10,2, new Rotation2d(0)));
     }
 
     public Command getCommandFromRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -253,36 +252,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
 
-    public SwerveDrivePoseEstimator getDrivePoseEstimator(){
-        return drivePoseEstimator;
-    }
-
     public Rotation2d getRobotRotation(){
         return this.getState().Pose.getRotation();
     } 
-    
 
-    // doesn't change robot pose, just stored SwerveDrivePoseEst
-    public void updateDrivePoseWithOdometry(){
-        drivePoseEstimator.update(
-            this.getPigeon2().getRotation2d(),
-            this.getState().ModulePositions);
-    }
 
     @Override
     public void resetRotation(Rotation2d rotation){
         super.resetRotation(rotation);
-        drivePoseEstimator.resetRotation(rotation);
     }
 
-    @Override
-    public void resetPose(Pose2d newPose){
-        super.resetPose(newPose);
-        drivePoseEstimator.resetPose(newPose);
-    }
-
-    public void resetFusedPose(){
-        this.resetPose(drivePoseEstimator.getEstimatedPosition());
+    public void resetFusedPose(Pose2d newPose){
+        if (newPose != null) {
+            this.resetPose(newPose);
+        }
     }
 
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
@@ -300,6 +283,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
         }
         return statusCode;
+    }
+
+    public Trigger isAutoAligned(){
+        return new Trigger(()-> m_isAutoAlign);
+    }
+
+    public void setisAutoAlign(boolean isAligned){
+        m_isAutoAlign = isAligned;
+    }
+
+    public Command setCoastCommand() {
+        return run(() -> {
+            for (var module : getModules()) {
+                module.getSteerMotor().setControl(new CoastOut());
+                module.getDriveMotor().setControl(new CoastOut());
+            }
+        });
     }
 
     @Override
@@ -322,8 +322,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        this.updateDrivePoseWithOdometry(); // updates drivetrain periodically
-
         publisher.set(currentStates);
 
         targetPublisher.set(targetStates);
@@ -332,6 +330,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         rotationPublisher.set(m_gyro.getAngle());
         posePublisher.set(this.getState().Pose);
 
+        SmartDashboard.putNumber("drivetrain/pigeon/accelX", this.getPigeon2().getAccelerationX().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/accelY", this.getPigeon2().getAccelerationY().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/accelZ", this.getPigeon2().getAccelerationZ().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/yaw", this.getPigeon2().getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/pitch", this.getPigeon2().getPitch().getValueAsDouble());
+        SmartDashboard.putNumber("drivetrain/pigeon/roll", this.getPigeon2().getRoll().getValueAsDouble());
+        SmartDashboard.putBoolean("drivetrain/is-aligned", m_isAutoAlign);
 
     }
 }
