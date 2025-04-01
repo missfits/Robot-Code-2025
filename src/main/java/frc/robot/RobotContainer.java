@@ -382,7 +382,15 @@ public class RobotContainer {
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
-    m_autoChooser = AutoBuilder.buildAutoChooser();
+    m_autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("drive 1m", (autoStream) -> {
+      return autoStream.map((auto) -> {
+        if (auto.getName().equals("3 pc right") || auto.getName().equals("3 pc left")){
+          auto.event("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+          auto.event("lifterToL4").onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+        }
+        return auto;
+      });
+     } );
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
     for (String autoName : AutoBuilder.getAllAutoNames()) {
     }
@@ -417,8 +425,8 @@ public class RobotContainer {
     SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);
 
     //add event markers
-    new EventTrigger("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
-    new EventTrigger("lifterToL4").onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
+    // new EventTrigger("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+    // new EventTrigger("lifterToL4").onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
     CameraServer.startAutomaticCapture();
 
     FollowPathCommand.warmupCommand().schedule();
