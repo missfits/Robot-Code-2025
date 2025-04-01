@@ -168,7 +168,10 @@ public class RobotContainer {
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.LEFT, m_ledSubsystem)); 
     driverJoystick.leftTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
     
-    driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
+    driverJoystick.b().and(driverJoystick.leftBumper().negate()).onTrue(m_climber.deployClimberCommand());
+    driverJoystick.b().and(driverJoystick.leftBumper().negate()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
+
+    driverJoystick.b().and(driverJoystick.leftBumper()).onTrue(m_climber.liftRobotCommand());
 
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input

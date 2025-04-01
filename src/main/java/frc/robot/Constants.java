@@ -179,7 +179,7 @@ public final class Constants {
 
     public static final double INITIAL_POSITION = 0.0; // down
     public static final double DEPLOY_POSITION = Math.PI*2/3; // 120 degrees
-    public static final double FINAL_POSITION = Math.PI*4/3; // 240 degres
+    public static final double LIFT_POSITION = Math.PI*4/3; // 240 degres
   }
   
   public static class LEDConstants {
@@ -288,5 +288,8 @@ public final class Constants {
     
     public static final double IN_ELEVATOR_POS = 0.024;
     public static final double IN_ARM_POS = -0.43;
+
+    public static final double CLIMB_ELEVATOR_POS = 0.01;
+    public static final double CLIMB_ARM_POS = Math.PI/2; // 90 degrees
   }
 }

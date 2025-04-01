@@ -32,9 +32,9 @@ public class ClimberSubsystem extends SubsystemBase {
         );
     }
 
-    public Command climbSequenceCommand() {
-        return m_deployed ? liftRobotCommand() : deployClimberCommand();
-    }
+    // public Command climbSequenceCommand() {
+    //     return m_deployed ? liftRobotCommand() : deployClimberCommand();
+    // }
 
     public Command deployClimberCommand() {
         return new FunctionalCommand(
@@ -51,7 +51,7 @@ public class ClimberSubsystem extends SubsystemBase {
             () -> {},
             () -> m_IO.setVoltage(ClimberConstants.AUTO_MOVE_MOTOR_SPEED),
             (interrupted) -> m_IO.motorOff(),
-            () -> (m_IO.getPosition() > ClimberConstants.FINAL_POSITION),
+            () -> (m_IO.getPosition() > ClimberConstants.LIFT_POSITION),
             this
         );
     }
