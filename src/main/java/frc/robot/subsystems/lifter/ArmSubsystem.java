@@ -38,7 +38,7 @@ public class ArmSubsystem extends SubsystemBase {
         ArmConstants.kMaxV, ArmConstants.kMaxA
     );
     private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(0,0);
-    private TrapezoidProfile.State m_profiledReference;
+    private TrapezoidProfile.State m_profiledReference = new TrapezoidProfile.State(0,0);
     private TrapezoidProfile m_profile;
 
     private boolean runKeepInPlacePID = true; // false if a manual move command was just ran
@@ -129,7 +129,7 @@ public class ArmSubsystem extends SubsystemBase {
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();
         m_goal = goal;
-        if (!isAtPosition(m_profiledReference.position)) {
+        if (!isAtPosition(m_profiledReference.position, ArmConstants.PROFILE_TOLERANCE)) {
             m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
         }
         m_profile = new TrapezoidProfile(m_constraints);
@@ -171,7 +171,7 @@ public class ArmSubsystem extends SubsystemBase {
         if (isAtPosition(m_goal.position)) {
             keepInPlacePIDGoal = m_goal.position; 
         } else {
-            keepInPlacePIDGoal = m_profiledReference.position;
+            keepInPlacePIDGoal = m_IO.getPosition();
         }
     }
 
@@ -220,8 +220,12 @@ public class ArmSubsystem extends SubsystemBase {
         return new Trigger(() -> isAtPosition(goal));
     } 
 
+    private boolean isAtPosition(double goal, double tolerance) {
+        return Math.abs(m_IO.getPosition() - goal) < tolerance;
+    } 
+
     private boolean isAtPosition(double goal) {
-        return Math.abs(m_IO.getPosition() - goal) < ArmConstants.MAX_POSITION_TOLERANCE;
+        return isAtPosition(goal, ArmConstants.MAX_POSITION_TOLERANCE);
     } 
     
     public Trigger okToMoveElevatorDownTrigger() {
