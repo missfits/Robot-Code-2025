@@ -167,10 +167,6 @@ public final class Constants {
     public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
 
-  public static class RampConstants {
-
-  }
-
   public static class ClimberConstants {
 
     public static final int CLIMBER_MOTOR_ID = 16;

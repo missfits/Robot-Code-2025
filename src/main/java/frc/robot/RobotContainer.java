@@ -81,7 +81,6 @@ import frc.robot.subsystems.lifter.ArmSubsystem;
 import frc.robot.subsystems.lifter.ElevatorIOHardware;
 import frc.robot.subsystems.lifter.ElevatorSubsystem;
 import frc.robot.subsystems.lifter.LifterCommandFactory;
-import frc.robot.subsystems.ramp.RampSubsystem;
 
 
 
@@ -116,7 +115,6 @@ public class RobotContainer {
   private final VisionSubsystem m_cameraTwo = new VisionSubsystem(VisionConstants.CAMERA2_NAME, VisionConstants.ROBOT_TO_CAM2_3D);
   private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
-  private final RampSubsystem m_ramp = new RampSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
   private final ClimberSubsystem m_climber = new ClimberSubsystem();
