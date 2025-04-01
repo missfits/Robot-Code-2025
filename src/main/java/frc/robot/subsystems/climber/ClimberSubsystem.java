@@ -46,7 +46,7 @@ public class ClimberSubsystem extends SubsystemBase {
         );
     }
 
-    public Command liftRobotCommand() {
+    public Command liftClimberCommand() {
         return new FunctionalCommand(
             () -> {},
             () -> m_IO.setVoltage(ClimberConstants.AUTO_MOVE_MOTOR_SPEED),
