@@ -77,7 +77,7 @@ public class LifterCommandFactory {
         );
     }
 
-    private Trigger isLifterAtGoal(double armGoal, double elevatorGoal) {
+    public Trigger isLifterAtGoal(double armGoal, double elevatorGoal) {
         return m_arm.isAtGoal(armGoal).and(m_elevator.isAtGoal(elevatorGoal));
     }
 

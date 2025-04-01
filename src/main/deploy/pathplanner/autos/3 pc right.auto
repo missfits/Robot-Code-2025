@@ -13,12 +13,6 @@
         {
           "type": "named",
           "data": {
-            "name": "waitUntilArmDone"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "shootCoral"
           }
         },
@@ -38,12 +32,6 @@
           "type": "path",
           "data": {
             "pathName": "right feed to peg d"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "waitUntilArmDone"
           }
         },
         {
@@ -74,12 +62,6 @@
           "type": "path",
           "data": {
             "pathName": "right feed to peg c"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "waitUntilArmDone"
           }
         },
         {
