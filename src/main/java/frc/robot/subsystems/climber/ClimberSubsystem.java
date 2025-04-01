@@ -10,7 +10,6 @@ import frc.robot.subsystems.lifter.ArmIOHardware;
 
 public class ClimberSubsystem extends SubsystemBase {
     private final ClimberIOHardware m_IO = new ClimberIOHardware();
-    private boolean m_deployed = false;
 
     public Command runClimberOff() {
         return new RunCommand(
@@ -32,13 +31,9 @@ public class ClimberSubsystem extends SubsystemBase {
         );
     }
 
-    // public Command climbSequenceCommand() {
-    //     return m_deployed ? liftRobotCommand() : deployClimberCommand();
-    // }
-
     public Command deployClimberCommand() {
         return new FunctionalCommand(
-            () -> m_deployed = true,
+            () -> {},
             () -> m_IO.setVoltage(ClimberConstants.AUTO_MOVE_MOTOR_SPEED),
             (interrupted) -> m_IO.motorOff(),
             () -> (m_IO.getPosition() > ClimberConstants.DEPLOY_POSITION),
