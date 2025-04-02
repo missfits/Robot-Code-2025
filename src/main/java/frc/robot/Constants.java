@@ -167,19 +167,19 @@ public final class Constants {
     public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
 
-  public static class RampConstants {
-
-  }
-
   public static class ClimberConstants {
 
     public static final int CLIMBER_MOTOR_ID = 16;
 
-    public static final double MOTOR_STATOR_LIMIT = 80; // needs to be updated lol
+    public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
+    public static final double AUTO_MOVE_MOTOR_SPEED = 12.0; // filler
+    public static final double DEGREES_PER_ROTATION = 360.0/810.0;
 
-    public static final double DEGREES_PER_ROTATION = 1;
+    public static final double INITIAL_POSITION = 0.0; // down
+    public static final double DEPLOY_POSITION = -2.58; // 120 degrees
+    public static final double LIFT_POSITION = -4.45; // 240 degres
   }
   
   public static class LEDConstants {
@@ -288,5 +288,8 @@ public final class Constants {
     
     public static final double IN_ELEVATOR_POS = 0.024;
     public static final double IN_ARM_POS = -0.43;
+
+    public static final double CLIMB_ELEVATOR_POS = 0.01;
+    public static final double CLIMB_ARM_POS = Math.PI/2; // 90 degrees
   }
 }

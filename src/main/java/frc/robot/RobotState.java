@@ -12,7 +12,8 @@ public enum RobotState {
     L4_CORAL_WITH_CORAL(RobotStateConstants.C4_ELEVATOR_POS_WITH_CORAL, RobotStateConstants.C4_ARM_POS_WITH_CORAL), 
     L2_ALGAE(RobotStateConstants.A2_ELEVATOR_POS, RobotStateConstants.A2_ARM_POS), 
     L3_ALGAE(RobotStateConstants.A3_ELEVATOR_POS, RobotStateConstants.A3_ARM_POS), 
-    INTAKE(RobotStateConstants.IN_ELEVATOR_POS, RobotStateConstants.IN_ARM_POS);
+    INTAKE(RobotStateConstants.IN_ELEVATOR_POS, RobotStateConstants.IN_ARM_POS),
+    CLIMB(RobotStateConstants.CLIMB_ELEVATOR_POS, RobotStateConstants.CLIMB_ARM_POS);
 
     private final double elevatorPos;
     private final double armPos;

@@ -81,7 +81,6 @@ import frc.robot.subsystems.lifter.ArmSubsystem;
 import frc.robot.subsystems.lifter.ElevatorIOHardware;
 import frc.robot.subsystems.lifter.ElevatorSubsystem;
 import frc.robot.subsystems.lifter.LifterCommandFactory;
-import frc.robot.subsystems.ramp.RampSubsystem;
 
 
 
@@ -116,7 +115,6 @@ public class RobotContainer {
   private final VisionSubsystem m_cameraTwo = new VisionSubsystem(VisionConstants.CAMERA2_NAME, VisionConstants.ROBOT_TO_CAM2_3D);
   private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
-  private final RampSubsystem m_ramp = new RampSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
   private final ClimberSubsystem m_climber = new ClimberSubsystem();
@@ -170,7 +168,12 @@ public class RobotContainer {
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.LEFT, m_ledSubsystem)); 
     driverJoystick.leftTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
     
-    driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
+    driverJoystick.b().and(driverJoystick.leftBumper().negate()).whileTrue(m_climber.manualMoveCommand());
+
+    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_climber.deployClimberCommand());
+    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
+
+    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_climber.liftClimberCommand());
 
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
@@ -183,7 +186,7 @@ public class RobotContainer {
     }));
 
     // snap to right coral station
-    driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    driverJoystick.y().and(driverJoystick.leftBumper().negate()).whileTrue(drivetrain.getCommandFromRequest(() -> {
       JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
