@@ -413,6 +413,11 @@ public class RobotContainer {
     SmartDashboard.putNumber("elevator constants/kMaxV", SmartDashboard.getNumber("elevator constants/kMaxV", ElevatorConstants.kMaxV));
     SmartDashboard.putNumber("elevator constants/kMaxA", SmartDashboard.getNumber("elevator constants/kMaxA", ElevatorConstants.kMaxA));
 
+    SmartDashboard.putNumber("drivetrain constants/kP", SmartDashboard.getNumber("drivetrain constants/kP", DrivetrainConstants.ROBOT_POSITION_P));
+    SmartDashboard.putNumber("drivetrain constants/kI", SmartDashboard.getNumber("drivetrain constants/kI", DrivetrainConstants.ROBOT_POSITION_I));
+    SmartDashboard.putNumber("drivetrain constants/KD", SmartDashboard.getNumber("drivetrain constants/kD", DrivetrainConstants.ROBOT_POSITION_D));
+
+
     SmartDashboard.putString("buildVersion/commitSHA", BuildConstants.GIT_SHA);
     SmartDashboard.putString("buildVersion/branchName", BuildConstants.GIT_BRANCH);
     SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);

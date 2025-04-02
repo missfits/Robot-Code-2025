@@ -16,14 +16,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** A command that drives robot-centric-ally forward 5m. */
+/** A command that drives forward 5m ROBOT CENTRIC. */
 public class Drive5mCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final CommandSwerveDrivetrain m_drivetrain;
   private Pose2d m_startPose;
 
-  private final PIDController xController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
-  private final PIDController yController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
+  private PIDController xController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
+  private PIDController yController = new PIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D);
 
   private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity).withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
 
@@ -41,6 +41,20 @@ public class Drive5mCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // reset controllers to adjustable PID values through elastic 
+    xController = new PIDController(
+        SmartDashboard.getNumber("drivetrain constants/kP", DrivetrainConstants.ROBOT_POSITION_P), 
+        SmartDashboard.getNumber("drivetrain constants/kI", DrivetrainConstants.ROBOT_POSITION_I),
+        SmartDashboard.getNumber("drivetrain constants/kD", DrivetrainConstants.ROBOT_POSITION_D)
+    );
+
+    yController = new PIDController(
+        SmartDashboard.getNumber("drivetrain constants/kP", DrivetrainConstants.ROBOT_POSITION_P), 
+        SmartDashboard.getNumber("drivetrain constants/kI", DrivetrainConstants.ROBOT_POSITION_I),
+        SmartDashboard.getNumber("drivetrain constants/kD", DrivetrainConstants.ROBOT_POSITION_D)
+    );
+
+
     m_startPose = m_drivetrain.getState().Pose;
     xController.setSetpoint(m_startPose.getX() + Math.cos(m_startPose.getRotation().getRadians()) * 5);
     yController.setSetpoint(m_startPose.getY() + Math.sin(m_startPose.getRotation().getRadians()) * 5);
