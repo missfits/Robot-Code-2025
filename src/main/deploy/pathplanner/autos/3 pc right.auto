@@ -53,12 +53,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "right feed to peg c"
@@ -68,12 +62,6 @@
           "type": "named",
           "data": {
             "name": "shootCoral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "descoreAlgaeL2"
           }
         },
         {
