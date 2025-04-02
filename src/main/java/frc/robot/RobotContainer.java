@@ -65,6 +65,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.Drive5mCommand;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsCeridwen;
@@ -156,8 +157,8 @@ public class RobotContainer {
     // reset the field-centric heading on a button press
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
-    // reset fused vision pose estimator to vision pose on center (cross button)
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_cameraOne.getEstimatedRobotPose().estimatedPose.toPose2d())));
+    // temp pls remove!!
+    driverJoystick.povCenter().whileTrue(new Drive5mCommand(drivetrain));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.RIGHT, m_ledSubsystem)); 
