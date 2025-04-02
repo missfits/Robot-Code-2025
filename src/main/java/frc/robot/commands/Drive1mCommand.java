@@ -16,8 +16,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** A command that drives forward 5m ROBOT CENTRIC. */
-public class Drive5mCommand extends Command {
+/** A command that drives forward 1m ROBOT CENTRIC. */
+public class Drive1mCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final CommandSwerveDrivetrain m_drivetrain;
   private Pose2d m_startPose;
@@ -32,7 +32,7 @@ public class Drive5mCommand extends Command {
    *s
    * @param subsystem The subsystem used by this command.
    */
-  public Drive5mCommand(CommandSwerveDrivetrain drivetrain) {
+  public Drive1mCommand(CommandSwerveDrivetrain drivetrain) {
     m_drivetrain = drivetrain;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
@@ -56,12 +56,12 @@ public class Drive5mCommand extends Command {
 
 
     m_startPose = m_drivetrain.getState().Pose;
-    xController.setSetpoint(m_startPose.getX() + Math.cos(m_startPose.getRotation().getRadians()) * 5);
-    yController.setSetpoint(m_startPose.getY() + Math.sin(m_startPose.getRotation().getRadians()) * 5);
+    xController.setSetpoint(m_startPose.getX() + Math.cos(m_startPose.getRotation().getRadians()) * 1);
+    yController.setSetpoint(m_startPose.getY() + Math.sin(m_startPose.getRotation().getRadians()) * 1);
 
 
-    SmartDashboard.putNumber("drive5m/setpoint position x", m_startPose.getX() + Math.cos(m_startPose.getRotation().getRadians()) * 5);
-    SmartDashboard.putNumber("drive5m/setpoint position y", m_startPose.getY() + Math.sin(m_startPose.getRotation().getRadians()) * 5);
+    SmartDashboard.putNumber("drive5m/setpoint position x", xController.getSetpoint());
+    SmartDashboard.putNumber("drive5m/setpoint position y", yController.getSetpoint());
 
   }
 

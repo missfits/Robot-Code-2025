@@ -65,7 +65,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.Drive5mCommand;
+import frc.robot.commands.Drive1mCommand;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsCeridwen;
@@ -158,7 +158,7 @@ public class RobotContainer {
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
 
     // temp pls remove!!
-    driverJoystick.povCenter().whileTrue(new Drive5mCommand(drivetrain));
+    driverJoystick.povCenter().whileTrue(new Drive1mCommand(drivetrain));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.RIGHT, m_ledSubsystem)); 
