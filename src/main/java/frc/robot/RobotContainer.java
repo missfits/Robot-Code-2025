@@ -157,9 +157,6 @@ public class RobotContainer {
 
     // reset the field-centric heading on a button press
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
-
-    // temp pls remove!!
-    driverJoystick.povCenter().negate().whileTrue(new Drive1mCommand(drivetrain));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.RIGHT, m_ledSubsystem)); 
