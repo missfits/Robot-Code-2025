@@ -354,6 +354,10 @@ public class RobotContainer {
     return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(collarTime).asProxy(), m_collar.runCollarOffInstant().asProxy(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
   }
 
+  private Trigger isAutoIntakeCommandRunning() {
+    return new Trigger(() -> !"autoIntake".equals(m_collar.getCurrentCommand() == null ? "" : m_collar.getCurrentCommand().getName()));
+  }
+
   public RobotContainer() {
     DataLogManager.start(); // log networktable 
     DriverStation.startDataLog(DataLogManager.getLog()); // log ds state, joystick data to /u/logs w/ usb stick, or home/lvuser/logs without. 
@@ -391,7 +395,7 @@ public class RobotContainer {
         if (auto.getName().equals("3 pc right") || auto.getName().equals("3 pc left")){
           auto.event("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
           auto.event("lifterToIntake").onTrue(m_collarCommandFactory.intakeCoralSequence2().withTimeout(5).withName("autoIntake").asProxy());
-          auto.event("lifterToL4").onTrue(Commands.waitSeconds(3).until(() -> !m_collar.getCurrentCommand().getName().equals("autoIntake")).andThen(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+          auto.event("lifterToL4").onTrue(Commands.waitSeconds(3).until(isAutoIntakeCommandRunning()).andThen(m_lifter.moveToCommand(RobotState.L4_CORAL)));
         }
         return auto;
       });
