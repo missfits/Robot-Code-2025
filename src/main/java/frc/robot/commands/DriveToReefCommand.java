@@ -114,7 +114,7 @@ public class DriveToReefCommand extends Command {
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
 
-      driveRequest.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
+      driveRequest.HeadingController = new PhoenixPIDController(DrivetrainConstants.AUTOALIGN_POSITION_P, DrivetrainConstants.AUTOALIGN_POSITION_I, DrivetrainConstants.AUTOALIGN_POSITION_D);
       driveRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
       
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
