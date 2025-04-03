@@ -56,8 +56,8 @@ public class Drive1mCommand extends Command {
 
 
     m_startPose = m_drivetrain.getState().Pose;
-    xController.setSetpoint(m_startPose.getX() + Math.cos(m_startPose.getRotation().getRadians()) * 1);
-    yController.setSetpoint(m_startPose.getY() + Math.sin(m_startPose.getRotation().getRadians()) * 1);
+    xController.setSetpoint(m_startPose.getX() + 0.5);
+    yController.setSetpoint(m_startPose.getY());
 
 
     SmartDashboard.putNumber("drive5m/setpoint position x", xController.getSetpoint());
@@ -71,7 +71,7 @@ public class Drive1mCommand extends Command {
 
     m_drivetrain.setControl(driveRequest
         .withVelocityX(xController.calculate(m_drivetrain.getState().Pose.getX())) 
-        .withVelocityY(yController.calculate(m_drivetrain.getState().Pose.getY())) 
+        .withVelocityY(0) 
     );
   }
 
