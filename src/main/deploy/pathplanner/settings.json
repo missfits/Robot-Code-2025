@@ -29,6 +29,6 @@
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
   "robotFeatures": [
-    "{\"name\":\"collar\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":0.432,\"y\":-0.127},\"radius\":0.01,\"strokeWidth\":0.08,\"filled\":false}}"
+    "{\"name\":\"collar\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":0.432,\"y\":-0.152},\"radius\":0.01,\"strokeWidth\":0.08,\"filled\":false}}"
   ]
 }
