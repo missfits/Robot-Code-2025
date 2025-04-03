@@ -195,8 +195,8 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(2);
-    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(12);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(0.5);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(13.5);
 
     public static final double kMaxV = 2; // to be tuned
     public static final double kMaxA = 1.5; // to be tuned
