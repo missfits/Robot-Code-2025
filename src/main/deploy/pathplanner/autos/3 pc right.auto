@@ -65,6 +65,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "descoreAlgaeL2"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "peg c to right feed"

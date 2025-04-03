@@ -347,7 +347,11 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), m_collar.runCollarOffInstant().asProxy(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+    return createScoreCommand(lifterCommand, 0.5);
+  }
+
+  private Command createScoreCommand(Command lifterCommand, double collarTime){
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(collarTime).asProxy(), m_collar.runCollarOffInstant().asProxy(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
   }
 
   public RobotContainer() {
@@ -371,7 +375,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("shootCoral", Commands.sequence((new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), m_collar.runCollarOffInstant().asProxy()));
     NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
     NamedCommands.registerCommand("waitUntilArmDone", new WaitCommand(1).until(m_elevator.isNotAtL4Trigger()));
-    NamedCommands.registerCommand("descoreAlgaeL2", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_ALGAE)));
+    NamedCommands.registerCommand("descoreAlgaeL2", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_ALGAE), 1.5));
 
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
@@ -386,8 +390,8 @@ public class RobotContainer {
       return autoStream.map((auto) -> {
         if (auto.getName().equals("3 pc right") || auto.getName().equals("3 pc left")){
           auto.event("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
-          auto.event("lifterToIntake").onTrue(m_collarCommandFactory.intakeCoralSequence2().withTimeout(3).asProxy());
-          auto.event("lifterToL4").onTrue(Commands.waitSeconds(3).until(() -> !m_collar.getCurrentCommand().getName().equals("intakeCoralSequence2")).andThen(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+          auto.event("lifterToIntake").onTrue(m_collarCommandFactory.intakeCoralSequence2().withTimeout(5).withName("autoIntake").asProxy());
+          auto.event("lifterToL4").onTrue(Commands.waitSeconds(3).until(() -> !m_collar.getCurrentCommand().getName().equals("autoIntake")).andThen(m_lifter.moveToCommand(RobotState.L4_CORAL)));
         }
         return auto;
       });
