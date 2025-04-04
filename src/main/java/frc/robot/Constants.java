@@ -291,7 +291,7 @@ public final class Constants {
     public static final double A3_ELEVATOR_POS = 0.3611; // from 3/1
     public static final double A3_ARM_POS = 0.9547; // from 3/1
     
-    public static final double IN_ELEVATOR_POS = 0.024;
+    public static final double IN_ELEVATOR_POS = 0.03;
     public static final double IN_ARM_POS = -0.43;
 
     public static final double CLIMB_ELEVATOR_POS = 0.01;
