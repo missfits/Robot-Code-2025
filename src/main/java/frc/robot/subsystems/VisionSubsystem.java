@@ -174,6 +174,7 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("vision/" + m_cameraName + "/isEstPoseJumpy", isEstPoseJumpy());
     SmartDashboard.putNumberArray("vision/" + m_cameraName + "/standardDeviations", curStdDevs.getData());
 
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/isConnected", m_camera.isConnected());
   }
 
   @Override
