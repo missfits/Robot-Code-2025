@@ -97,8 +97,8 @@ public class DriveToReefCommand extends Command {
         }
 
         m_targetIntermediateTranslation = m_targetTranslation.plus(new Translation2d(
-            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.sin(Math.PI/2 + targetPose.getRotation().getRadians()),
-            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.cos(Math.PI/2 + targetPose.getRotation().getRadians())
+            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.cos(targetPose.getRotation().getRadians()),
+            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.sin(targetPose.getRotation().getRadians())
           )
         );
         
