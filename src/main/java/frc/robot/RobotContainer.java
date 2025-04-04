@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.events.EventTrigger;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
@@ -65,6 +66,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.Drive1mCommand;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsCeridwen;
@@ -155,9 +157,6 @@ public class RobotContainer {
 
     // reset the field-centric heading on a button press
     driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().equals(Alliance.Blue) ? 0 : Math.PI))));
-
-    // reset fused vision pose estimator to vision pose on center (cross button)
-    driverJoystick.povCenter().onTrue(drivetrain.runOnce(() -> drivetrain.resetFusedPose(m_cameraOne.getEstimatedRobotPose().estimatedPose.toPose2d())));
   
     // moves to the RIGHT side. only press after running rotatetofacereef (right trigger)
     driverJoystick.rightTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.RIGHT, m_ledSubsystem)); 
@@ -349,7 +348,15 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_collar.runCollarOffInstant(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+    return createScoreCommand(lifterCommand, 0.5);
+  }
+
+  private Command createScoreCommand(Command lifterCommand, double collarTime){
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(collarTime).asProxy(), m_collar.runCollarOffInstant().asProxy(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+  }
+
+  private Trigger isAutoIntakeCommandRunning() {
+    return new Trigger(() -> !"autoIntake".equals(m_collar.getCurrentCommand() == null ? "" : m_collar.getCurrentCommand().getName()));
   }
 
   public RobotContainer() {
@@ -370,8 +377,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
     NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+    NamedCommands.registerCommand("shootCoral", Commands.sequence((new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), new WaitCommand(0.1), m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), m_collar.runCollarOffInstant().asProxy()));
     NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
     NamedCommands.registerCommand("waitUntilArmDone", new WaitCommand(1).until(m_elevator.isNotAtL4Trigger()));
+    NamedCommands.registerCommand("descoreAlgaeL2", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_ALGAE), 1.5));
 
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
@@ -382,7 +391,16 @@ public class RobotContainer {
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
-    m_autoChooser = AutoBuilder.buildAutoChooser();
+    m_autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("drive 1m", (autoStream) -> {
+      return autoStream.map((auto) -> {
+        if (auto.getName().equals("3 pc right") || auto.getName().equals("3 pc left")){
+          auto.event("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+          auto.event("lifterToIntake").onTrue(m_collarCommandFactory.intakeCoralSequence2().withTimeout(5).withName("autoIntake").asProxy());
+          auto.event("lifterToL4").onTrue(Commands.waitSeconds(3).until(isAutoIntakeCommandRunning()).andThen(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+        }
+        return auto;
+      });
+     } );
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
     for (String autoName : AutoBuilder.getAllAutoNames()) {
     }
@@ -412,10 +430,18 @@ public class RobotContainer {
     SmartDashboard.putNumber("elevator constants/kMaxV", SmartDashboard.getNumber("elevator constants/kMaxV", ElevatorConstants.kMaxV));
     SmartDashboard.putNumber("elevator constants/kMaxA", SmartDashboard.getNumber("elevator constants/kMaxA", ElevatorConstants.kMaxA));
 
+    SmartDashboard.putNumber("drivetrain constants/kP", SmartDashboard.getNumber("drivetrain constants/kP", DrivetrainConstants.ROBOT_POSITION_P));
+    SmartDashboard.putNumber("drivetrain constants/kI", SmartDashboard.getNumber("drivetrain constants/kI", DrivetrainConstants.ROBOT_POSITION_I));
+    SmartDashboard.putNumber("drivetrain constants/KD", SmartDashboard.getNumber("drivetrain constants/kD", DrivetrainConstants.ROBOT_POSITION_D));
+
+
     SmartDashboard.putString("buildVersion/commitSHA", BuildConstants.GIT_SHA);
     SmartDashboard.putString("buildVersion/branchName", BuildConstants.GIT_BRANCH);
     SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);
 
+    //add event markers
+    // new EventTrigger("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+    // new EventTrigger("lifterToL4").onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
     CameraServer.startAutomaticCapture();
 
     FollowPathCommand.warmupCommand().schedule();
