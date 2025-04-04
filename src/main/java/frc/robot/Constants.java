@@ -139,7 +139,7 @@ public final class Constants {
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
-    public static final double PROFILE_TOLERANCE = Math.toRadians(5);
+    public static final double PROFILE_TOLERANCE = Math.toRadians(20);
 
     public static final double MIN_POS_ELEVATOR_CLEAR = -0.3; // accounts for when coral inside collar
     public static final double LOWER_INSIDE_ROBOT_BOUND = 0;
