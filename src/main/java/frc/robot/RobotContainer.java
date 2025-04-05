@@ -207,8 +207,12 @@ public class RobotContainer {
     );
 
     // outtake from collar
-    copilotJoystick.y().whileTrue(
+    copilotJoystick.y().and(copilotJoystick.povCenter()).whileTrue(
       m_collarCommandFactory.runCollarOut()
+    );
+
+    copilotJoystick.povCenter().negate().whileTrue(
+      m_collar.runCollar(1.0)
     );
 
     copilotJoystick.b().whileTrue(
@@ -268,7 +272,6 @@ public class RobotContainer {
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
       m_collarCommandFactory.runCollarOut()
     ); 
-
 
     // lifter backup controls -- joysticks :)
     Trigger elevatorManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getLeftY()) != 0);
