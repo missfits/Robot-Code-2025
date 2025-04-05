@@ -389,7 +389,6 @@ public class RobotContainer {
       new PIDToTargetCommand(drivetrain, () -> m_ppTargetPose), 
       Commands.sequence(  
         (new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), 
-        new WaitCommand(0.1), 
         m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), 
         m_collar.runCollarOffInstant().asProxy())));
     NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
