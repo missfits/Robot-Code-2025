@@ -67,6 +67,10 @@ public final class Constants {
     public static final double AUTOALIGN_POSITION_P = 5;
     public static final double AUTOALIGN_POSITION_I = 0;
     public static final double AUTOALIGN_POSITION_D = 0;
+
+    public static final double TO_TARGET_POSITION_P = 2.5;
+    public static final double TO_TARGET_POSITION_I = 0;
+    public static final double TO_TARGET_POSITION_D = 0;
   
     public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
     public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.97205; // approximated @ PF session 1/13

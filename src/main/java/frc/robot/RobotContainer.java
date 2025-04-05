@@ -22,6 +22,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
@@ -72,6 +73,7 @@ import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsCeridwen;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
+import frc.robot.commands.PIDToTargetCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -141,6 +143,8 @@ public class RobotContainer {
   private final Field2d m_estPoseFieldBeam = new Field2d();
   private final Field2d m_estPoseFieldSwerve = new Field2d();
   private final Field2d m_actualField = new Field2d();
+
+  private Pose2d m_ppTargetPose; 
 
 
   private void configureBindings() {
@@ -378,7 +382,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
     NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
     NamedCommands.registerCommand("shootCoral", Commands.parallel(
-      drivetrain.getCommandFromRequest(() -> brake).withTimeout(0.5), 
+      new PIDToTargetCommand(drivetrain, () -> m_ppTargetPose), 
       Commands.sequence(  
         (new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), 
         new WaitCommand(0.1), 
@@ -451,6 +455,13 @@ public class RobotContainer {
     CameraServer.startAutomaticCapture();
 
     FollowPathCommand.warmupCommand().schedule();
+
+    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+      m_ppTargetPose = pose;
+      SmartDashboard.putNumber("ppTargetPose/x", m_ppTargetPose.getX());
+      SmartDashboard.putNumber("ppTargetPose/y", m_ppTargetPose.getY());
+      SmartDashboard.putNumber("ppTargetPose/rotation", m_ppTargetPose.getRotation().getRadians());
+    });
 
     configureBindings();
 
