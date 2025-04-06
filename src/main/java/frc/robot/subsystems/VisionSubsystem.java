@@ -166,10 +166,18 @@ public class VisionSubsystem extends SubsystemBase {
               lastEstPoses.remove(0);
             }
           }
-          else{
+          else {
             SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "poseNOTsane");
             targetFound = false;
+
+            
           }
+
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "zIsSane", VisionUtils.zIsSane(poseEstimatorOutput.get().estimatedPose));
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "rollIsSane", VisionUtils.rollIsSane(poseEstimatorOutput.get().estimatedPose));
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "pitchIsSane", VisionUtils.pitchIsSane(poseEstimatorOutput.get().estimatedPose));
+
+
         }
       }
 
