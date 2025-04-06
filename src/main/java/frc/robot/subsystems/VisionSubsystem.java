@@ -61,6 +61,8 @@ public class VisionSubsystem extends SubsystemBase {
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private PhotonPoseEstimator poseEstimator;
 
+  private boolean isNewResult = false;
+
   private ArrayList<Pose2d> lastEstPoses = new ArrayList<>();
 
   /** Creates a new Vision Subsystem. */
@@ -111,6 +113,7 @@ public class VisionSubsystem extends SubsystemBase {
       // Camera processed a new frame since last
       // Get the last one in the list.
       var result = results.get(results.size() - 1);
+      isNewResult = true;
 
       if (result.hasTargets()) {
         PhotonTrackedTarget target = null;
@@ -126,7 +129,6 @@ public class VisionSubsystem extends SubsystemBase {
             biggestTargetArea = sampleTarget.getArea();
             target = sampleTarget;
           }
-
         }
 
         // gets target with lowest reprojection error
@@ -180,6 +182,9 @@ public class VisionSubsystem extends SubsystemBase {
 
         }
       }
+      else{
+        isNewResult = false;
+      }
 
     }
 
@@ -195,11 +200,18 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putNumberArray("vision/" + m_cameraName + "/standardDeviations", curStdDevs.getData());
 
     SmartDashboard.putBoolean("vision/" + m_cameraName + "/isConnected", m_camera.isConnected());
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/isNewResult", getIsNewResult());
+
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+
+  public boolean getIsNewResult(){
+    return isNewResult;
   }
 
   // returns bool if camera within tolerance to AprilTag
