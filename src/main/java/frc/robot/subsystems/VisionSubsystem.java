@@ -157,7 +157,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         if (poseEstimatorOutput.isPresent()) {
           if (VisionUtils.poseIsSane(poseEstimatorOutput.get().estimatedPose)){
-            SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "poseSane");
+            SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetFound");
             estimatedRobotPose = poseEstimatorOutput.get(); 
   
             // update our last n poses
@@ -173,9 +173,9 @@ public class VisionSubsystem extends SubsystemBase {
             
           }
 
-          SmartDashboard.putBoolean("vision/" + m_cameraName + "zIsSane", VisionUtils.zIsSane(poseEstimatorOutput.get().estimatedPose));
-          SmartDashboard.putBoolean("vision/" + m_cameraName + "rollIsSane", VisionUtils.rollIsSane(poseEstimatorOutput.get().estimatedPose));
-          SmartDashboard.putBoolean("vision/" + m_cameraName + "pitchIsSane", VisionUtils.pitchIsSane(poseEstimatorOutput.get().estimatedPose));
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "/zIsSane", VisionUtils.zIsSane(poseEstimatorOutput.get().estimatedPose));
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "/rollIsSane", VisionUtils.rollIsSane(poseEstimatorOutput.get().estimatedPose));
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "/pitchIsSane", VisionUtils.pitchIsSane(poseEstimatorOutput.get().estimatedPose));
 
 
         }
