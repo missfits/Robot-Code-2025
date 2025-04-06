@@ -553,6 +553,7 @@ public class RobotContainer {
         double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
         SmartDashboard.putNumber("vision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
+
         if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
           drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
           drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
