@@ -129,10 +129,12 @@ public class ArmSubsystem extends SubsystemBase {
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();
         m_goal = goal;
+        m_profile = new TrapezoidProfile(m_constraints);
         if (!isAtPosition(m_profiledReference.position, ArmConstants.PROFILE_TOLERANCE)) {
             m_profiledReference = new TrapezoidProfile.State(m_IO.getPosition(), m_IO.getVelocity());
+        } else {
+            executeMoveToOnMotor();
         }
-        m_profile = new TrapezoidProfile(m_constraints);
         runKeepInPlacePID = true;
     }
 
