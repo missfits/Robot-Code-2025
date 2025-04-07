@@ -122,6 +122,15 @@ public class ElevatorSubsystem extends SubsystemBase{
         return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
 
+    public Command zeroElevatorCommand() {
+        return new FunctionalCommand(
+            null, 
+            () ->  m_IO.setVoltageNoCheck(ElevatorConstants.ZERO_ELEVATOR_MOTOR_SPEED), 
+            (interrupted) -> {m_IO.setVoltage(0); m_IO.setPosition(ElevatorConstants.ZERO_ELEVATOR_POSITION);}, 
+            () -> m_IO.getCurrent() > ElevatorConstants.ZERO_ELEVATOR_MAX_CURRENT, 
+            this);
+    }
+
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();
@@ -254,6 +263,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("elevator/position", m_IO.getPosition());
         SmartDashboard.putNumber("elevator/velocity", m_IO.getVelocity());
+        SmartDashboard.putNumber("elevator/current", m_IO.getCurrent());
+
         SmartDashboard.putNumber("elevator/voltage", m_IO.getVoltage());
         SmartDashboard.putNumber("elevator/goal position", m_goal.position);
         SmartDashboard.putNumber("elevator/keepInPlacePIDGoal", keepInPlacePIDGoal);
