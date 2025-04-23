@@ -46,7 +46,8 @@ public final class Constants {
     public static final int kCopilotControllerPort = 1;
     public static final int kTestControllerPort = 2;
 
-    public static final double JOYSTICK_DEADBAND = 0.1;
+    public static final double TRANSLATION_JOYSTICK_DEADBAND = 0.1;
+    public static final double ROTATION_JOYSTICK_DEADBAND = 0.1;
     public static final double SLOWMODE_FACTOR = 0.2;
 
     public static final double SLEW_RATE_LIMIT = 1.5; // limits how fast operator input (-1 to 1) 
