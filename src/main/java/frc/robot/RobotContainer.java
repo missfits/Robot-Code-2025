@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 
@@ -22,6 +24,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
@@ -30,6 +33,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -50,6 +54,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -72,6 +77,7 @@ import frc.robot.commands.RotateToFaceReefCommand;
 import frc.robot.generated.TunerConstantsCeridwen;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
+import frc.robot.commands.PIDToTargetCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -142,6 +148,8 @@ public class RobotContainer {
   private final Field2d m_estPoseFieldSwerve = new Field2d();
   private final Field2d m_actualField = new Field2d();
 
+  private Pose2d m_ppTargetPose; 
+
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -202,8 +210,12 @@ public class RobotContainer {
     );
 
     // outtake from collar
-    copilotJoystick.y().whileTrue(
+    copilotJoystick.y().and(copilotJoystick.povCenter()).whileTrue(
       m_collarCommandFactory.runCollarOut()
+    );
+
+    copilotJoystick.povCenter().negate().whileTrue(
+      m_collar.runCollar(1.0)
     );
 
     copilotJoystick.b().whileTrue(
@@ -263,7 +275,6 @@ public class RobotContainer {
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
       m_collarCommandFactory.runCollarOut()
     ); 
-
 
     // lifter backup controls -- joysticks :)
     Trigger elevatorManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getLeftY()) != 0);
@@ -377,7 +388,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
     NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
-    NamedCommands.registerCommand("shootCoral", Commands.sequence((new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), new WaitCommand(0.1), m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), m_collar.runCollarOffInstant().asProxy()));
+    NamedCommands.registerCommand("shootCoral", new ParallelRaceGroup(
+      new PIDToTargetCommand(drivetrain, () -> m_ppTargetPose), 
+      Commands.sequence(  
+        (new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), 
+        m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), 
+        m_collar.runCollarOffInstant().asProxy())));
     NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
     NamedCommands.registerCommand("waitUntilArmDone", new WaitCommand(1).until(m_elevator.isNotAtL4Trigger()));
     NamedCommands.registerCommand("descoreAlgaeL2", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_ALGAE), 1.5));
@@ -395,7 +411,7 @@ public class RobotContainer {
       return autoStream.map((auto) -> {
         if (auto.getName().equals("3 pc right") || auto.getName().equals("3 pc left")){
           auto.event("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
-          auto.event("lifterToIntake").onTrue(m_collarCommandFactory.intakeCoralSequence2().withTimeout(5).withName("autoIntake").asProxy());
+          auto.event("lifterToIntake").onTrue(m_collarCommandFactory.intakeCoralSequence2().withName("autoIntake").asProxy());
           auto.event("lifterToL4").onTrue(Commands.waitSeconds(3).until(isAutoIntakeCommandRunning()).andThen(m_lifter.moveToCommand(RobotState.L4_CORAL)));
         }
         return auto;
@@ -445,6 +461,13 @@ public class RobotContainer {
     CameraServer.startAutomaticCapture();
 
     FollowPathCommand.warmupCommand().schedule();
+
+    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+      m_ppTargetPose = pose;
+      SmartDashboard.putNumber("ppTargetPose/x", m_ppTargetPose.getX());
+      SmartDashboard.putNumber("ppTargetPose/y", m_ppTargetPose.getY());
+      SmartDashboard.putNumber("ppTargetPose/rotation", m_ppTargetPose.getRotation().getRadians());
+    });
 
     configureBindings();
 
@@ -525,17 +548,32 @@ public class RobotContainer {
   }
 
   public void updatePoseEst(EstimatedRobotPose robotPose, VisionSubsystem camera, Field2d field){
-    if (robotPose != null && camera.getTargetFound()) {
+    if (robotPose != null && camera.getTargetFound() && camera.getIsNewResult()) {
       Pose3d estPose3d = robotPose.estimatedPose; // estimated robot pose of vision
       Pose2d estPose2d = estPose3d.toPose2d();
-
+      
         // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
         double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
         SmartDashboard.putNumber("vision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
+
         if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
           drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
+          
+          Optional<Pose2d> samplePose = drivetrain.samplePoseAt(Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
+
+          if (samplePose.isPresent()){
+            SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/samplePose",  new double [] {
+              samplePose.get().getX(), samplePose.get().getY(), samplePose.get().getRotation().getRadians()});
+          }
+
+          SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/drivetrainBeforeUpdate", new double [] {
+            drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY(), drivetrain.getState().Pose.getRotation().getRadians()});
+
           drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
+
+          SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/drivetrainAfterUpdate", new double [] {
+            drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY(), drivetrain.getState().Pose.getRotation().getRadians()});
         
           field.setRobotPose(estPose2d);
           SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});

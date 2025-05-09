@@ -38,6 +38,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import frc.robot.Constants;
@@ -59,6 +60,8 @@ public class VisionSubsystem extends SubsystemBase {
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private PhotonPoseEstimator poseEstimator;
+
+  private boolean isNewResult = false;
 
   private ArrayList<Pose2d> lastEstPoses = new ArrayList<>();
 
@@ -110,6 +113,7 @@ public class VisionSubsystem extends SubsystemBase {
       // Camera processed a new frame since last
       // Get the last one in the list.
       var result = results.get(results.size() - 1);
+      isNewResult = true;
 
       if (result.hasTargets()) {
         PhotonTrackedTarget target = null;
@@ -125,8 +129,11 @@ public class VisionSubsystem extends SubsystemBase {
             biggestTargetArea = sampleTarget.getArea();
             target = sampleTarget;
           }
-
         }
+
+        // gets target with lowest reprojection error
+        SmartDashboard.putNumber("vision/" + m_camera + "Alternate Target X", target.getBestCameraToTarget().getX());
+        SmartDashboard.putNumber("vision/" + m_camera + "Alternate Target Y", target.getBestCameraToTarget().getY());
 
         if (target.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY) {
           SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetDiscardedAmbiguity");
@@ -150,15 +157,33 @@ public class VisionSubsystem extends SubsystemBase {
         // update standard deviation based on dist 
         this.updateEstimationStdDevs(poseEstimatorOutput, result.getTargets());
 
-        if (poseEstimatorOutput.isPresent() && VisionUtils.poseIsSane(poseEstimatorOutput.get().estimatedPose)) {
-          estimatedRobotPose = poseEstimatorOutput.get(); 
-
-          // update our last n poses
-          lastEstPoses.add(estimatedRobotPose.estimatedPose.toPose2d());
-          if (lastEstPoses.size() > VisionConstants.NUM_LAST_EST_POSES) {
-            lastEstPoses.remove(0);
+        if (poseEstimatorOutput.isPresent()) {
+          if (VisionUtils.poseIsSane(poseEstimatorOutput.get().estimatedPose)){
+            SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetFound");
+            estimatedRobotPose = poseEstimatorOutput.get(); 
+  
+            // update our last n poses
+            lastEstPoses.add(estimatedRobotPose.estimatedPose.toPose2d());
+            if (lastEstPoses.size() > VisionConstants.NUM_LAST_EST_POSES) {
+              lastEstPoses.remove(0);
+            }
           }
+          else {
+            SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "poseNOTsane");
+            targetFound = false;
+
+            
+          }
+
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "/zIsSane", VisionUtils.zIsSane(poseEstimatorOutput.get().estimatedPose));
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "/rollIsSane", VisionUtils.rollIsSane(poseEstimatorOutput.get().estimatedPose));
+          SmartDashboard.putBoolean("vision/" + m_cameraName + "/pitchIsSane", VisionUtils.pitchIsSane(poseEstimatorOutput.get().estimatedPose));
+
+
         }
+      }
+      else{
+        isNewResult = false;
       }
 
     }
@@ -174,11 +199,19 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("vision/" + m_cameraName + "/isEstPoseJumpy", isEstPoseJumpy());
     SmartDashboard.putNumberArray("vision/" + m_cameraName + "/standardDeviations", curStdDevs.getData());
 
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/isConnected", m_camera.isConnected());
+    SmartDashboard.putBoolean("vision/" + m_cameraName + "/isNewResult", getIsNewResult());
+
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+
+  public boolean getIsNewResult(){
+    return isNewResult;
   }
 
   // returns bool if camera within tolerance to AprilTag

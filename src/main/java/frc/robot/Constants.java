@@ -54,7 +54,7 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(35.5) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(35) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
@@ -64,9 +64,13 @@ public final class Constants {
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
 
-    public static final double AUTOALIGN_POSITION_P = 5;
+    public static final double AUTOALIGN_POSITION_P = 4;
     public static final double AUTOALIGN_POSITION_I = 0;
     public static final double AUTOALIGN_POSITION_D = 0;
+
+    public static final double TO_TARGET_POSITION_P = 2.5;
+    public static final double TO_TARGET_POSITION_I = 0;
+    public static final double TO_TARGET_POSITION_D = 0;
   
     public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
     public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.97205; // approximated @ PF session 1/13
@@ -133,12 +137,12 @@ public final class Constants {
     public static double kV = 0.6;
     public static double kA = 0.0125;
 
-    public static double kP = 45;
+    public static double kP = 75;
     public static double kI = 0;
     public static double kD = 0;
     
     public static double kMaxV = 9;
-    public static double kMaxA = 15; 
+    public static double kMaxA = 17; 
 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
@@ -198,11 +202,15 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(0.5);
-    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(13.5);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(3.5);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(9.5);
 
     public static final double kMaxV = 2; // to be tuned
-    public static final double kMaxA = 1.5; // to be tuned
+    public static final double kMaxA = 2.5; // to be tuned
+
+    public static final double kMaxIntermediateV = 2; // to be tuned
+    public static final double kMaxIntermediateA = 1.5; // to be tuned
+
     public static final double INTERMEDIATE_POS_DIST = Units.inchesToMeters(5);
   }
 
@@ -231,7 +239,7 @@ public final class Constants {
     public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
     public static final double VISION_DISTANCE_DISCARD = 10; 
 
-    public static final double VISION_ALIGNMENT_DISCARD = Units.inchesToMeters(1.5); // in meters
+    public static final double VISION_ALIGNMENT_DISCARD = Units.inchesToMeters(1); // in meters
 
 
     public static final Translation2d ROBOT_TO_CAM1 = 
