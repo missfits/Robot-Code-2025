@@ -134,7 +134,7 @@ public class RobotContainer {
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      .withRotationalDeadband(MaxAngularRate * OperatorConstants.ROTATION_JOYSTICK_DEADBAND) // deadband on rotation; translation deadband is handled in Controls.java
       .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
