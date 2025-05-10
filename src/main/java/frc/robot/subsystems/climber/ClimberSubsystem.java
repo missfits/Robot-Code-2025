@@ -34,7 +34,7 @@ public class ClimberSubsystem extends SubsystemBase {
     public Command deployClimberCommand() {
         return new FunctionalCommand(
             () -> {},
-            () -> runMotorInRightDirection(ClimberConstants.AUTO_MOVE_MOTOR_SPEED),
+            () -> runMotorInRightDirection(ClimberConstants.DEPLOY_MOVE_MOTOR_SPEED),
             (interrupted) -> m_IO.motorOff(),
             () -> (m_IO.getPosition() < ClimberConstants.DEPLOY_POSITION),
             this
@@ -44,7 +44,7 @@ public class ClimberSubsystem extends SubsystemBase {
     public Command liftClimberCommand() {
         return new FunctionalCommand(
             () -> {},
-            () -> runMotorInRightDirection(ClimberConstants.AUTO_MOVE_MOTOR_SPEED),
+            () -> runMotorInRightDirection(ClimberConstants.LIFT_MOVE_MOTOR_SPEED),
             (interrupted) -> m_IO.motorOff(),
             () -> (m_IO.getPosition() < ClimberConstants.LIFT_POSITION),
             this
