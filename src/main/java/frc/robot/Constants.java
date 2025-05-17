@@ -186,9 +186,9 @@ public final class Constants {
 
     public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 6.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 8.0;
     public static final double DEPLOY_MOVE_MOTOR_SPEED = 10.0; 
-    public static final double LIFT_MOVE_MOTOR_SPEED = 6.0; 
+    public static final double LIFT_MOVE_MOTOR_SPEED = 7.0; 
     public static final double DEGREES_PER_ROTATION = 360.0/690.0;
 
     public static final double INITIAL_POSITION = 0.0; // down
