@@ -215,7 +215,7 @@ public class RobotContainer {
     );
 
     copilotJoystick.povCenter().negate().whileTrue(
-      m_collar.runCollar(1.0)
+      m_collarCommandFactory.runCollarOutSlow()
     );
 
     copilotJoystick.b().whileTrue(

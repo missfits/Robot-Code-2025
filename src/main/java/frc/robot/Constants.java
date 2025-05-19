@@ -48,7 +48,7 @@ public final class Constants {
 
     public static final double TRANSLATION_JOYSTICK_DEADBAND = 0.1;
     public static final double ROTATION_JOYSTICK_DEADBAND = 0.1;
-    public static final double SLOWMODE_FACTOR = 0.2;
+    public static final double SLOWMODE_FACTOR = 0.3;
 
     public static final double SLEW_RATE_LIMIT = 1.5; // limits how fast operator input (-1 to 1) 
   }
@@ -169,6 +169,8 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
+    public static final double SLOW_OUTTAKE_MOTOR_SPEED = 2.0;
+
     
     public static final double INTAKE_MOTOR_SPEED = 6.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 3.0;
@@ -186,9 +188,9 @@ public final class Constants {
 
     public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 6.0;
-    public static final double DEPLOY_MOVE_MOTOR_SPEED = 10.0; 
-    public static final double LIFT_MOVE_MOTOR_SPEED = 6.0; 
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 8.0;
+    public static final double DEPLOY_MOVE_MOTOR_SPEED = 12.0; 
+    public static final double LIFT_MOVE_MOTOR_SPEED = 9.0; 
     public static final double DEGREES_PER_ROTATION = 360.0/690.0;
 
     public static final double INITIAL_POSITION = 0.0; // down

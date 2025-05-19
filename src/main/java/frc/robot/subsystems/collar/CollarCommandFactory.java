@@ -39,6 +39,10 @@ public class CollarCommandFactory {
         return m_collar.runCollar(CollarConstants.OUTTAKE_MOTOR_SPEED);
     }
 
+    public Command runCollarOutSlow() {
+        return m_collar.runCollar(CollarConstants.SLOW_OUTTAKE_MOTOR_SPEED);
+    }
+
     public Command runCollarInSecondary() {
         return m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED);
     }
