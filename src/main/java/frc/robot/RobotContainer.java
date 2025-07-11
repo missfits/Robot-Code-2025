@@ -7,6 +7,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -139,8 +141,6 @@ public class RobotContainer {
 
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
 
-  private final Field2d m_estPoseFieldBeam = new Field2d();
-  private final Field2d m_estPoseFieldSwerve = new Field2d();
   private final Field2d m_actualField = new Field2d();
 
 
@@ -368,8 +368,6 @@ public class RobotContainer {
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
     
-    SmartDashboard.putData("est pose field beam", m_estPoseFieldBeam);
-    SmartDashboard.putData("est pose field swerve", m_estPoseFieldSwerve);
     SmartDashboard.putData("Actual Field", m_actualField);
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
@@ -457,39 +455,56 @@ public class RobotContainer {
   }
 
   public void updatePoseEst() {
-    ArrayList<LocalizationCamera> cameras = m_vision.getLocalizationCameras();
-    LocalizationCamera cam_1 = cameras.get(0);
-    LocalizationCamera cam_2 = cameras.get(1);
+    List<LocalizationCamera> cameras = m_vision.getLocalizationCameras();
 
-    updatePoseEst(cam_1.getRobotPose(), cam_1, m_estPoseFieldBeam);
-    updatePoseEst(cam_2.getRobotPose(), cam_2, m_estPoseFieldSwerve);
+    for (LocalizationCamera cam : cameras){
+      updatePoseEst(cam);
+    }
     
     m_actualField.setRobotPose(drivetrain.getState().Pose);
   }
 
-    public void updatePoseEst(EstimatedRobotPose robotPose, LocalizationCamera camera, Field2d field){
-    if (robotPose != null && camera.getTargetFound()) {
-      Pose3d estPose3d = robotPose.estimatedPose; // estimated robot pose of vision
-      Pose2d estPose2d = estPose3d.toPose2d();
+    public void updatePoseEst(LocalizationCamera camera){
+      EstimatedRobotPose robotPose = camera.getRobotPose();
+      
+      if (robotPose != null && camera.getTargetFound() && camera.getIsNewResult()) {
+        Pose3d estPose3d = robotPose.estimatedPose; // estimated robot pose of vision
+        Pose2d estPose2d = estPose3d.toPose2d();
 
-        // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-        double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+          // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+          double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
-        SmartDashboard.putNumber("vision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
-        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
-          drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
-          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
-        
-          field.setRobotPose(estPose2d);
-          SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
+          SmartDashboard.putNumber("fusedVision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
+          if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
+            drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
+            
+            // sample drivetrain fusedPose before updating
+            Optional<Pose2d> samplePose = drivetrain.samplePoseAt(Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
+
+            if (samplePose.isPresent()){
+              SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/samplePose",  new double [] {
+                samplePose.get().getX(), samplePose.get().getY(), samplePose.get().getRotation().getRadians()});
+            }
+            SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/drivetrainBeforeUpdate", new double [] {
+            drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY(), drivetrain.getState().Pose.getRotation().getRadians()});
+
+
+            drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
+            camera.updateField(estPose2d);
+
+            // sample drivetrain fusedPose after updating
+            SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/drivetrainAfterUpdate", new double [] {
+              drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY(), drivetrain.getState().Pose.getRotation().getRadians()});
+              
+            SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
+        }
+
+        SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/visionPose3D", new double[] {
+          estPose3d.getX(),
+          estPose3d.getY(),
+          estPose3d.getZ(),
+          estPose3d.getRotation().toRotation2d().getRadians()
+        }); // post vision 3d to smartdashboard
       }
-
-      SmartDashboard.putNumberArray("vision/" + camera.getCameraName() + "/visionPose3D", new double[] {
-        estPose3d.getX(),
-        estPose3d.getY(),
-        estPose3d.getZ(),
-        estPose3d.getRotation().toRotation2d().getRadians()
-      }); // post vision 3d to smartdashboard
     }
-  }
 }

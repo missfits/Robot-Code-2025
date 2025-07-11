@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -51,10 +52,12 @@ public class LocalizationCamera {
   private boolean targetFound; // true if the translation2d was updated last periodic() call
   private Pose2d targetPose;
   private EstimatedRobotPose estimatedRobotPose;
+  private boolean isNewResult = false;
 
   private Matrix<N3, N1> curStdDevs = VisionConstants.kSingleTagStdDevs;
 
   private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  private final Field2d m_estPoseField = new Field2d(); // field pose estimator
   private PhotonPoseEstimator poseEstimator;
 
   private PhotonTrackedTarget m_target;
@@ -65,6 +68,8 @@ public class LocalizationCamera {
     m_cameraName = cameraName;
     m_camera = new PhotonCamera(m_cameraName);
     poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
+
+    SmartDashboard.putBoolean("isConnected/" + m_cameraName, m_camera.isConnected());
   }
 
   public String getCameraName() {
@@ -87,8 +92,22 @@ public class LocalizationCamera {
     return estimatedRobotPose;
   }
 
+  public Field2d getEstField(){
+    return m_estPoseField;
+  }
+
+  public boolean getIsNewResult(){
+    return isNewResult;
+  }
+
   public Matrix<N3, N1> getCurrentStdDevs(){
     return curStdDevs;
+  }
+
+  public void updateField(Pose2d newPos){
+    m_estPoseField.setRobotPose(newPos);
+
+    SmartDashboard.putData("est pose field/" + m_cameraName + "/", m_estPoseField);
   }
 
   public void findTarget() {
@@ -102,6 +121,7 @@ public class LocalizationCamera {
             // Camera processed a new frame since last
             // Get the last one in the list.
             var result = results.get(results.size() - 1);
+            isNewResult = true;
 
             if (result.hasTargets()) {
                 double biggestTargetArea = 0;
@@ -117,6 +137,9 @@ public class LocalizationCamera {
                         m_target = sampleTarget;
                     }
                 }
+
+                SmartDashboard.putNumber("vision/" + m_camera + "Alternate Target X", m_target.getBestCameraToTarget().getX());
+                SmartDashboard.putNumber("vision/" + m_camera + "Alternate Target Y", m_target.getBestCameraToTarget().getY());
 
                 if (m_target.getPoseAmbiguity() > VisionConstants.MAX_POSE_AMBIGUITY) {
                     SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetDiscardedAmbiguity");
@@ -147,14 +170,27 @@ public class LocalizationCamera {
                 if (m_lastEstPoses.size() > VisionConstants.NUM_LAST_EST_POSES) {
                   m_lastEstPoses.remove(0);
                 }
+
+                SmartDashboard.putString("vision/" + m_cameraName + "/targetState", "targetFound");
+                SmartDashboard.putBoolean("vision/" + m_cameraName + "/zIsSane", VisionUtils.zIsSane(poseEstimatorOutput.get().estimatedPose));
+                SmartDashboard.putBoolean("vision/" + m_cameraName + "/rollIsSane", VisionUtils.rollIsSane(poseEstimatorOutput.get().estimatedPose));
+                SmartDashboard.putBoolean("vision/" + m_cameraName + "/pitchIsSane", VisionUtils.pitchIsSane(poseEstimatorOutput.get().estimatedPose));
               }      
             }
+            else{
+              isNewResult = false;
+            }
         }
+        SmartDashboard.putBoolean("vision/" + m_cameraName + "/isConnected", m_camera.isConnected());
+        SmartDashboard.putBoolean("vision/" + m_cameraName + "/isNewResult", getisNewResult());
+
         SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
         SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
         SmartDashboard.putBoolean("vision/" + m_cameraName + "/Target Found", targetFound);
+
         SmartDashboard.putNumber("vision/" + m_cameraName + "/Target X Distance", targetTranslation2d.getX());
         SmartDashboard.putNumber("vision/" + m_cameraName + "/Target Y Distance", targetTranslation2d.getY());
+
         SmartDashboard.putBoolean("vision/" + m_cameraName + "/isEstPoseJumpy", isEstPoseJumpy());
         SmartDashboard.putNumberArray("vision/" + m_cameraName + "/standardDeviations", curStdDevs.getData());
     }

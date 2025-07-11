@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -50,7 +51,7 @@ import frc.robot.VisionUtils;
 
 public class VisionSubsystem extends SubsystemBase {
   private ArrayList<LocalizationCamera> cameras = new ArrayList<>();
-  private ArrayList<PhotonTrackedTarget> targetResults = new ArrayList<>();
+  private List<LocalizationCamera> camerasWithValidPose = new ArrayList<>();
 
   /** Creates a new Vision Subsystem. */
   public VisionSubsystem() {
@@ -58,20 +59,28 @@ public class VisionSubsystem extends SubsystemBase {
     cameras.add(new LocalizationCamera(VisionConstants.CAMERA2_NAME, VisionConstants.ROBOT_TO_CAM2_3D));
   }
 
-  public ArrayList<LocalizationCamera> getLocalizationCameras(){
-    return cameras;
+  public List<LocalizationCamera> getLocalizationCameras(){
+    return camerasWithValidPose;
   }
 
   @Override
   public void periodic() {
+    cameras = new ArrayList<>();
     for (LocalizationCamera cam : cameras){
       cam.findTarget();
-      
-      if (cam.getTargetFound()){
-        targetResults.add(cam.getTarget());
-      }
     }
-  }
+
+    camerasWithValidPose = cameras.stream() // turn the list into a stream
+    .filter((camera) -> { // only get the cameras with a valid EstimatedRobotPose
+         return camera.getRobotPose() != null && camera.getTargetFound();
+    })
+    .sorted((camera_a, camera_b) -> { // simplified comparator because we've filtered out invalid readings.
+         EstimatedRobotPose poseA = camera_a.getRobotPose();
+         EstimatedRobotPose poseB = camera_b.getRobotPose();
+         return Double.compare(poseA.timestampSeconds, poseB.timestampSeconds);
+     })
+    .toList();
+    }
 
   @Override
   public void simulationPeriodic() {
