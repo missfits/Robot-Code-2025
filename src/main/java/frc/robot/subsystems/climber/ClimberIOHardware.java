@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Revolutions;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
@@ -14,6 +15,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ClimberConstants;
@@ -23,6 +25,7 @@ public class ClimberIOHardware {
     private final TalonFX m_climberMotor = new TalonFX(ClimberConstants.CLIMBER_MOTOR_ID);
     private final StatusSignal<Angle> m_positionSignal = m_climberMotor.getPosition();
     private final StatusSignal<AngularVelocity> m_velocitySignal = m_climberMotor.getVelocity();
+    private final StatusSignal<Current> m_currentSignal = m_climberMotor.getStatorCurrent();
 
     // constructor
     public ClimberIOHardware() {
@@ -52,6 +55,10 @@ public class ClimberIOHardware {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ClimberConstants.DEGREES_PER_ROTATION;
     }
 
+    public double getCurrent() {
+        return m_currentSignal.refresh().getValue().in(Amps);
+    }
+
     // setters
     public void motorOff() {
         m_climberMotor.stopMotor();
@@ -63,6 +70,7 @@ public class ClimberIOHardware {
 
     public void setVoltage(double value) {
         m_climberMotor.setControl(new VoltageOut(value));
+        SmartDashboard.putNumber("climber/voltage", value);
     }
     
     public void requestClosedLoopPosition(double value) {

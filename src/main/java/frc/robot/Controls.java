@@ -29,7 +29,7 @@ public class Controls {
     // square the input while maintaining direction 
     public static JoystickVals inputShape(double x, double y) {
         double hypot = Math.hypot(x, y);
-        double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.JOYSTICK_DEADBAND);
+        double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.TRANSLATION_JOYSTICK_DEADBAND);
     
         double scaleFactor= hypot == 0 ? 0 : deadbandedValue * Math.abs(deadbandedValue) / hypot; // avoid division by 0 issues
 
@@ -48,7 +48,7 @@ public class Controls {
     }
 
     public static double applyDeadband(double input) {
-        return MathUtil.applyDeadband(input, OperatorConstants.JOYSTICK_DEADBAND);
+        return MathUtil.applyDeadband(input, OperatorConstants.TRANSLATION_JOYSTICK_DEADBAND);
     }
 
 }

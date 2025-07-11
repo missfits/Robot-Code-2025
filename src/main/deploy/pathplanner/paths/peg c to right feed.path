@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5685297309027773,
-        "y": 3.0472254774305547
+        "x": 3.5702766927083327,
+        "y": 3.0630645978009254
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1777275464463512,
-        "y": 2.6383755879083557
+        "x": 3.1794745082519067,
+        "y": 2.6542147082787264
       },
       "isLocked": false,
       "linkedName": "peg c"
@@ -31,7 +31,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "lifterToIntake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.5,
     "maxAcceleration": 3.0,

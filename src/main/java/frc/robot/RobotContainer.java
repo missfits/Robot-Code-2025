@@ -25,6 +25,8 @@ import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
@@ -33,6 +35,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -53,6 +56,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -69,10 +73,12 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.Drive1mCommand;
 import frc.robot.commands.DriveToReefCommand;
 import frc.robot.generated.TunerConstantsCeridwen;
 import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.commands.DriveToReefCommand.ReefPosition;
+import frc.robot.commands.PIDToTargetCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LocalizationCamera;
@@ -85,7 +91,6 @@ import frc.robot.subsystems.lifter.ArmSubsystem;
 import frc.robot.subsystems.lifter.ElevatorIOHardware;
 import frc.robot.subsystems.lifter.ElevatorSubsystem;
 import frc.robot.subsystems.lifter.LifterCommandFactory;
-import frc.robot.subsystems.ramp.RampSubsystem;
 
 
 
@@ -119,7 +124,6 @@ public class RobotContainer {
   private final VisionSubsystem m_vision = new VisionSubsystem();
   private final RampSensorSubsystem m_rampSensor = new RampSensorSubsystem(); 
   private final CollarSubsystem m_collar = new CollarSubsystem();
-  private final RampSubsystem m_ramp = new RampSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
   private final ClimberSubsystem m_climber = new ClimberSubsystem();
@@ -131,7 +135,7 @@ public class RobotContainer {
 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      .withRotationalDeadband(MaxAngularRate * OperatorConstants.ROTATION_JOYSTICK_DEADBAND) // deadband on rotation; translation deadband is handled in Controls.java
       .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -142,6 +146,8 @@ public class RobotContainer {
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
 
   private final Field2d m_actualField = new Field2d();
+
+  private Pose2d m_ppTargetPose; 
 
 
   private void configureBindings() {
@@ -168,7 +174,12 @@ public class RobotContainer {
     driverJoystick.leftTrigger().whileTrue(new DriveToReefCommand(drivetrain, ReefPosition.LEFT, m_ledSubsystem)); 
     driverJoystick.leftTrigger().and(drivetrain.isAutoAligned().negate()).whileTrue(m_ledSubsystem.runSolidRed()); 
     
-    driverJoystick.b().whileTrue(m_climber.manualMoveBackwardCommand());
+    driverJoystick.b().and(driverJoystick.leftBumper().negate()).whileTrue(m_climber.manualMoveCommand());
+
+    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_climber.deployClimberCommand());
+    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
+
+    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_climber.liftClimberCommand());
 
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
@@ -181,7 +192,7 @@ public class RobotContainer {
     }));
 
     // snap to right coral station
-    driverJoystick.y().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    driverJoystick.y().and(driverJoystick.leftBumper().negate()).whileTrue(drivetrain.getCommandFromRequest(() -> {
       JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
@@ -198,8 +209,12 @@ public class RobotContainer {
     );
 
     // outtake from collar
-    copilotJoystick.y().whileTrue(
+    copilotJoystick.y().and(copilotJoystick.povCenter()).whileTrue(
       m_collarCommandFactory.runCollarOut()
+    );
+
+    copilotJoystick.povCenter().negate().whileTrue(
+      m_collarCommandFactory.runCollarOutSlow()
     );
 
     copilotJoystick.b().whileTrue(
@@ -259,7 +274,6 @@ public class RobotContainer {
     copilotJoystick.leftBumper().and(copilotJoystick.a()).and(copilotJoystick.povCenter()).whileTrue(
       m_collarCommandFactory.runCollarOut()
     ); 
-
 
     // lifter backup controls -- joysticks :)
     Trigger elevatorManualTrigger = new Trigger(() -> Controls.applyDeadband(copilotJoystick.getLeftY()) != 0);
@@ -341,7 +355,15 @@ public class RobotContainer {
   }
 
   private Command createScoreCommand(Command lifterCommand){
-    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(0.5), m_collar.runCollarOffInstant(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+    return createScoreCommand(lifterCommand, 0.5);
+  }
+
+  private Command createScoreCommand(Command lifterCommand, double collarTime){
+    return Commands.sequence(lifterCommand.asProxy(), m_collarCommandFactory.runCollarOut().withTimeout(collarTime).asProxy(), m_collar.runCollarOffInstant().asProxy(), m_lifter.moveToCommand(RobotState.INTAKE).asProxy());
+  }
+
+  private Trigger isAutoIntakeCommandRunning() {
+    return new Trigger(() -> !"autoIntake".equals(m_collar.getCurrentCommand() == null ? "" : m_collar.getCurrentCommand().getName()));
   }
 
   public RobotContainer() {
@@ -362,8 +384,15 @@ public class RobotContainer {
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
     NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+    NamedCommands.registerCommand("shootCoral", new ParallelRaceGroup(
+      new PIDToTargetCommand(drivetrain, () -> m_ppTargetPose), 
+      Commands.sequence(  
+        (new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), 
+        m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), 
+        m_collar.runCollarOffInstant().asProxy())));
     NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
     NamedCommands.registerCommand("waitUntilArmDone", new WaitCommand(1).until(m_elevator.isNotAtL4Trigger()));
+    NamedCommands.registerCommand("descoreAlgaeL2", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_ALGAE), 1.5));
 
 
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option
@@ -372,7 +401,16 @@ public class RobotContainer {
   
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
-    m_autoChooser = AutoBuilder.buildAutoChooser();
+    m_autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("drive 1m", (autoStream) -> {
+      return autoStream.map((auto) -> {
+        if (auto.getName().equals("3 pc right") || auto.getName().equals("3 pc left")){
+          auto.event("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+          auto.event("lifterToIntake").onTrue(m_collarCommandFactory.intakeCoralSequence2().withName("autoIntake").asProxy());
+          auto.event("lifterToL4").onTrue(Commands.waitSeconds(3).until(isAutoIntakeCommandRunning()).andThen(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+        }
+        return auto;
+      });
+     } );
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
     for (String autoName : AutoBuilder.getAllAutoNames()) {
     }
@@ -402,13 +440,28 @@ public class RobotContainer {
     SmartDashboard.putNumber("elevator constants/kMaxV", SmartDashboard.getNumber("elevator constants/kMaxV", ElevatorConstants.kMaxV));
     SmartDashboard.putNumber("elevator constants/kMaxA", SmartDashboard.getNumber("elevator constants/kMaxA", ElevatorConstants.kMaxA));
 
+    SmartDashboard.putNumber("drivetrain constants/kP", SmartDashboard.getNumber("drivetrain constants/kP", DrivetrainConstants.ROBOT_POSITION_P));
+    SmartDashboard.putNumber("drivetrain constants/kI", SmartDashboard.getNumber("drivetrain constants/kI", DrivetrainConstants.ROBOT_POSITION_I));
+    SmartDashboard.putNumber("drivetrain constants/KD", SmartDashboard.getNumber("drivetrain constants/kD", DrivetrainConstants.ROBOT_POSITION_D));
+
+
     SmartDashboard.putString("buildVersion/commitSHA", BuildConstants.GIT_SHA);
     SmartDashboard.putString("buildVersion/branchName", BuildConstants.GIT_BRANCH);
     SmartDashboard.putString("buildVersion/commitDate", BuildConstants.GIT_DATE);
 
+    //add event markers
+    // new EventTrigger("lifterToIntake").onTrue(m_lifter.moveToCommand(RobotState.INTAKE));
+    // new EventTrigger("lifterToL4").onTrue(m_lifter.moveToCommand(RobotState.L4_CORAL));
     CameraServer.startAutomaticCapture();
 
     FollowPathCommand.warmupCommand().schedule();
+
+    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+      m_ppTargetPose = pose;
+      SmartDashboard.putNumber("ppTargetPose/x", m_ppTargetPose.getX());
+      SmartDashboard.putNumber("ppTargetPose/y", m_ppTargetPose.getY());
+      SmartDashboard.putNumber("ppTargetPose/rotation", m_ppTargetPose.getRotation().getRadians());
+    });
 
     configureBindings();
 
@@ -471,40 +524,41 @@ public class RobotContainer {
         Pose3d estPose3d = robotPose.estimatedPose; // estimated robot pose of vision
         Pose2d estPose2d = estPose3d.toPose2d();
 
-          // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
-          double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+        // check if new estimated pose and previous pose are less than 2 meters apart (fused poseEst)
+        double distance = estPose2d.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
 
-          SmartDashboard.putNumber("fusedVision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
-          if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
-            drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
-            
-            // sample drivetrain fusedPose before updating
-            Optional<Pose2d> samplePose = drivetrain.samplePoseAt(Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
+        SmartDashboard.putNumber("fusedVision/" + camera.getCameraName() + "/distanceBetweenVisionAndActualPose", distance);
+        if (distance < VisionConstants.MAX_VISION_POSE_DISTANCE || !camera.isEstPoseJumpy()) {
+          drivetrain.setVisionMeasurementStdDevs(camera.getCurrentStdDevs());
+          
+          // sample drivetrain fusedPose before updating
+          Optional<Pose2d> samplePose = drivetrain.samplePoseAt(Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
 
-            if (samplePose.isPresent()){
-              SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/samplePose",  new double [] {
-                samplePose.get().getX(), samplePose.get().getY(), samplePose.get().getRotation().getRadians()});
-            }
-            SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/drivetrainBeforeUpdate", new double [] {
+          if (samplePose.isPresent()){
+            SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/samplePose",  new double [] {
+              samplePose.get().getX(), samplePose.get().getY(), samplePose.get().getRotation().getRadians()});
+          }
+          
+          SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/drivetrainBeforeUpdate", new double [] {
+          drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY(), drivetrain.getState().Pose.getRotation().getRadians()});
+
+
+          drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
+          camera.updateField(estPose2d);
+
+          // sample drivetrain fusedPose after updating
+          SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/drivetrainAfterUpdate", new double [] {
             drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY(), drivetrain.getState().Pose.getRotation().getRadians()});
-
-
-            drivetrain.addVisionMeasurement(estPose2d, Utils.fpgaToCurrentTime(robotPose.timestampSeconds));
-            camera.updateField(estPose2d);
-
-            // sample drivetrain fusedPose after updating
-            SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/drivetrainAfterUpdate", new double [] {
-              drivetrain.getState().Pose.getX(), drivetrain.getState().Pose.getY(), drivetrain.getState().Pose.getRotation().getRadians()});
-              
-            SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
-        }
-
-        SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/visionPose3D", new double[] {
-          estPose3d.getX(),
-          estPose3d.getY(),
-          estPose3d.getZ(),
-          estPose3d.getRotation().toRotation2d().getRadians()
-        }); // post vision 3d to smartdashboard
+            
+          SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/visionPose2dFiltered" + camera.getCameraName(), new double[] {estPose2d.getX(), estPose2d.getY(), estPose2d.getRotation().getRadians()});
       }
+
+      SmartDashboard.putNumberArray("fusedVision/" + camera.getCameraName() + "/visionPose3D", new double[] {
+        estPose3d.getX(),
+        estPose3d.getY(),
+        estPose3d.getZ(),
+        estPose3d.getRotation().toRotation2d().getRadians()
+      }); // post vision 3d to smartdashboard
     }
+  }
 }

@@ -4,31 +4,24 @@
 
 package frc.robot.commands;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.VisionUtils;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
-
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
-import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 public class DriveToReefCommand extends Command {
 
@@ -45,11 +38,13 @@ public class DriveToReefCommand extends Command {
   private final LEDSubsystem m_ledSubsystem;
   private boolean reachedIntermediateTranslation = false; 
 
-  private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
-  private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.ROBOT_POSITION_P, DrivetrainConstants.ROBOT_POSITION_I, DrivetrainConstants.ROBOT_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
+  private final ProfiledPIDController xController = new ProfiledPIDController(DrivetrainConstants.AUTOALIGN_POSITION_P, DrivetrainConstants.AUTOALIGN_POSITION_I, DrivetrainConstants.AUTOALIGN_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
+  private final ProfiledPIDController yController = new ProfiledPIDController(DrivetrainConstants.AUTOALIGN_POSITION_P, DrivetrainConstants.AUTOALIGN_POSITION_I, DrivetrainConstants.AUTOALIGN_POSITION_D, new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA));
   private final SwerveRequest.FieldCentricFacingAngle driveRequest = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity).withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
-  
-  
+
+  private final TrapezoidProfile.Constraints intermediateConstraints = new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxIntermediateV, AutoAlignConstants.kMaxIntermediateA);
+  private final TrapezoidProfile.Constraints normalConstraints = new TrapezoidProfile.Constraints(AutoAlignConstants.kMaxV, AutoAlignConstants.kMaxA);
+
     /**
      * Creates a new DriveToReefCommand, which moves the robot to a seen AprilTag AFTER rotating to face parallel
      *
@@ -97,8 +92,8 @@ public class DriveToReefCommand extends Command {
         }
 
         m_targetIntermediateTranslation = m_targetTranslation.plus(new Translation2d(
-            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.sin(Math.PI/2 + targetPose.getRotation().getRadians()),
-            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.cos(Math.PI/2 + targetPose.getRotation().getRadians())
+            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.cos(targetPose.getRotation().getRadians()),
+            AutoAlignConstants.INTERMEDIATE_POS_DIST * Math.sin(targetPose.getRotation().getRadians())
           )
         );
         
@@ -114,7 +109,7 @@ public class DriveToReefCommand extends Command {
       xController.reset(m_drivetrain.getState().Pose.getX());
       yController.reset(m_drivetrain.getState().Pose.getY());
 
-      driveRequest.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_ROTATION_P, DrivetrainConstants.ROBOT_ROTATION_I, DrivetrainConstants.ROBOT_ROTATION_D);
+      driveRequest.HeadingController = new PhoenixPIDController(DrivetrainConstants.AUTOALIGN_POSITION_P, DrivetrainConstants.AUTOALIGN_POSITION_I, DrivetrainConstants.AUTOALIGN_POSITION_D);
       driveRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
       
       SmartDashboard.putString("drivetoreef/target robot pose", m_targetTranslation.toString());
@@ -131,10 +126,16 @@ public class DriveToReefCommand extends Command {
       double yVelocity;
 
       if (! reachedIntermediateTranslation) {
+        xController.setConstraints(normalConstraints);
+        yController.setConstraints(normalConstraints);
+      
         xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetIntermediateTranslation.getX()) + xController.getSetpoint().velocity;
         yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetIntermediateTranslation.getY()) + yController.getSetpoint().velocity;
         reachedIntermediateTranslation = isAligned(m_targetIntermediateTranslation);
       } else {
+        xController.setConstraints(intermediateConstraints);
+        yController.setConstraints(intermediateConstraints);
+
         xVelocity = xController.calculate(m_drivetrain.getState().Pose.getX(), m_targetTranslation.getX()) + xController.getSetpoint().velocity;
         yVelocity = yController.calculate(m_drivetrain.getState().Pose.getY(), m_targetTranslation.getY()) + yController.getSetpoint().velocity;
       }
@@ -150,6 +151,9 @@ public class DriveToReefCommand extends Command {
       
       SmartDashboard.putNumber("drivetoreef/setpoint velocity x", xController.getSetpoint().velocity);
       SmartDashboard.putNumber("drivetoreef/setpoint velocity y", yController.getSetpoint().velocity);
+
+      SmartDashboard.putNumber("drivetoreef/input velocity x", xVelocity);
+      SmartDashboard.putNumber("drivetoreef/input velocity y", yVelocity);
 
       SmartDashboard.putBoolean("drivetoreef/reachedIntermediateTranslation", reachedIntermediateTranslation);
 

@@ -46,25 +46,35 @@ public final class Constants {
     public static final int kCopilotControllerPort = 1;
     public static final int kTestControllerPort = 2;
 
-    public static final double JOYSTICK_DEADBAND = 0.1;
-    public static final double SLOWMODE_FACTOR = 0.2;
+    public static final double TRANSLATION_JOYSTICK_DEADBAND = 0.1;
+    public static final double ROTATION_JOYSTICK_DEADBAND = 0.1;
+    public static final double SLOWMODE_FACTOR = 0.3;
 
     public static final double SLEW_RATE_LIMIT = 1.5; // limits how fast operator input (-1 to 1) 
   }
 
   public static class DrivetrainConstants {
 
-    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(35.5) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
+    public static final double ROBOT_SIZE_X =  RobotContainer.name == RobotName.DYNAMENE ? Units.inchesToMeters(35) : 0.66675; // in meters, including bumpers (est. 26.25in for ceridwen)
     // Not tuned
     public static final double ROBOT_ROTATION_P = 5; // 11.507 from rotation sys-id @PF 1/13
     public static final double ROBOT_ROTATION_I = 0;
     public static final double ROBOT_ROTATION_D = 0; // 0.10877 from rotation sys-id @PF 1/13
-    public static final double ROBOT_POSITION_P = 5;
+    
+    public static final double ROBOT_POSITION_P = 10;
     public static final double ROBOT_POSITION_I = 0;
     public static final double ROBOT_POSITION_D = 0;
 
+    public static final double AUTOALIGN_POSITION_P = 4;
+    public static final double AUTOALIGN_POSITION_I = 0;
+    public static final double AUTOALIGN_POSITION_D = 0;
+
+    public static final double TO_TARGET_POSITION_P = 2.5;
+    public static final double TO_TARGET_POSITION_I = 0;
+    public static final double TO_TARGET_POSITION_D = 0;
+  
     public static final double CERIDWEN_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
-    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.96153846153; // approximated @ PF session 1/13
+    public static final double DYNAMENE_WHEEL_RADIUS_FUDGE_FACTOR = 0.97205; // approximated @ PF session 1/13
 
   }
 
@@ -100,6 +110,7 @@ public final class Constants {
     public static final double MANUAL_MOVE_MOTOR_SPEED = 1.5;
 
     public static final double MAX_POSITION_TOLERANCE = 0.005;
+    public static final double PROFILE_TOLERANCE = 0.08;
 
     public static final double MIN_POS_ARM_CLEAR = 0.28; 
 
@@ -127,21 +138,23 @@ public final class Constants {
     public static double kV = 0.6;
     public static double kA = 0.0125;
 
-    public static double kP = 45;
+    public static double kP = 75;
     public static double kI = 0;
     public static double kD = 0;
     
     public static double kMaxV = 9;
-    public static double kMaxA = 15; 
+    public static double kMaxA = 17; 
 
 
     public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
 
     public static final double MAX_POSITION_TOLERANCE = 0.025; // equal to 1 degree
+    public static final double PROFILE_TOLERANCE = Math.toRadians(20);
 
     public static final double MIN_POS_ELEVATOR_CLEAR = -0.3; // accounts for when coral inside collar
     public static final double LOWER_INSIDE_ROBOT_BOUND = 0;
     public static final double UPPER_INSIDE_ROBOT_BOUND = -Math.PI;
+
   }
 
   public static class CollarConstants {
@@ -156,6 +169,8 @@ public final class Constants {
     public static final double SPEED_UPPER_LIMIT = 0.0;
 
     public static final double OUTTAKE_MOTOR_SPEED = 8.0;
+    public static final double SLOW_OUTTAKE_MOTOR_SPEED = 2.0;
+
     
     public static final double INTAKE_MOTOR_SPEED = 6.0;
     public static final double INTAKE_SECONDARY_MOTOR_SPEED = 3.0;
@@ -167,19 +182,20 @@ public final class Constants {
     public static final double INTAKE_STOP_OFFSET = 0; // in seconds
   }
 
-  public static class RampConstants {
-
-  }
-
   public static class ClimberConstants {
 
     public static final int CLIMBER_MOTOR_ID = 16;
 
-    public static final double MOTOR_STATOR_LIMIT = 80; // needs to be updated lol
+    public static final double MOTOR_STATOR_LIMIT = 40; // needs to be updated lol
 
-    public static final double MANUAL_MOVE_MOTOR_SPEED = 3.0;
+    public static final double MANUAL_MOVE_MOTOR_SPEED = 8.0;
+    public static final double DEPLOY_MOVE_MOTOR_SPEED = 12.0; 
+    public static final double LIFT_MOVE_MOTOR_SPEED = 9.0; 
+    public static final double DEGREES_PER_ROTATION = 360.0/690.0;
 
-    public static final double DEGREES_PER_ROTATION = 1;
+    public static final double INITIAL_POSITION = 0.0; // down
+    public static final double DEPLOY_POSITION = -1.98; 
+    public static final double LIFT_POSITION = -4.50; 
   }
   
   public static class LEDConstants {
@@ -190,12 +206,16 @@ public final class Constants {
   }
 
   public static class AutoAlignConstants {
-    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(2);
-    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(12);
+    public static final double REEF_OFFSET_RIGHT = Units.inchesToMeters(3.5);
+    public static final double REEF_OFFSET_LEFT = Units.inchesToMeters(9.5);
 
-    public static final double kMaxV = 1; // to be tuned
-    public static final double kMaxA = 1; // to be tuned
-    public static final double INTERMEDIATE_POS_DIST = Units.inchesToMeters(2);
+    public static final double kMaxV = 2; // to be tuned
+    public static final double kMaxA = 2.5; // to be tuned
+
+    public static final double kMaxIntermediateV = 2; // to be tuned
+    public static final double kMaxIntermediateA = 1.5; // to be tuned
+
+    public static final double INTERMEDIATE_POS_DIST = Units.inchesToMeters(5);
   }
 
   public static class VisionConstants {
@@ -222,7 +242,7 @@ public final class Constants {
     public static final double MAX_VISION_POSE_PITCH = 0.05; // in radians
     public static final double VISION_DISTANCE_DISCARD = 10; 
 
-    public static final double VISION_ALIGNMENT_DISCARD = Units.inchesToMeters(2); // in meters
+    public static final double VISION_ALIGNMENT_DISCARD = Units.inchesToMeters(1); // in meters
 
 
     public static final Translation2d ROBOT_TO_CAM1 = 
@@ -287,5 +307,8 @@ public final class Constants {
     
     public static final double IN_ELEVATOR_POS = 0.024;
     public static final double IN_ARM_POS = -0.43;
+
+    public static final double CLIMB_ELEVATOR_POS = 0.01;
+    public static final double CLIMB_ARM_POS = Math.PI/4; // 45 degrees
   }
 }

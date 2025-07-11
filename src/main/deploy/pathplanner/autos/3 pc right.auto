@@ -11,149 +11,63 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "scoreL4Coral"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "waitUntilArmDone"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "peg e to right feed"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "name": "shootCoral"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "intakeCoral"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "waitUntilCoralIntaken"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "right feed to peg c"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "scoreL4Coral"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "waitUntilArmDone"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "peg c to right feed"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "intakeCoral"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "waitUntilCoralIntaken"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "right feed to peg d"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "peg e to right feed"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "scoreL4Coral"
+            "name": "waitUntilCoralIntaken"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "right feed to peg d"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "peg d to right feed"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitUntilCoralIntaken"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "right feed to peg c"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "peg c to right feed"
           }
         }
       ]
