@@ -182,7 +182,7 @@ public class LocalizationCamera {
             }
         }
         SmartDashboard.putBoolean("vision/" + m_cameraName + "/isConnected", m_camera.isConnected());
-        SmartDashboard.putBoolean("vision/" + m_cameraName + "/isNewResult", getisNewResult());
+        SmartDashboard.putBoolean("vision/" + m_cameraName + "/isNewResult", getIsNewResult());
 
         SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Targets Seen", targetIds.stream().mapToDouble(Integer::doubleValue).toArray());
         SmartDashboard.putNumberArray("vision/" + m_cameraName + "/Target Pose Ambiguities", targetPoseAmbiguity.stream().mapToDouble(Double::doubleValue).toArray());
