@@ -193,6 +193,8 @@ public class LocalizationCamera {
 
         SmartDashboard.putBoolean("vision/" + m_cameraName + "/isEstPoseJumpy", isEstPoseJumpy());
         SmartDashboard.putNumberArray("vision/" + m_cameraName + "/standardDeviations", curStdDevs.getData());
+
+        SmartDashboard.putBoolean("isConnected/" + m_cameraName, m_camera.isConnected());
     }
 
   private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
