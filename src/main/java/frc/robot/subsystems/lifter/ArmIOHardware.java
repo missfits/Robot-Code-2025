@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -23,6 +24,7 @@ public class ArmIOHardware {
     private final TalonFX m_armMotor = new TalonFX(ArmConstants.ARM_MOTOR_ID);
     private final StatusSignal<Angle> m_positionSignal = m_armMotor.getPosition();
     private final StatusSignal<AngularVelocity> m_velocitySignal = m_armMotor.getVelocity();
+    private final StatusSignal<Current> m_currentSignal = m_armMotor.getStatorCurrent();
     private final StatusSignal<Voltage> m_voltageSignal = m_armMotor.getMotorVoltage();
     private final StatusSignal<Double> m_targetPositionSignal = m_armMotor.getClosedLoopReference();
     private final StatusSignal<Double> m_targetVelocitySignal = m_armMotor.getClosedLoopReferenceSlope();
@@ -69,6 +71,10 @@ public class ArmIOHardware {
         return m_velocitySignal.refresh().getValue().in(RevolutionsPerSecond)*ArmConstants.DEGREES_PER_ROTATION;
     }
 
+    public double getCurrent() {
+        return m_currentSignal.refresh().getValue().in(Amp);
+    }
+    
     public double getTargetVelocity() {
         return Math.toRadians(m_targetVelocitySignal.refresh().getValue()*ArmConstants.DEGREES_PER_ROTATION);
     }
