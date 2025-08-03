@@ -2,10 +2,13 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.units.Units;
 
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 
 import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -43,7 +46,7 @@ public class LEDSubsystem extends SubsystemBase {
     // Set the default command to turn the strip off, otherwise the last colors written by
     // the last command to run will continue to be displayed.
     // Note: Other default patterns could be used instead!
-    setDefaultCommand((runGradientBlueYellow()).withName("Off"));
+    setDefaultCommand((runScrollingBlueYellowCommand()).withName("Off"));
   }
 
 
@@ -108,5 +111,14 @@ public class LEDSubsystem extends SubsystemBase {
   public Command runGradientGreenYellow(){
     LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kGreen).scrollAtRelativeSpeed(Percent.per(Second).of(100));
     return runPattern(gradient);
-  }  
+  }
+
+  public Command runScrollingBlueYellowCommand(){
+    Distance ledSpacing = Meters.of(1 / 60.0);
+    LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kBlue);
+    LEDPattern pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(100));
+    LEDPattern absolute = base.scrollAtAbsoluteSpeed(Centimeters.per(Second).of(6.25), ledSpacing);
+    return runPattern(pattern);
+  }
+
 }

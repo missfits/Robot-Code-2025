@@ -288,7 +288,7 @@ public class RobotContainer {
 
     m_elevator.setDefaultCommand(m_elevator.keepInPlacePIDCommand());
     m_arm.setDefaultCommand(m_arm.keepInPlacePIDCommand());
-    m_ledSubsystem.setDefaultCommand(m_ledSubsystem.runGradientBlueYellow());
+    m_ledSubsystem.setDefaultCommand(m_ledSubsystem.runScrollingBlueYellowCommand());
 
 
     // LED and rumble feedback when coral is seen in ramp
