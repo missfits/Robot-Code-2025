@@ -125,6 +125,8 @@ public class ArmSubsystem extends SubsystemBase {
         return new RunCommand(() -> m_IO.setVoltage(0), this).ignoringDisable(true);
     }
 
+
+
     // helper commands
     private void initalizeMoveTo(TrapezoidProfile.State goal) {
         m_controller.reset();
@@ -294,5 +296,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command setCoastCommand() {
         return run(() -> m_IO.setCoast()).ignoringDisable(true);
+    }
+
+    public void resetPosition() {
+        m_IO.resetPosition();
     }
 }

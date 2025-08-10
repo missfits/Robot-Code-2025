@@ -480,7 +480,10 @@ public class RobotContainer {
     drivetrain.setBrake(false);
     m_lifter.setDisabledNeutralMode();
     m_climber.setDisabledNeutralMode();
+  }
 
+  public void resetArmToInitalPosition(){
+    m_arm.resetPosition();
   }
 
   public void setVoltageUponDisable() {
