@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     CommandScheduler.getInstance().cancelAll();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_robotContainer.resetArmToInitalPosition();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
