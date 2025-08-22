@@ -294,6 +294,8 @@ public final class Constants {
 
     public static final double C4_ELEVATOR_POS = 0.7043; // from 3/1
     public static final double C4_ARM_POS = -3.211; // from 3/1
+
+    public static final double C4_FORWARD_ARM_POS = 2*Math.PI + C4_ARM_POS; // swing arm forward
     
     public static final double C4_ELEVATOR_POS_WITH_CORAL = 0.7026; // from 3/1
     public static final double C4_ARM_POS_WITH_CORAL = -3.2239; // from 3/1

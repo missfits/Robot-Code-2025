@@ -9,6 +9,7 @@ public enum RobotState {
     L3_CORAL(RobotStateConstants.C3_ELEVATOR_POS, RobotStateConstants.C3_ARM_POS), 
     L3_CORAL_WITH_CORAL(RobotStateConstants.C3_ELEVATOR_POS_WITH_CORAL, RobotStateConstants.C3_ARM_POS_WITH_CORAL), 
     L4_CORAL(RobotStateConstants.C4_ELEVATOR_POS, RobotStateConstants.C4_ARM_POS), 
+    L4_CORAL_FORWARD(RobotStateConstants.C4_ELEVATOR_POS, RobotStateConstants.C4_FORWARD_ARM_POS), // arm swinging forward :>
     L4_CORAL_WITH_CORAL(RobotStateConstants.C4_ELEVATOR_POS_WITH_CORAL, RobotStateConstants.C4_ARM_POS_WITH_CORAL), 
     L2_ALGAE(RobotStateConstants.A2_ELEVATOR_POS, RobotStateConstants.A2_ARM_POS), 
     L3_ALGAE(RobotStateConstants.A3_ELEVATOR_POS, RobotStateConstants.A3_ARM_POS), 
