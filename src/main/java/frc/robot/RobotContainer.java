@@ -205,7 +205,7 @@ public class RobotContainer {
     );
 
     copilotJoystick.x().whileTrue(
-      m_collarCommandFactory.intakeCoralSequence2()
+      m_collarCommandFactory.intakeCoralSequence3()
     );
 
     // outtake from collar
