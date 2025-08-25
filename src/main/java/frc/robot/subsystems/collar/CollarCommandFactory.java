@@ -35,6 +35,18 @@ public class CollarCommandFactory {
             m_collar.runCollarOffInstant()).withName("intakeCoralSequence2");
     }
 
+    // uses the RampIn sensor 
+    public Command intakeCoralSequence3() {
+        return Commands.sequence(
+            // run collar at INTAKE_MOTOR_SPEED until either sensor sees the coral
+            m_collar.runCollar(CollarConstants.INTAKE_MOTOR_SPEED).until(m_rampSensors.coralSeenInRampTrigger().or(m_rampSensors.coralSeenAfterRampTrigger())),
+            // run collar at INTAKE_SECONDARY_MOTOR_SPEED until first sensor can't see coral
+            m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_MOTOR_SPEED).until(m_rampSensors.coralSeenInRampTrigger().negate()),
+            // run collar backwards? until the second sensor sees the coral
+            m_collar.runCollar(CollarConstants.INTAKE_SECONDARY_BACK_MOTOR_SPEED).until(m_rampSensors.coralSeenAfterRampTrigger())
+        ).withName("intakeCoralSequence3");
+    }
+
     public Command runCollarOut() {
         return m_collar.runCollar(CollarConstants.OUTTAKE_MOTOR_SPEED);
     }
