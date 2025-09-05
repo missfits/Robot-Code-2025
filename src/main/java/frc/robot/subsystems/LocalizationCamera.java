@@ -64,6 +64,8 @@ public class LocalizationCamera {
   private ArrayList<Pose2d> m_lastEstPoses = new ArrayList<>();
 
 
+  // LocalizationCamera is a camera object (each camera = separate LocalizationCamera object)
+  // All vision processing happens in LocalizationCamera class
   public LocalizationCamera(String cameraName, Transform3d robotToCam) {
     m_cameraName = cameraName;
     m_camera = new PhotonCamera(m_cameraName);
@@ -104,18 +106,21 @@ public class LocalizationCamera {
     return curStdDevs;
   }
 
+  // Updates the field simulation in elastic
   public void updateField(Pose2d newPos){
     m_estPoseField.setRobotPose(newPos);
 
     SmartDashboard.putData("est pose field/" + m_cameraName + "/", m_estPoseField);
   }
 
+  // processes all targets
+  // uses area, standard deviation checks (outlier results?), "jumpiness" (are readings sporadic/random-looking?), and "sane-ness" (are readings > pre-determined maximum constants?) 
   public void findTarget() {
 
       ArrayList<Integer> targetIds = new ArrayList<>();
       ArrayList<Double> targetPoseAmbiguity = new ArrayList<>();
 
-        var results = m_camera.getAllUnreadResults();
+        var results = m_camera.getAllUnreadResults(); // raw camera data
 
         if (!results.isEmpty()){
             // Camera processed a new frame since last
@@ -129,8 +134,8 @@ public class LocalizationCamera {
                 for (PhotonTrackedTarget sampleTarget : result.getTargets()){
                     targetIds.add(sampleTarget.getFiducialId());
                     targetPoseAmbiguity.add(sampleTarget.getPoseAmbiguity());
-                    //loops through every sample target in results.getTargets()
-                    //if the sample target's area is bigger than the biggestTargetArea, then the sample target
+                    // loops through every sample target in results.getTargets()
+                    // if the sample target's area is bigger than the biggestTargetArea, then the sample target
                     // is set to the target, and the biggest Target Area is set to the sample's target area
                     if (sampleTarget.getArea() > biggestTargetArea){
                         biggestTargetArea = sampleTarget.getArea();
@@ -197,6 +202,8 @@ public class LocalizationCamera {
         SmartDashboard.putBoolean("isConnected/" + m_cameraName, m_camera.isConnected());
     }
 
+
+  // Standard deviation measures how "spread out" / accurate a vision reading is
   private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
     if (estimatedPose.isEmpty()) {
       // No pose input. Default to single-tag std devs
@@ -241,6 +248,7 @@ public class LocalizationCamera {
     }
   }
 
+  // checks sporadic-ness of the vision readings based on the last 3 previous readings by comparing average distances
   public boolean isEstPoseJumpy() {
     if (m_lastEstPoses.size() < VisionConstants.NUM_LAST_EST_POSES) {
       return true;

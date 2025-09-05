@@ -30,7 +30,7 @@ public class VisionUtils {
         return robotPose.nearest(reefAprilTagPoses);
     } 
 
-
+    // sanity check: does the pose "read" by vision make sense? (based on predetermined maximum constants)
     public static boolean poseIsSane(Pose3d pose) {
         return pose.getZ() < VisionConstants.MAX_VISION_POSE_Z 
         && pose.getRotation().getX() < VisionConstants.MAX_VISION_POSE_ROLL 
