@@ -176,10 +176,10 @@ public class RobotContainer {
     
     driverJoystick.b().and(driverJoystick.leftBumper().negate()).whileTrue(m_climber.manualMoveCommand());
 
-    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_climber.deployClimberCommand());
-    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
+    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_climber.deployClimberCommand());
+    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
 
-    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_climber.liftClimberCommand());
+    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_climber.liftClimberCommand());
 
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
