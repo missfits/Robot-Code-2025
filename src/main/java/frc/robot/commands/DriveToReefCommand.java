@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -106,8 +107,11 @@ public class DriveToReefCommand extends Command {
 
       targetRotation = targetPose.getRotation().plus(Rotation2d.fromRadians(Math.PI));
 
-      xController.reset(m_drivetrain.getState().Pose.getX());
-      yController.reset(m_drivetrain.getState().Pose.getY());
+      ChassisSpeeds robotCentricSpeeds = m_drivetrain.getState().Speeds;
+      ChassisSpeeds fieldCentricSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(robotCentricSpeeds, m_drivetrain.getState().Pose.getRotation());
+
+      xController.reset(new TrapezoidProfile.State(m_drivetrain.getState().Pose.getX(), fieldCentricSpeeds.vxMetersPerSecond));
+      yController.reset(new TrapezoidProfile.State(m_drivetrain.getState().Pose.getY(), fieldCentricSpeeds.vyMetersPerSecond));
 
       driveRequest.HeadingController = new PhoenixPIDController(DrivetrainConstants.AUTOALIGN_POSITION_P, DrivetrainConstants.AUTOALIGN_POSITION_I, DrivetrainConstants.AUTOALIGN_POSITION_D);
       driveRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
