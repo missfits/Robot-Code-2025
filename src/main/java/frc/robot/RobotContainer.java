@@ -176,15 +176,15 @@ public class RobotContainer {
     
     driverJoystick.b().and(driverJoystick.leftBumper().negate()).whileTrue(m_climber.manualMoveCommand());
 
-    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_climber.deployClimberCommand());
-    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
+    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_climber.deployClimberCommand());
+    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_lifter.moveToCommand(RobotState.CLIMB));
 
-    driverJoystick.leftBumper().and(driverJoystick.y()).onTrue(m_climber.liftClimberCommand());
+    driverJoystick.leftBumper().and(driverJoystick.b()).onTrue(m_climber.liftClimberCommand());
 
     // drive facing angle buttons
     // can be pressed alone for rotation or pressed with joystick input
     // snap to left coral station
-    driverJoystick.x().whileTrue(drivetrain.getCommandFromRequest(() -> {
+    driverJoystick.x().and(driverJoystick.leftBumper().negate()).whileTrue(drivetrain.getCommandFromRequest(() -> {
       JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
@@ -197,6 +197,14 @@ public class RobotContainer {
       return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
         .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
         .withTargetDirection(Rotation2d.fromDegrees(55));
+    }));
+
+    // snap to cage 
+    driverJoystick.x().and(driverJoystick.leftBumper()).whileTrue(drivetrain.getCommandFromRequest(() -> {
+      JoystickVals shapedValues = Controls.adjustDrivetrainInputs(driverJoystick.getLeftX(), driverJoystick.getLeftY(), driverJoystick.rightBumper().getAsBoolean(), m_elevator.isTallTrigger().getAsBoolean());
+      return driveFacingAngle.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+        .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
+        .withTargetDirection(Rotation2d.fromDegrees(0));
     }));
 
     // move to intake, start collar 
