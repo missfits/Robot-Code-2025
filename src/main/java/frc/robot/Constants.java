@@ -272,7 +272,7 @@ public final class Constants {
     public static final int LASER_CAN_RAMP_IN_ID = 15;
 
     public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_OUT = 20; // in mm
-    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 300; // in mm
+    public static final double MIN_CORAL_SEEN_DISTANCE_RAMP_IN = 20; // in mm
 
   }
 
