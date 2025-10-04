@@ -45,6 +45,25 @@ public class LifterCommandFactory {
                     m_elevator.moveToCommand(targetRobotState.getElevatorPos())
                 )
             ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("moveToL4Command");
+        } else if (targetRobotState == RobotState.L4_CORAL_FORWARD) { 
+            // moves arm and elevator in parallel for maximum speed 
+
+            // keep elevator at intermediate pos to let arm clear ramp
+            double elevatorIntermediatePosition = Math.max(targetRobotState.getElevatorPos(), 
+                ElevatorConstants.MIN_POS_ARM_CLEAR);
+        
+            return Commands.parallel(
+                Commands.sequence( 
+                    m_arm.moveToCommand(targetRobotState.getArmPos())
+                ), 
+                Commands.sequence(
+                    Commands.waitSeconds(3).until(m_arm.isArmInsideRobotTrigger()),
+                    m_elevator.moveToCommand(elevatorIntermediatePosition)
+                        .until(m_arm.okToMoveElevatorDownTrigger()),
+                    m_elevator.moveToCommand(targetRobotState.getElevatorPos())
+                )
+            ).until(isLifterAtGoal(targetRobotState.getArmPos(), targetRobotState.getElevatorPos())).withName("moveToL4ForwardCommand");
+        
         } else {
             // move arm to intermediate pos inside the robot before moving elevator
             double armIntermediatePosition = MathUtil.clamp(targetRobotState.getArmPos(), 

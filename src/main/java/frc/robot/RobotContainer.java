@@ -391,11 +391,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("scoreL1Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L1_CORAL)));
     NamedCommands.registerCommand("scoreL2Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L2_CORAL)));
     NamedCommands.registerCommand("scoreL3Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L3_CORAL)));
-    NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL)));
+    NamedCommands.registerCommand("scoreL4Coral", createScoreCommand(m_lifter.moveToCommand(RobotState.L4_CORAL_FORWARD)));
     NamedCommands.registerCommand("shootCoral", new ParallelRaceGroup(
       new PIDToTargetCommand(drivetrain, () -> m_ppTargetPose), 
       Commands.sequence(  
-        (new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL.getArmPos(), RobotState.L4_CORAL.getElevatorPos()))), 
+        (new WaitCommand(1).until(m_lifter.isLifterAtGoal(RobotState.L4_CORAL_FORWARD.getArmPos(), RobotState.L4_CORAL_FORWARD.getElevatorPos()))), 
         m_collarCommandFactory.runCollarOut().withTimeout(0.5).asProxy(), 
         m_collar.runCollarOffInstant().asProxy())));
     NamedCommands.registerCommand("waitUntilCoralIntaken", new WaitCommand(2).until(m_rampSensor.coralSeenAfterRampTrigger()));
