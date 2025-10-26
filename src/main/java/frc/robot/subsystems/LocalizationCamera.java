@@ -61,7 +61,7 @@ public class LocalizationCamera {
   private PhotonPoseEstimator poseEstimator;
 
   private PhotonTrackedTarget m_target;
-  private ArrayList<Pose2d> m_lastEstPoses = new ArrayList<>();
+  private ArrayList<EstimatedRobotPose> m_lastEstPoses = new ArrayList<>();
 
 
   // LocalizationCamera is a camera object (each camera = separate LocalizationCamera object)
@@ -171,7 +171,7 @@ public class LocalizationCamera {
                 estimatedRobotPose = poseEstimatorOutput.get(); 
       
                 // update our last n poses
-                m_lastEstPoses.add(estimatedRobotPose.estimatedPose.toPose2d());
+                m_lastEstPoses.add(estimatedRobotPose);
                 if (m_lastEstPoses.size() > VisionConstants.NUM_LAST_EST_POSES) {
                   m_lastEstPoses.remove(0);
                 }
@@ -255,15 +255,26 @@ public class LocalizationCamera {
     }
 
     double totalDistance = 0;
+    double totalTime = 0;
 
     for (int i = 0; i < m_lastEstPoses.size() - 1; i++) {
       // add distance between ith pose and i+1th pose
-      totalDistance += Math.abs(m_lastEstPoses.get(i).minus(m_lastEstPoses.get(i + 1)).getTranslation().getNorm());
+      totalDistance += Math.abs(m_lastEstPoses.get(i).estimatedPose.toPose2d().minus(m_lastEstPoses.get(i + 1).estimatedPose.toPose2d()).getTranslation().getNorm());
+      totalTime += Math.abs(m_lastEstPoses.get(i).timestampSeconds - m_lastEstPoses.get(i+1).timestampSeconds);
     }
 
     double avgDist = totalDistance / m_lastEstPoses.size();
-    SmartDashboard.putNumber("vision/" + m_cameraName + "/avgDistBetweenLastEstPoses", avgDist);
+    double avgTime = totalTime / m_lastEstPoses.size();
+    if (avgTime == 0){
+      return true;
+    }
+    double avgSpeed = avgDist/avgTime;
 
-    return avgDist > VisionConstants.MAX_AVG_DIST_BETWEEN_LAST_EST_POSES;
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/avgDistBetweenLastEstPoses", avgDist);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/avgSpeedBetweenLastEstPoses", avgSpeed);
+    SmartDashboard.putNumber("vision/" + m_cameraName + "/avgTimeBetweenLastEstPoses", avgTime);
+
+
+    return avgSpeed > VisionConstants.MAX_AVG_SPEED_BETWEEN_LAST_EST_POSES;
   }
 }

@@ -263,7 +263,8 @@ public final class Constants {
     public static final double TARGET_HEIGHT = 0.3048; // in meters to the middle of the apriltag on reef
     public static final double TARGET_PITCH = 0;
 
-    public static final double MAX_AVG_DIST_BETWEEN_LAST_EST_POSES = 0.3; // in meters 
+    public static final double MAX_AVG_DIST_BETWEEN_LAST_EST_POSES = 0.3;
+    public static final double MAX_AVG_SPEED_BETWEEN_LAST_EST_POSES = MAX_AVG_DIST_BETWEEN_LAST_EST_POSES * 50.; // in meters 
     public static final int NUM_LAST_EST_POSES = 3;
   }
 
