@@ -30,6 +30,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -42,13 +43,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DrivetrainConstants;
-
+import frc.robot.generated.TunerConstantsDynamene;
 import frc.robot.generated.TunerSwerveDrivetrainContainer.TunerSwerveDrivetrain;
+import frc.robot.utils.MapleSimSwerveDrivetrain;
 
 
 /**
@@ -154,14 +157,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineRotation;
 
-    public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
-        super(driveTrainConstants, OdometryUpdateFrequency, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
-    }
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
-        super(driveTrainConstants, modules);
+        super(driveTrainConstants, MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules));
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -214,20 +211,31 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
+
+    private MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
+    
+    @SuppressWarnings("unchecked")
     private void startSimThread() {
-        m_lastSimTime = Utils.getCurrentTimeSeconds();
-
+        mapleSimSwerveDrivetrain = new MapleSimSwerveDrivetrain(
+            Seconds.of(kSimLoopPeriod),
+            // TODO: modify the following constants according to your robot
+            Pounds.of(115), // robot weight
+            Inches.of(30), // bumper length
+            Inches.of(30), // bumper width
+            DCMotor.getKrakenX60(1), // drive motor type
+            DCMotor.getFalcon500(1), // steer motor type
+            1.2, // wheel COF
+            getModuleLocations(),
+            getPigeon2(),
+            getModules(),
+            TunerConstantsDynamene.FrontLeft,
+            TunerConstantsDynamene.FrontRight,
+            TunerConstantsDynamene.BackLeft,
+            TunerConstantsDynamene.BackRight);
         /* Run simulation at a faster rate so PID gains behave more reasonably */
-        m_simNotifier = new Notifier(() -> {
-            final double currentTime = Utils.getCurrentTimeSeconds();
-            double deltaTime = currentTime - m_lastSimTime;
-            m_lastSimTime = currentTime;
-
-            /* use the measured time delta, get battery voltage from WPILib */
-            updateSimState(deltaTime, RobotController.getBatteryVoltage());
-        });
+        m_simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
         m_simNotifier.startPeriodic(kSimLoopPeriod);
-    }
+}
 
     /**
      * Runs the SysId Quasistatic test in the given direction for the routine
@@ -262,11 +270,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         super.resetRotation(rotation);
     }
 
+    @Override
+    public void resetPose(Pose2d pose) {
+        if (this.mapleSimSwerveDrivetrain != null)
+            mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
+        Timer.delay(0.05); // Wait for simulation to update
+        super.resetPose(pose);
+}
+
     public void resetFusedPose(Pose2d newPose){
         if (newPose != null) {
             this.resetPose(newPose);
         }
     }
+
 
     // sets all motors' (including steer) neutral modes to coast (false) or brake (true)
     public void setBrake(boolean brake) {

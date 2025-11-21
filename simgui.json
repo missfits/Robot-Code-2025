@@ -4,11 +4,16 @@
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
       "/Shuffleboard/Comp HUD/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Actual Field": "Field2d",
       "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/Module 0": "Mechanism2d",
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
-      "/SmartDashboard/Module 3": "Mechanism2d"
+      "/SmartDashboard/Module 3": "Mechanism2d",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/arm/subsystem": "Subsystem",
+      "/SmartDashboard/collar/subsystem": "Subsystem",
+      "/SmartDashboard/elevator/subsystem": "Subsystem"
     },
     "windows": {
       "/Pose": {

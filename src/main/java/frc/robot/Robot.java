@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
+
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -96,6 +98,8 @@ public class Robot extends TimedRobot {
   public void testExit() {}
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    SimulatedArena.getInstance().simulationPeriodic();
+  }
   
 }
