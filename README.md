@@ -21,7 +21,7 @@ The goal of 2025's game is to pick up "coral" (PVC pipes) and place it on a reef
 - PathPlannerLib 2025.2.5
 - libgrapplefrc 2025.1.3 (LaserCAN)
 
-## Elevator and arm
+## Elevator and Arm
 
 Each mechanism runs a trapezoid profile and computes its own feedforward
 (`ElevatorFeedforward` / `ArmFeedforward` with kS, kG, kV) on top of position PID, rather
@@ -36,7 +36,7 @@ This is gated by `isArmInsideRobotTrigger`.
 Level 4 has its own path because the arm goes over the top, and is gated 
 by the `okToMoveArmBackTrigger`, since it has to avoid the coral input ramp. 
 
-## Automatic alignment
+## Automatic Alignment
 
 `DriveToReefCommand` picks the closest reef AprilTag to the current pose, offsets the target
 by robot width and left/right branch offset, and drives there with profiled PID on x and y
@@ -81,6 +81,6 @@ src/main/deploy/pathplanner/ # Paths and autos
 ```
 
 
-## Running it
+## Running the Project
 
 Standard WPILib project: open in VS Code with the WPILib extension, deploy to the roboRIO.
