@@ -56,6 +56,7 @@ registered in `RobotContainer`. We ran 1-piece center and 3-piece left/right aut
 
 ## Project Structure
 
+```
 src/main/java/frc/robot/
 ├── Robot.java
 ├── RobotContainer.java # Init, bindings, auto chooser, robot selection
@@ -77,6 +78,7 @@ src/main/java/frc/robot/
 └── generated/ # TunerConstants for each robot
 
 src/main/deploy/pathplanner/ # Paths and autos
+```
 
 
 ## Running it
